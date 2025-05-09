@@ -1,0 +1,44 @@
+@use '@angular/material' as mat;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// @import 'tailwindcss';
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+  color: var(--mat-sys-on-surface);
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--mat-sys-surface);
+}
+
+:root {
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: #006a6a,
+      // container-text-color: red,
+    )
+  );
+
+  // @include mat.tabs-overrides(
+  //   (
+  //     // active-indicator-color: orange,
+  //     // divider-color: red,
+  //     background-color: transparent
+  //   )
+  // );
+
+  .mat-mdc-card-title {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.WR {
+  color: green;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "dynasty-rookie-rankings-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/dynasty-rookie-rankings-e2e/src",
+  "implicitDependencies": ["dynasty-rookie-rankings"],
+  "// targets": "to see all targets run: nx show project dynasty-rookie-rankings-e2e --web",
+  "targets": {}
+}

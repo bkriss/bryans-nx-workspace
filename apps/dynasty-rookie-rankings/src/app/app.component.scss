@@ -1,0 +1,19 @@
+.rank {
+  display: grid;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  color: black;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background-color: white;
+
+  margin-right: 15px;
+}
+
+.main-content {
+  padding: 20px 50px;
+}
+
+// Customize the entire app. Change :root to your selector if you want to scope the styles.
