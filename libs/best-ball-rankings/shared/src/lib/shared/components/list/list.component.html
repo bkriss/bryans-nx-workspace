@@ -1,0 +1,26 @@
+<dx-list
+  [dataSource]="items"
+  displayExpr="name"
+  (onItemReordered)="onItemReordered()"
+  (onItemClick)="onItemClick($event)"
+  (onSelectionChanged)="onSelectionChanged($event)"
+  [repaintChangesOnly]="true"
+  [searchEnabled]="true"
+  searchMode="contains"
+  selectionMode="none"
+>
+  <dxo-item-dragging [allowReordering]="true"> </dxo-item-dragging>
+
+  <div *dxTemplate="let item of 'item'">
+    <div class="grid grid-flow-col gap-3 items-center justify-start">
+      <span class="rank">{{ item.rank }}</span>
+      <span class="text-md">{{ item.name }}</span>
+
+      <div class="grid grid-flow-col gap-1 text-xs">
+        <span class="{{ item?.position }}">{{ item?.position }}</span>
+        <span>&bull;</span>
+        <span class="text-300">{{ item?.teamLongName }}</span>
+      </div>
+    </div>
+  </div>
+</dx-list>

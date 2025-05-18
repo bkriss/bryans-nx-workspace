@@ -1,0 +1,43 @@
+<h1>
+  <fa-icon class="text-3xl" [icon]="faFootball"></fa-icon>
+  Best Ball Rankings
+</h1>
+
+<ng-container *ngIf="selectedPlayers().length">
+  <div class="grid grid-flow-col gap-3 mb-4">
+    <div *ngFor="let selectedPlayer of selectedPlayers()">
+      <lib-player-card
+        (closeCard)="closeSelectedCard($event)"
+        [player]="selectedPlayer"
+      ></lib-player-card>
+    </div>
+  </div>
+</ng-container>
+
+<div class="grid grid-flow-col items-end justify-space-between mb-4">
+  <span class="text-md italic">Click players below to compare</span>
+
+  <dx-button
+    class="justify-self-end"
+    icon="plus"
+    (onClick)="openAddPlayerModal()"
+    stylingMode="contained"
+    text="Add Player"
+    type="default"
+  >
+  </dx-button>
+</div>
+
+<shared-bbr-list
+  [items]="players()"
+  (reorderItems)="reorderPlayers($event)"
+  (selectionChanged)="onSelectionChanged($event)"
+></shared-bbr-list>
+
+<lib-save-player-modal
+  [isPopupVisible]="isPopupVisible"
+  (closePlayerModal)="closePlayerModal()"
+  [currentNumberOfPlayers]="players().length"
+  [teams]="teams"
+  (updatePlayersList)="updatePlayersList($event)"
+></lib-save-player-modal>

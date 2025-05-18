@@ -1,0 +1,26 @@
+.rank {
+  height: 22px;
+  width: 38px;
+  background-color: #b9c4d4;
+  border-radius: 6px;
+  display: inline-block;
+  line-height: 22px;
+  color: #181c28;
+  text-align: center;
+}
+
+.QB {
+  color: var(--qb-red);
+}
+
+.RB {
+  color: var(--rb-green);
+}
+
+.WR {
+  color: var(--wr-blue);
+}
+
+.TE {
+  color: var(--te-orange);
+}

@@ -1,0 +1,85 @@
+<dx-popup
+  contentTemplate="popup-content"
+  [hideOnOutsideClick]="true"
+  title="Add Player"
+  [(visible)]="isPopupVisible"
+>
+  <div *dxTemplate="let data of 'popup-content'">
+    <form
+      [formGroup]="playerForm"
+      class="gap-4 grid content-center"
+      (ngSubmit)="savePlayer()"
+    >
+      <!-- Name -->
+      <dx-text-box
+        formControlName="name"
+        label="Name"
+        labelMode="static"
+        placeholder="Name"
+      ></dx-text-box>
+      <!-- Team -->
+      <dx-select-box
+        displayExpr="teamLongName"
+        formControlName="teamId"
+        [items]="teams"
+        label="Team"
+        labelMode="static"
+        valueExpr="teamId"
+      ></dx-select-box>
+      <!-- Position -->
+      <dx-select-box
+        displayExpr="name"
+        formControlName="position"
+        [items]="positions"
+        label="Position"
+        labelMode="static"
+        valueExpr="id"
+      ></dx-select-box>
+      <!-- Optimism -->
+      <dx-text-area
+        formControlName="reasonsForOptimism"
+        label="Reasons For Optimism"
+        labelMode="static"
+        placeholder="Why might this player have a great season?"
+      ></dx-text-area>
+      <!-- Concern -->
+      <dx-text-area
+        formControlName="reasonsForConcern"
+        label="Reasons For Concern"
+        labelMode="static"
+        placeholder="Why might this player be a bust?"
+      ></dx-text-area>
+
+      <!-- Save -->
+      <div class="grid grid-flow-col gap-[10px] justify-stretch">
+        <dx-button
+          class=""
+          icon="close"
+          (onClick)="cancel()"
+          stylingMode="contained"
+          text="Close"
+          type="normal"
+        >
+        </dx-button>
+        <dx-button
+          class=""
+          icon="plus"
+          (onClick)="savePlayer(false, false)"
+          stylingMode="contained"
+          text="Save and Add Another"
+          type="default"
+        >
+        </dx-button>
+        <dx-button
+          class=""
+          icon="save"
+          (onClick)="savePlayer(false, true)"
+          stylingMode="contained"
+          text="Save and Close"
+          type="success"
+        >
+        </dx-button>
+      </div>
+    </form>
+  </div>
+</dx-popup>

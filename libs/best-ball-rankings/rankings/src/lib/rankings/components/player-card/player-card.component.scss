@@ -1,0 +1,57 @@
+.card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  background-color: #2a3846;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.card-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.QB,
+.RB,
+.WR,
+.TE {
+  color: white;
+  border-radius: 8px;
+  display: inline-block;
+  line-height: 20px;
+  width: 34px;
+  text-align: center;
+  border: 1px solid;
+}
+
+.QB {
+  background-color: var(--qb-red);
+  border-color: var(--qb-red);
+}
+
+.RB {
+  background-color: var(--rb-green);
+  border-color: var(--rb-green);
+}
+
+.WR {
+  background-color: var(--wr-blue);
+  border-color: var(--wr-blue);
+}
+
+.TE {
+  background-color: var(--te-orange);
+  border-color: var(--te-orange);
+}

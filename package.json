@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "npx nx serve dynasty-rookie-rankings"
+    "start-bbr": "npx nx serve best-ball-rankings",
+    "start-drr": "npx nx serve dynasty-rookie-rankings"
   },
   "private": true,
   "dependencies": {
@@ -16,7 +17,11 @@
     "@angular/platform-browser": "~19.2.0",
     "@angular/platform-browser-dynamic": "~19.2.0",
     "@angular/router": "~19.2.0",
+    "@fortawesome/angular-fontawesome": "^1.0.0",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@tailwindcss/postcss": "^4.1.5",
+    "devextreme": "24.2.7",
+    "devextreme-angular": "24.2.7",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.5",
