@@ -6,7 +6,6 @@
   background-color: #2a3846;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
-  cursor: pointer;
 
   &:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -54,4 +53,13 @@
 .TE {
   background-color: var(--te-orange);
   border-color: var(--te-orange);
+}
+
+// TODO: Figure out how to use tailwind class for this
+.thumbs-down {
+  color: var(--qb-red);
+}
+
+.thumbs-up {
+  color: var(--rb-green);
 }

@@ -4,7 +4,7 @@
 </h1>
 
 <ng-container *ngIf="selectedPlayers().length">
-  <div class="grid grid-flow-col gap-3 mb-4">
+  <div class="grid grid-cols-2 gap-3 mb-4">
     <div *ngFor="let selectedPlayer of selectedPlayers()">
       <lib-player-card
         (closeCard)="closeSelectedCard($event)"
@@ -15,7 +15,7 @@
 </ng-container>
 
 <div class="grid grid-flow-col items-end justify-space-between mb-4">
-  <span class="text-md italic">Click players below to compare</span>
+  <span class="text-md italic">Click on two players below to compare</span>
 
   <dx-button
     class="justify-self-end"
@@ -28,6 +28,8 @@
   </dx-button>
 </div>
 
+<ng-container *ngIf="isLoading()">Loading...</ng-container>
+
 <shared-bbr-list
   [items]="players()"
   (reorderItems)="reorderPlayers($event)"
@@ -39,5 +41,4 @@
   (closePlayerModal)="closePlayerModal()"
   [currentNumberOfPlayers]="players().length"
   [teams]="teams"
-  (updatePlayersList)="updatePlayersList($event)"
 ></lib-save-player-modal>

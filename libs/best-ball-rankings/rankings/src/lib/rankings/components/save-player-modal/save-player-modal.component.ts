@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  inject,
   Input,
   Output,
 } from '@angular/core';
@@ -17,6 +18,7 @@ import {
 } from 'devextreme-angular';
 import { Position } from '../../enums';
 import { Player, Team } from '../../models';
+import { RankingsService } from '../../services';
 
 @Component({
   selector: 'lib-save-player-modal',
@@ -40,7 +42,8 @@ export class SavePlayerModalComponent {
   @Input() isPopupVisible = false;
   @Input() teams: Team[] = [];
   @Output() closePlayerModal = new EventEmitter();
-  @Output() updatePlayersList = new EventEmitter<Player>();
+  // @Output() updatePlayersList = new EventEmitter<Player>();
+  private rankingsService = inject(RankingsService);
 
   playerForm = new FormGroup({
     name: new FormControl<string>(''),
@@ -78,10 +81,13 @@ export class SavePlayerModalComponent {
 
     // TODO: Save player to the backend or local storage
 
-    this.updatePlayersList.emit(newPlayer);
+    // this.updatePlayersList.emit(newPlayer);
+
+    this.rankingsService.addPlayer(newPlayer);
 
     this.playerForm.reset();
 
+    // TODO: Subscribe to Observable and move this code inside the subscription
     if (closeAfterSave) {
       this.closePlayerModal.emit();
     }
