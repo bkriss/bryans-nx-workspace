@@ -28,13 +28,27 @@
   </dx-button>
 </div>
 
-<ng-container *ngIf="isLoading()">Loading...</ng-container>
+<!-- <ng-container *ngIf="isLoading()">Loading...</ng-container> -->
 
+@if (isLoading()) {
+<!-- <div class="flex justify-center items-center h-96">
+  <dx-load-indicator></dx-load-indicator>
+</div> -->
+<div>Loading...</div>
+} @else if (errorMessage()) {
+<div>Error: {{ errorMessage() }}</div>
+} @else {
 <shared-bbr-list
   [items]="players()"
   (reorderItems)="reorderPlayers($event)"
   (selectionChanged)="onSelectionChanged($event)"
 ></shared-bbr-list>
+}
+
+<!-- <h1>Testing New For Loop</h1>
+@for (let player of players(); track player.id) {
+<div>{{ player.name }}</div>
+}  -->
 
 <lib-save-player-modal
   [isPopupVisible]="isPopupVisible"

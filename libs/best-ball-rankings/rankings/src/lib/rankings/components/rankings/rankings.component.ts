@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   OnInit,
+  Signal,
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -41,19 +42,28 @@ export class RankingsComponent implements OnInit {
   private rankingsService = inject(RankingsService);
 
   faFootball = faFootball;
-  isLoading = this.rankingsService.isLoading;
+  // isLoading = this.rankingsService.isLoading;
   isPopupVisible = false;
   // toSignal is readonly and automatically subscribes and unsubscribes to the observable
   // players = toSignal<Player[]>(this.players$, {
   //   initialValue: [] as Player[],
   // });
-  players = this.rankingsService.playerRankings;
+  // players = this.rankingsService.playerRankings;
   selectedPlayers = signal<Player[]>([]);
   teams = teams;
   test1 = signal<number>(1);
   test2 = signal<number>(2);
   // This is a computed property that will automatically update when test1 or test2 changes
   example = computed(() => this.test1() + this.test2());
+
+  // TODO: Refactor this so that the API isn't hit every time the component is initialized
+  rankingsResource = this.rankingsService.getPlayerRankings();
+  players = this.rankingsResource.value;
+  isLoading = this.rankingsResource.isLoading;
+  error = this.rankingsResource.error;
+  // errorMessage = computed(() => this.error() ? this.error()?.message : '');
+  // TODO: Why does above errorMessage not work?
+  errorMessage = computed(() => (this.error() ? 'There was an error' : ''));
 
   constructor() {
     effect(() => console.log('players:: ', this.players()));
@@ -69,7 +79,9 @@ export class RankingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rankingsService.getPlayerRankings();
+    if (this.players()?.length === 0) {
+      this.rankingsService.getPlayerRankings();
+    }
   }
 
   onSelectionChanged(selectedPlayer: Player) {
