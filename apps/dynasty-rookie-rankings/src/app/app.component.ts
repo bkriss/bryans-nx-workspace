@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
-import { CommonModule, NgFor } from '@angular/common';
+
 // import { NxWelcomeComponent } from './nx-welcome.component';
 import { MatCardModule } from '@angular/material/card';
 
@@ -52,9 +52,8 @@ enum Position {
     MatTabsModule,
     MatToolbarModule,
     ReactiveFormsModule,
-    RouterModule,
-    NgFor,
-  ],
+    RouterModule
+],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

@@ -6,14 +6,14 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { DxListComponent, DxListModule } from 'devextreme-angular';
 import { ItemClickEvent, SelectionChangedEvent } from 'devextreme/ui/list';
 
 @Component({
   selector: 'shared-bbr-list',
   standalone: true,
-  imports: [CommonModule, DxListModule],
+  imports: [DxListModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

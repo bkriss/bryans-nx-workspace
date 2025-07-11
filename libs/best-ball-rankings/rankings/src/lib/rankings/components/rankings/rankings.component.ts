@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { ListComponent } from '@bryans-nx-workspace/bbr/shared';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faFootball } from '@fortawesome/free-solid-svg-icons';
@@ -28,11 +28,9 @@ import { HttpClient } from '@angular/common/http';
     DxButtonModule,
     FontAwesomeModule,
     ListComponent,
-    NgFor,
-    NgIf,
     PlayerCardComponent,
-    SavePlayerModalComponent,
-  ],
+    SavePlayerModalComponent
+],
   standalone: true,
   templateUrl: './rankings.component.html',
   styleUrl: './rankings.component.scss',

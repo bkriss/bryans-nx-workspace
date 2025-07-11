@@ -6,7 +6,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {
   DxButtonModule,
@@ -23,15 +23,14 @@ import { RankingsService } from '../../services';
 @Component({
   selector: 'lib-save-player-modal',
   imports: [
-    CommonModule,
     DxButtonModule,
     DxCheckBoxModule,
     DxSelectBoxModule,
     DxPopupModule,
     DxTextAreaModule,
     DxTextBoxModule,
-    ReactiveFormsModule,
-  ],
+    ReactiveFormsModule
+],
   standalone: true,
   templateUrl: './save-player-modal.component.html',
   styleUrl: './save-player-modal.component.scss',

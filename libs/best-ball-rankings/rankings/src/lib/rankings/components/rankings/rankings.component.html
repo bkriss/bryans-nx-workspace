@@ -3,16 +3,18 @@
   Best Ball Rankings
 </h1>
 
-<ng-container *ngIf="selectedPlayers().length">
+@if (selectedPlayers().length) {
   <div class="grid grid-cols-2 gap-3 mb-4">
-    <div *ngFor="let selectedPlayer of selectedPlayers()">
-      <lib-player-card
-        (closeCard)="closeSelectedCard($event)"
-        [player]="selectedPlayer"
-      ></lib-player-card>
-    </div>
+    @for (selectedPlayer of selectedPlayers(); track selectedPlayer) {
+      <div>
+        <lib-player-card
+          (closeCard)="closeSelectedCard($event)"
+          [player]="selectedPlayer"
+        ></lib-player-card>
+      </div>
+    }
   </div>
-</ng-container>
+}
 
 <div class="grid grid-flow-col items-end justify-space-between mb-4">
   <span class="text-md italic">Click on two players below to compare</span>
@@ -24,35 +26,35 @@
     stylingMode="contained"
     text="Add Player"
     type="default"
-  >
+    >
   </dx-button>
 </div>
 
 <!-- <ng-container *ngIf="isLoading()">Loading...</ng-container> -->
 
 @if (isLoading()) {
-<!-- <div class="flex justify-center items-center h-96">
+  <!-- <div class="flex justify-center items-center h-96">
   <dx-load-indicator></dx-load-indicator>
 </div> -->
 <div>Loading...</div>
 } @else if (errorMessage()) {
-<div>Error: {{ errorMessage() }}</div>
+  <div>Error: {{ errorMessage() }}</div>
 } @else {
-<shared-bbr-list
-  [items]="players()"
-  (reorderItems)="reorderPlayers($event)"
-  (selectionChanged)="onSelectionChanged($event)"
-></shared-bbr-list>
+  <shared-bbr-list
+    [items]="players()"
+    (reorderItems)="reorderPlayers($event)"
+    (selectionChanged)="onSelectionChanged($event)"
+  ></shared-bbr-list>
 }
 
 <!-- <h1>Testing New For Loop</h1>
 @for (let player of players(); track player.id) {
-<div>{{ player.name }}</div>
-}  -->
+  <div>{{ player.name }}</div>
+  }  -->
 
-<lib-save-player-modal
-  [isPopupVisible]="isPopupVisible"
-  (closePlayerModal)="closePlayerModal()"
-  [currentNumberOfPlayers]="players().length"
-  [teams]="teams"
-></lib-save-player-modal>
+  <lib-save-player-modal
+    [isPopupVisible]="isPopupVisible"
+    (closePlayerModal)="closePlayerModal()"
+    [currentNumberOfPlayers]="players().length"
+    [teams]="teams"
+  ></lib-save-player-modal>
