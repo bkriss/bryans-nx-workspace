@@ -86,10 +86,8 @@
       "unitTestRunner": "jest"
     },
     "@nx/angular:library": {
-      "lazy": true,
       "changeDetection": "OnPush",
       "linter": "eslint",
-      "routing": true,
       "style": "scss",
       "unitTestRunner": "jest"
     },
