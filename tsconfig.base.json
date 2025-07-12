@@ -18,6 +18,7 @@
       "@bryans-nx-workspace/bbr/shared": [
         "libs/best-ball-rankings/shared/src/index.ts"
       ],
+      "@bryans-nx-workspace/dfs": ["libs/draftkings/dfs/src/index.ts"],
       "@bryans-nx-workspace/rankings": [
         "libs/best-ball-rankings/rankings/src/index.ts"
       ]
