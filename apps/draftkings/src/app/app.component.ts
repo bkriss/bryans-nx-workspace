@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
+import { HeaderComponent } from '@bryans-nx-workspace/draftkings-shared';
 
 @Component({
-  imports: [RouterModule, MatButtonModule],
+  imports: [HeaderComponent, RouterModule],
   selector: 'dk-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
