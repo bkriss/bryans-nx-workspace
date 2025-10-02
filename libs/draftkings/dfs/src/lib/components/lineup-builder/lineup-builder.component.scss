@@ -1,0 +1,45 @@
+@use '@angular/material' as mat;
+
+.lineup-card {
+  @include mat.list-overrides(
+    (
+      list-item-one-line-container-height: 40px,
+    )
+  );
+}
+
+.lineup-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  //   padding: 8px;
+  //   margin: 16px 0;
+  background-color: #2a3846;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &.error {
+    border-color: red;
+
+    .remaining-salary {
+      border-color: red;
+
+      // .amount {
+      //   color: red;
+      // }
+    }
+  }
+}
+
+.remaining-salary {
+  //   font-weight: 600;
+  //   font-size: 16px;
+  //   margin-top: 8px;
+  //   background-color: var(--border-color);
+
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}

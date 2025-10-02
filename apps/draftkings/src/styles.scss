@@ -1,8 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@use 'tailwindcss';
+
+// @tailwind base;
+// @tailwind components;
+// @tailwind utilities;
+
+// @use 'styles/_dx-overrides';
+
+:root {
+  --qb-red: #fc2b6d;
+  --rb-green: #20ceb7;
+  --wr-blue: #59a6ff;
+  --te-orange: #feae58;
+  --flex-purple: #c96cff;
+  --dst-brown: #bf5f40;
+  --border-color: #414b5f;
+  --background-color: #1e2832;
+}
 
 /* You can add global styles to this file, and also import other style files */
 body {
   margin: 0;
+  background-color: var(--background-color);
+  color: #fff;
+  font-weight: 400;
+  font-size: 14px;
+  font-family: 'Helvetica Neue', 'Segoe UI', helvetica, verdana, sans-serif;
+  line-height: 1.35715;
 }

@@ -29,8 +29,8 @@ import { HttpClient } from '@angular/common/http';
     FontAwesomeModule,
     ListComponent,
     PlayerCardComponent,
-    SavePlayerModalComponent
-],
+    SavePlayerModalComponent,
+  ],
   standalone: true,
   templateUrl: './rankings.component.html',
   styleUrl: './rankings.component.scss',
@@ -55,7 +55,13 @@ export class RankingsComponent implements OnInit {
   example = computed(() => this.test1() + this.test2());
 
   // TODO: Refactor this so that the API isn't hit every time the component is initialized
-  rankingsResource = this.rankingsService.getPlayerRankings();
+  // rankingsResource = this.rankingsService.getPlayerRankings();
+  rankingsResource = {
+    isLoading: signal(false),
+    error: signal<Error | null>(null),
+    value: signal<Player[]>(players),
+  };
+
   players = this.rankingsResource.value;
   isLoading = this.rankingsResource.isLoading;
   error = this.rankingsResource.error;

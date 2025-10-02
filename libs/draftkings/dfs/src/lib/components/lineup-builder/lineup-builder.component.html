@@ -1,0 +1,109 @@
+<mat-list
+  class="lineup-card"
+  [class.error]="lineup.remainingSalary > 300"
+  role="list"
+>
+  <mat-list-item role="listitem">
+    <div class="remaining-salary">
+      <span class="text-xs">Remaining Salary:</span>
+      <span class="amount font-bold ml-1">
+        {{ lineup.remainingSalary | currency : 'USD' : 'symbol' : '1.0-0' }}
+      </span>
+    </div>
+  </mat-list-item>
+  <!-- Quarterback -->
+  <!-- <mat-list-item role="listitem">
+    <div
+      class="grid grid-cols-[auto_1fr_50px_auto] gap-3 items-center justify-start"
+    >
+      <span class="position qb">QB</span>
+      @if (lineup.qb) {
+      <span class="">{{ lineup.qb.name }}</span>
+      <span class="text-sm">
+        {{ lineup.qb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
+      </span>
+      <button
+        aria-label="Remove player button"
+        class="justify-end self-end"
+        (click)="removePlayer(lineup.qb)"
+        matIconButton
+      >
+        <mat-icon fontIcon="close"></mat-icon>
+      </button>
+      } @else {
+      <button (click)="selectQb()" matButton>Select QB</button>
+      }
+    </div>
+  </mat-list-item> -->
+  <dfs-lineup-builder-position
+    className="qb"
+    [player]="lineup.qb"
+    position="QB"
+    (selectPlayer)="selectPlayer('QB')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+  <!-- Running Back 1 -->
+  <dfs-lineup-builder-position
+    className="rb"
+    [player]="lineup.rb1"
+    position="RB"
+    (selectPlayer)="selectPlayer('RB')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+  <!-- Running Back 2 -->
+  <dfs-lineup-builder-position
+    className="rb"
+    [player]="lineup.rb2"
+    position="RB"
+    (selectPlayer)="selectPlayer('RB')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+  <!-- Wide Receiver 1 -->
+  <dfs-lineup-builder-position
+    className="wr"
+    [player]="lineup.wr1"
+    position="WR"
+    (selectPlayer)="selectPlayer('WR')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+  <!-- Wide Receiver 2 -->
+  <dfs-lineup-builder-position
+    className="wr"
+    [player]="lineup.wr2"
+    position="WR"
+    (selectPlayer)="selectPlayer('WR')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+  <!-- Wide Receiver 3 -->
+  <dfs-lineup-builder-position
+    className="wr"
+    [player]="lineup.wr3"
+    position="WR"
+    (selectPlayer)="selectPlayer('WR')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+  <!-- Tight End -->
+  <dfs-lineup-builder-position
+    className="te"
+    [player]="lineup.te"
+    position="TE"
+    (selectPlayer)="selectPlayer('TE')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+  <!-- Flex -->
+  <dfs-lineup-builder-position
+    className="flex"
+    [player]="lineup.flex"
+    position="FLEX"
+    (selectPlayer)="selectPlayer('FLEX')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+  <!-- Defense -->
+  <dfs-lineup-builder-position
+    className="dst"
+    [player]="lineup.dst"
+    position="DST"
+    (selectPlayer)="selectPlayer('DST')"
+    (removePlayer)="removePlayer($event)"
+  ></dfs-lineup-builder-position>
+</mat-list>

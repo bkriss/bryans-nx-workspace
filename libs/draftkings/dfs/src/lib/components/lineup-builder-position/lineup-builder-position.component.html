@@ -1,0 +1,27 @@
+<mat-list-item role="listitem">
+  <div
+    class="grid grid-cols-[auto_1fr_50px_auto] gap-3 items-center justify-start"
+  >
+    <span class="position {{ className }}">{{ position }}</span>
+    @if (player) {
+    <!-- <span class="text-sm">{{ player.name }}</span> -->
+    <span class="text-sm">{{ player.nameAbbrev }}</span>
+    <span class="text-sm">
+      {{ player.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
+    </span>
+    <button
+      aria-label="Remove player button"
+      class="justify-end self-end"
+      (click)="removePlayer.emit(player)"
+      matIconButton
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+
+    } @else {
+    <button (click)="selectPlayer.emit(position)" matButton>
+      Select {{ position }}
+    </button>
+    }
+  </div>
+</mat-list-item>

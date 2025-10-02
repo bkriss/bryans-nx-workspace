@@ -1,0 +1,31 @@
+.mat-stepper-horizontal {
+  background-color: var(--background-color);
+}
+
+.mdc-list-item:nth-child(even) {
+  background-color: rgb(42, 56, 70);
+}
+
+.qb {
+  color: var(--qb-red);
+}
+
+.rb {
+  color: var(--rb-green);
+}
+
+.wr {
+  color: var(--wr-blue);
+}
+
+.te {
+  color: var(--te-orange);
+}
+
+.dst {
+  color: var(--dst-brown);
+}
+
+.gray-text {
+  color: var(--mat-sys-on-surface-variant);
+}

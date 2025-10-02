@@ -1,0 +1,35 @@
+.position {
+  height: 26px;
+  width: 50px;
+  background-color: var(--border-color);
+  border-radius: 6px;
+  display: inline-block;
+  line-height: 26px;
+  text-align: center;
+}
+
+.qb {
+  color: var(--qb-red);
+}
+
+.rb {
+  color: var(--rb-green);
+}
+
+.wr {
+  color: var(--wr-blue);
+}
+
+.te {
+  color: var(--te-orange);
+}
+
+.flex {
+  color: var(--flex-purple);
+}
+
+.dst {
+  color: var(--dst-brown);
+}
+
+// TODO: Figure out how to use tailwind class for this

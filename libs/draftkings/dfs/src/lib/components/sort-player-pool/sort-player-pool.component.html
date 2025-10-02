@@ -1,0 +1,31 @@
+@if (quarterbacks.length > 0 ){
+<div
+  cdkDropList
+  class="example-list"
+  (cdkDropListDropped)="dropQuarterback($event)"
+>
+  @for (qb of quarterbacks; let i = $index; track qb) {
+  <div class="example-box" cdkDrag>{{ i + 1 }}&rpar; {{ qb.name }}</div>
+  }
+</div>
+} @else if (runningBacks.length > 0 ){
+<div
+  cdkDropList
+  class="example-list"
+  (cdkDropListDropped)="dropRunningBack($event)"
+>
+  @for (rb of runningBacks; let i = $index; track rb) {
+  <div class="example-box" cdkDrag>{{ i + 1 }}&rpar; {{ rb.name }}</div>
+  }
+</div>
+} @else if (wideReceivers.length > 0 ){
+<div
+  cdkDropList
+  class="example-list"
+  (cdkDropListDropped)="dropWideReceiver($event)"
+>
+  @for (wr of wideReceivers; let i = $index; track wr) {
+  <div class="example-box" cdkDrag>{{ i + 1 }}&rpar; {{ wr.name }}</div>
+  }
+</div>
+} @else if (tightEnds.length > 0 ){ TE List } @else { No Players Selected }
