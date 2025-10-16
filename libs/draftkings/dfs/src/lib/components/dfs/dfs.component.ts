@@ -73,7 +73,7 @@ export class DfsComponent implements OnInit {
   teSelectionFormGroup = this._formBuilder.group({
     tePoolCtrl: [
       [] as TightEnd[],
-      [Validators.minLength(4), Validators.maxLength(7)],
+      [Validators.minLength(4), Validators.maxLength(8)],
     ],
   });
   dstSelectionFormGroup = this._formBuilder.group({
@@ -84,7 +84,7 @@ export class DfsComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const { qbs, rbs, wrs, tes, dsts } = getAvailablePlayers(20);
+    const { qbs, rbs, wrs, tes, dsts } = getAvailablePlayers(30);
     this.availableQuarterbacks.set(qbs);
     this.availableRunningBacks = rbs;
     this.availableWideReceivers = wrs;
@@ -126,6 +126,11 @@ export class DfsComponent implements OnInit {
     this.router.navigate(['/dfs/lineup-builders']);
   }
 
+  updateQuarterbacks(newQuarterbacks: Quarterback[]) {
+    console.log('Updated Quarterbacks:', newQuarterbacks);
+    this.qbSelectionFormGroup.controls.qbPoolCtrl.setValue(newQuarterbacks);
+  }
+
   updateRunningBacks(newRunningBacks: Player[]) {
     console.log('Updated Running Backs:', newRunningBacks);
     this.rbSelectionFormGroup.controls.rbPoolCtrl.setValue(newRunningBacks);
@@ -139,5 +144,10 @@ export class DfsComponent implements OnInit {
   updateTightEnds(newTightEnds: TightEnd[]) {
     console.log('Updated Tight ends:', newTightEnds);
     this.teSelectionFormGroup.controls.tePoolCtrl.setValue(newTightEnds);
+  }
+
+  updateDsts(newDsts: Player[]) {
+    console.log('Updated DSTs:', newDsts);
+    this.dstSelectionFormGroup.controls.dstPoolCtrl.setValue(newDsts);
   }
 }

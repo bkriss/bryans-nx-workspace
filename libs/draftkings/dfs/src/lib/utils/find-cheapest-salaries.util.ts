@@ -1,4 +1,4 @@
-import { Player } from '../models';
+import { Player, TightEnd } from '../models';
 
 export const findCheapestPlayersSalary = (players: Player[]): number => {
   const cheapestPlayersSalary = players.reduce((accumulator, currentValue) => {
@@ -11,6 +11,18 @@ export const findCheapestPlayersSalary = (players: Player[]): number => {
 };
 
 export const findCheapestPlayer = (players: Player[]): Player => {
+  const cheapestPlayer = players.reduce((accumulator, currentObject) => {
+    if (currentObject.salary < accumulator.salary) {
+      return currentObject;
+    } else {
+      return accumulator;
+    }
+  }, players[0]); // Initialize the accumulator with the first object in the array
+
+  return cheapestPlayer;
+};
+
+export const findCheapestTightEnd = (players: TightEnd[]): TightEnd => {
   const cheapestPlayer = players.reduce((accumulator, currentObject) => {
     if (currentObject.salary < accumulator.salary) {
       return currentObject;

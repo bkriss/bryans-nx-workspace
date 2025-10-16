@@ -1,0 +1,179 @@
+<!-- TODO: Convert *ngIf and *ngFor to use structural directives -->
+<!-- TODO: Convert each distribution container into new component -->
+
+<!-- <div class="grid grid-flow-col gap-4 justify-start mb-4">
+  <mat-form-field>
+    <mat-label>Quarterback</mat-label>
+    <mat-select>
+      @for (qb of quarterbackDistribution(); track qb) {
+      <mat-option [value]="qb.playerId">{{ qb.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Running Back</mat-label>
+    <mat-select>
+      @for (rb of runningBackDistribution(); track rb) {
+      <mat-option [value]="rb.playerId">{{ rb.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div> -->
+<div class="grid grid-cols-4 gap-4">
+  <!-- <div class="grid grid-cols-[auto_1fr_1fr_1fr_1fr] gap-4"> -->
+  <!-- Quarterbacks -->
+  <!-- <div class="qb-distribution">
+    <h3 class="mb-1 font-bold position-header qb-text-color">
+      Quarterback Distribution
+    </h3> 
+    <ol>
+      <li *ngFor="let player of quarterbackDistribution()">
+        <span class="text-sm">
+          {{ player.name }} <span class="bullet">&rarr;</span>
+        </span>
+        <span class="count">
+          {{ player.count }}
+        </span>
+      </li>
+    </ol>
+  </div>-->
+
+  <!-- Running Backs -->
+  <div class="rb-distribution">
+    <h3 class="mb-1 font-bold position-header rb-text-color">
+      Running Back Distribution
+    </h3>
+    <ol>
+      <li *ngFor="let player of runningBackDistribution()">
+        <span class="text-sm">
+          <span
+            class="player-name"
+            [class.text-yellow-300]="player.teamAbbrev === currentQb.teamAbbrev"
+            [class.text-fuchsia-400]="
+              player.teamAbbrev === currentQb.opposingTeamAbbrev
+            "
+          >
+            {{ player.name }}
+          </span>
+          <span class="mx-1">&rarr;</span>
+        </span>
+        <span class="count">{{ player.count }}</span>
+        @if (player.percentageDifference.length > 0) {
+        <span class="text-slate-400 ml-1">&#8942;</span>
+        <span
+          class="percentage-difference"
+          [class.text-orange-400]="player.overLimit"
+          [class.text-teal-300]="player.underMinimumRequirement"
+        >
+          {{ player.percentageDifference }}
+        </span>
+        }
+      </li>
+    </ol>
+  </div>
+
+  <!-- Wide Receivers -->
+  <div class="wr-distribution">
+    <h3 class="mb-1 font-bold position-header wr-text-color">
+      Wide Receiver Distribution
+    </h3>
+    <ol>
+      <li *ngFor="let player of wideReceiverDistribution()">
+        <span class="text-sm">
+          <span
+            class="player-name"
+            [class.text-yellow-300]="player.teamAbbrev === currentQb.teamAbbrev"
+            [class.text-fuchsia-400]="
+              player.teamAbbrev === currentQb.opposingTeamAbbrev
+            "
+          >
+            {{ player.name }}
+          </span>
+          <span class="mx-1">&rarr;</span>
+        </span>
+        <span class="count">
+          {{ player.count }}
+        </span>
+        @if (player.percentageDifference.length > 0) {
+        <span class="text-slate-400 ml-1">&#8942;</span>
+        <span
+          class="percentage-difference"
+          [class.text-orange-400]="player.overLimit"
+          [class.text-teal-300]="player.underMinimumRequirement"
+        >
+          {{ player.percentageDifference }}
+        </span>
+        }
+      </li>
+    </ol>
+  </div>
+
+  <!-- Tight Ends -->
+  <div class="te-distribution">
+    <h3 class="mb-1 font-bold position-header te-text-color">
+      Tight End Distribution
+    </h3>
+    <ol>
+      <li *ngFor="let player of tightEndDistribution()">
+        <span class="text-sm">
+          <span
+            class="player-name"
+            [class.text-yellow-300]="player.teamAbbrev === currentQb.teamAbbrev"
+            [class.text-fuchsia-400]="
+              player.teamAbbrev === currentQb.opposingTeamAbbrev
+            "
+          >
+            {{ player.name }}
+          </span>
+          <span class="mx-1">&rarr;</span>
+        </span>
+        <span class="count">{{ player.count }}</span>
+        @if (player.percentageDifference.length > 0) {
+        <span class="text-slate-400 ml-1">&#8942;</span>
+        <span
+          class="percentage-difference"
+          [class.text-orange-400]="player.overLimit"
+          [class.text-teal-300]="player.underMinimumRequirement"
+        >
+          {{ player.percentageDifference }}
+        </span>
+        }
+      </li>
+    </ol>
+  </div>
+
+  <!-- DSTs -->
+  <div class="dst-distribution">
+    <h3 class="mb-1 font-bold position-header dst-text-color">
+      DST Distribution
+    </h3>
+    <ol>
+      <li *ngFor="let player of dstDistribution()">
+        <span class="text-sm">
+          <span
+            class="player-name"
+            [class.text-yellow-300]="player.teamAbbrev === currentQb.teamAbbrev"
+            [class.text-fuchsia-400]="
+              player.teamAbbrev === currentQb.opposingTeamAbbrev
+            "
+          >
+            {{ player.name }}
+          </span>
+          <span class="mx-1">&rarr;</span>
+        </span>
+        <span class="count">{{ player.count }}</span>
+        @if (player.percentageDifference.length > 0) {
+        <span class="text-slate-400 ml-1">&#8942;</span>
+        <span
+          class="percentage-difference"
+          [class.text-orange-400]="player.overLimit"
+          [class.text-teal-300]="player.underMinimumRequirement"
+        >
+          {{ player.percentageDifference }}
+        </span>
+        }
+      </li>
+    </ol>
+  </div>
+</div>

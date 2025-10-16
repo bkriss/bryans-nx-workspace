@@ -1,31 +1,95 @@
 @if (quarterbacks.length > 0 ){
 <div
   cdkDropList
-  class="example-list"
+  class="sorted-player-list"
   (cdkDropListDropped)="dropQuarterback($event)"
 >
   @for (qb of quarterbacks; let i = $index; track qb) {
-  <div class="example-box" cdkDrag>{{ i + 1 }}&rpar; {{ qb.name }}</div>
+  <div class="sorted-player" cdkDrag>
+    {{ i + 1 }}&rpar; {{ qb.name }}
+    <mat-form-field>
+      <mat-label>Min pass catchers from team</mat-label>
+      <mat-select [(value)]="quarterbacks[i].minNumberOfTeammatePasscatchers">
+        <mat-option [value]="1">1</mat-option>
+        <mat-option [value]="2">2</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Max pass catchers from team</mat-label>
+      <mat-select [(value)]="quarterbacks[i].maxNumberOfTeammatePasscatchers">
+        <mat-option [value]="1">1</mat-option>
+        <mat-option [value]="2">2</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-checkbox
+      [checked]="quarterbacks[i].requirePassCatcherFromOpposingTeam"
+      (change)="
+        quarterbacks[i].requirePassCatcherFromOpposingTeam =
+          !quarterbacks[i].requirePassCatcherFromOpposingTeam
+      "
+    >
+      Require Pass Catcher From Opposing Team
+    </mat-checkbox>
+
+    <mat-form-field>
+      <mat-label>Number Of Lineups With This Player</mat-label>
+      <input
+        matInput
+        placeholder="Number Of Lineups With This Player"
+        [value]="quarterbacks[i].numberOfLineupsWithThisPlayer"
+        (input)="
+          quarterbacks[i].numberOfLineupsWithThisPlayer = $any(
+            $event.target
+          ).value
+        "
+      />
+    </mat-form-field>
+
+    <!-- numberOfLineupsWithThisPlayer: number;
+  requirePassCatcherFromOpposingTeam: boolean; -->
+  </div>
   }
 </div>
 } @else if (runningBacks.length > 0 ){
 <div
   cdkDropList
-  class="example-list"
+  class="sorted-player-list"
   (cdkDropListDropped)="dropRunningBack($event)"
 >
   @for (rb of runningBacks; let i = $index; track rb) {
-  <div class="example-box" cdkDrag>{{ i + 1 }}&rpar; {{ rb.name }}</div>
+  <div class="sorted-player" cdkDrag>{{ i + 1 }}&rpar; {{ rb.name }}</div>
   }
 </div>
 } @else if (wideReceivers.length > 0 ){
 <div
   cdkDropList
-  class="example-list"
+  class="sorted-player-list"
   (cdkDropListDropped)="dropWideReceiver($event)"
 >
   @for (wr of wideReceivers; let i = $index; track wr) {
-  <div class="example-box" cdkDrag>{{ i + 1 }}&rpar; {{ wr.name }}</div>
+  <div class="sorted-player" cdkDrag>{{ i + 1 }}&rpar; {{ wr.name }}</div>
   }
 </div>
-} @else if (tightEnds.length > 0 ){ TE List } @else { No Players Selected }
+} @else if (tightEnds.length > 0 ){
+<div
+  cdkDropList
+  class="sorted-player-list"
+  (cdkDropListDropped)="dropTightEnd($event)"
+>
+  @for (te of tightEnds; let i = $index; track te) {
+  <div class="sorted-player" cdkDrag>{{ i + 1 }}&rpar; {{ te.name }}</div>
+  }
+</div>
+} @else if (dsts.length > 0 ){
+<div
+  cdkDropList
+  class="sorted-player-list"
+  (cdkDropListDropped)="dropDst($event)"
+>
+  @for (dst of dsts; let i = $index; track dst) {
+  <div class="sorted-player" cdkDrag>{{ i + 1 }}&rpar; {{ dst.name }}</div>
+  }
+</div>
+} @else { No Players Selected }

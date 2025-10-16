@@ -36,74 +36,92 @@
     </div>
   </mat-list-item> -->
   <dfs-lineup-builder-position
+    [availablePlayers]="qbPool"
     className="qb"
+    [lineup]="lineup"
     [player]="lineup.qb"
     position="QB"
-    (selectPlayer)="selectPlayer('QB')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('QB', $event)"
+    (removePlayer)="removeQuarterback($event)"
   ></dfs-lineup-builder-position>
   <!-- Running Back 1 -->
   <dfs-lineup-builder-position
+    [availablePlayers]="runningBackPool"
     className="rb"
+    [lineup]="lineup"
     [player]="lineup.rb1"
     position="RB"
-    (selectPlayer)="selectPlayer('RB')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('RB1', $event)"
+    (removePlayer)="removeRb1($event)"
   ></dfs-lineup-builder-position>
   <!-- Running Back 2 -->
   <dfs-lineup-builder-position
+    [availablePlayers]="runningBackPool"
     className="rb"
+    [lineup]="lineup"
     [player]="lineup.rb2"
     position="RB"
-    (selectPlayer)="selectPlayer('RB')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('RB2', $event)"
+    (removePlayer)="removeRb2($event)"
   ></dfs-lineup-builder-position>
   <!-- Wide Receiver 1 -->
   <dfs-lineup-builder-position
+    [availablePlayers]="wideReceiverPool"
     className="wr"
+    [lineup]="lineup"
     [player]="lineup.wr1"
     position="WR"
-    (selectPlayer)="selectPlayer('WR')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('WR1', $event)"
+    (removePlayer)="removeWr1($event)"
   ></dfs-lineup-builder-position>
   <!-- Wide Receiver 2 -->
   <dfs-lineup-builder-position
+    [availablePlayers]="wideReceiverPool"
     className="wr"
+    [lineup]="lineup"
     [player]="lineup.wr2"
     position="WR"
-    (selectPlayer)="selectPlayer('WR')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('WR2', $event)"
+    (removePlayer)="removeWr2($event)"
   ></dfs-lineup-builder-position>
   <!-- Wide Receiver 3 -->
   <dfs-lineup-builder-position
+    [availablePlayers]="wideReceiverPool"
     className="wr"
+    [lineup]="lineup"
     [player]="lineup.wr3"
     position="WR"
-    (selectPlayer)="selectPlayer('WR')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('WR3', $event)"
+    (removePlayer)="removeWr3($event)"
   ></dfs-lineup-builder-position>
   <!-- Tight End -->
   <dfs-lineup-builder-position
+    [availablePlayers]="tightEndPool"
     className="te"
+    [lineup]="lineup"
     [player]="lineup.te"
     position="TE"
-    (selectPlayer)="selectPlayer('TE')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('TE', $event)"
+    (removePlayer)="removeTightEnd($event)"
   ></dfs-lineup-builder-position>
   <!-- Flex -->
   <dfs-lineup-builder-position
+    [availablePlayers]="wideReceiverPool"
     className="flex"
+    [lineup]="lineup"
     [player]="lineup.flex"
     position="FLEX"
-    (selectPlayer)="selectPlayer('FLEX')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('FLEX', $event)"
+    (removePlayer)="removeFlex($event)"
   ></dfs-lineup-builder-position>
   <!-- Defense -->
   <dfs-lineup-builder-position
+    [availablePlayers]="dstPool"
     className="dst"
+    [lineup]="lineup"
     [player]="lineup.dst"
     position="DST"
-    (selectPlayer)="selectPlayer('DST')"
-    (removePlayer)="removePlayer($event)"
+    (selectPlayer)="selectPlayer('DST', $event)"
+    (removePlayer)="removeDst($event)"
   ></dfs-lineup-builder-position>
 </mat-list>

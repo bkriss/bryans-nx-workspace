@@ -1,5 +1,11 @@
 import { salaries } from './salaries';
-import { Player, Quarterback, TightEnd, WideReceiver } from '../models';
+import {
+  Player,
+  Quarterback,
+  RunningBack,
+  TightEnd,
+  WideReceiver,
+} from '../models';
 
 interface RawPlayer {
   AvgPointsPerGame: string;
@@ -47,28 +53,104 @@ export const csvToJson = (csvString: string) => {
   return jsonData;
 };
 
+const renderLastName = (fullName: string): string => {
+  const brokenUpName = fullName.split(' ');
+
+  let lastName = brokenUpName[1];
+  if (brokenUpName.length === 3) {
+    lastName = `${brokenUpName[1]} ${brokenUpName[2]}`;
+  }
+
+  return lastName;
+};
+
 export const draftKingsPlayers = csvToJson(salaries).map(
-  (player: RawPlayer) => {
-    const firstName = player.Name.split(' ')[0];
-    const lastName = player.Name.split(' ')[1];
-    const nameAbbrev = `${firstName?.[0]}. ${lastName}`;
-    const gameInfo = player['Game Info'].split(' ')[0];
-    const opposingTeam =
-      gameInfo.split('@')[0] !== player.TeamAbbrev
+  (rawPlayer: RawPlayer) => {
+    const firstName = rawPlayer.Name.split(' ')[0];
+    const lastName = renderLastName(rawPlayer.Name);
+    const nameAbbrev =
+      rawPlayer.Position !== 'DST'
+        ? `${firstName?.[0]}. ${lastName}`
+        : rawPlayer.Name;
+    const gameInfo = rawPlayer['Game Info'].split(' ')[0];
+    const opposingTeamAbbrev =
+      gameInfo.split('@')[0] !== rawPlayer.TeamAbbrev
         ? gameInfo.split('@')[0]
         : gameInfo.split('@')[1];
 
-    return {
+    const player: Player = {
       gameInfo,
-      id: player.ID,
-      name: player.Name,
+      // gradeOutOfTen: 0,
+      id: rawPlayer.ID,
+      maxOwnershipPercentage: 30,
+      minOwnershipPercentage: 10,
+      name: rawPlayer.Name,
       nameAbbrev,
-      position: player.Position,
-      salary: parseInt(player.Salary, 10),
-      teamAbbrev: player.TeamAbbrev,
-      opposingTeam,
-      // avgPointsPerGame: parseFloat(player.AvgPointsPerGame),
+      opposingTeamAbbrev,
+      position: rawPlayer.Position,
+      salary: parseInt(rawPlayer.Salary, 10),
+      teamAbbrev: rawPlayer.TeamAbbrev,
     };
+
+    const runningBack: RunningBack = {
+      ...player,
+      allowRBFromOpposingTeam: false,
+      maxOwnershipPercentage: 35,
+      minOwnershipPercentage: 10,
+    };
+
+    const quarterback: Quarterback = {
+      ...player,
+      maxNumberOfTeammatePasscatchers: 2,
+      minNumberOfTeammatePasscatchers: 1,
+      maxOwnershipPercentage: 100,
+      minOwnershipPercentage: 100,
+      numberOfLineupsWithThisPlayer: 10,
+      requirePassCatcherFromOpposingTeam: true,
+      qbPassCatcherPairings: [],
+    };
+
+    const wideReceiver: WideReceiver = {
+      ...player,
+      gradeOutOfTen: 0,
+      maxOwnershipPercentage: 25,
+      minOwnershipPercentage: 5,
+      maxOwnershipWhenPairedWithQb: 80,
+      minOwnershipWhenPairedWithQb: 20,
+      maxOwnershipWhenPairedWithOpposingQb: 65,
+      minOwnershipWhenPairedWithOpposingQb: 20,
+      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
+    };
+
+    const tightEnd: TightEnd = {
+      ...player,
+      gradeOutOfTen: 0,
+      maxOwnershipPercentage: 25,
+      minOwnershipPercentage: 5,
+      maxOwnershipWhenPairedWithQb: 80,
+      minOwnershipWhenPairedWithQb: 20,
+      maxOwnershipWhenPairedWithOpposingQb: 65,
+      minOwnershipWhenPairedWithOpposingQb: 20,
+      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
+    };
+
+    if (player.position === 'QB') {
+      return quarterback;
+    }
+
+    if (player.position === 'RB') {
+      return runningBack;
+    }
+
+    if (player.position === 'WR') {
+      return wideReceiver;
+    }
+
+    if (player.position === 'TE') {
+      return tightEnd;
+    }
+
+    return player;
   }
 );
 

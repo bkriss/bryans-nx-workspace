@@ -1,4 +1,4 @@
-export const salaries = `Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame
+Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame
 RB,Jonathan Taylor (40392332),Jonathan Taylor,40392332,RB/FLEX,8800,IND@LAC 10/19/2025 04:05PM ET,IND,25.67
 RB,De'Von Achane (40392334),De'Von Achane,40392334,RB/FLEX,8100,MIA@CLE 10/19/2025 01:00PM ET,MIA,21.08
 RB,Josh Jacobs (40392336),Josh Jacobs,40392336,RB/FLEX,7800,GB@ARI 10/19/2025 04:25PM ET,GB,20.9
@@ -509,4 +509,3 @@ DST,Saints  (40393198),Saints ,40393198,DST,2300,NO@CHI 10/19/2025 01:00PM ET,NO
 DST,Giants  (40393199),Giants ,40393199,DST,2200,NYG@DEN 10/19/2025 04:05PM ET,NYG,3.67
 DST,Cardinals  (40393200),Cardinals ,40393200,DST,2100,GB@ARI 10/19/2025 04:25PM ET,ARI,6.17
 DST,Raiders  (40393201),Raiders ,40393201,DST,2000,LV@KC 10/19/2025 01:00PM ET,LV,4.83
-`;

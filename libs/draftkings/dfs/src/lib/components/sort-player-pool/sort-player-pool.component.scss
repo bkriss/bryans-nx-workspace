@@ -1,19 +1,16 @@
-.example-list {
-}
-
-.example-list {
+.sorted-player-list {
   border: solid 1px #ccc;
   min-height: 60px;
   background-color: var(--border-color);
   border-radius: 4px;
   overflow: hidden;
   display: block;
-  width: 400px;
+  // width: 400px;
   max-width: 100%;
   font-family: sans-serif;
 }
 
-.example-box {
+.sorted-player {
   padding: 20px 10px;
   border-bottom: solid 1px #ccc;
   color: rgba(0, 0, 0, 0.87);
@@ -44,10 +41,11 @@
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.example-box:last-child {
+.sorted-player:last-child {
   border: none;
 }
 
-.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+.sorted-player-list.cdk-drop-list-dragging
+  .sorted-player:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }

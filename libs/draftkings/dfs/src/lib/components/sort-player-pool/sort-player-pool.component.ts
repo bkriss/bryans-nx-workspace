@@ -12,11 +12,23 @@ import {
   CdkDrag,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { Player, Quarterback, TightEnd, WideReceiver } from '../../models';
 
 @Component({
   selector: 'dfs-sort-player-pool',
-  imports: [CdkDropList, CdkDrag, CommonModule],
+  imports: [
+    CdkDropList,
+    CdkDrag,
+    CommonModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+  ],
   templateUrl: './sort-player-pool.component.html',
   styleUrl: './sort-player-pool.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,17 +38,25 @@ export class SortPlayerPoolComponent {
   @Input() runningBacks: Player[] = [];
   @Input() wideReceivers: WideReceiver[] = [];
   @Input() tightEnds: TightEnd[] = [];
+  @Input() dsts: Player[] = [];
+  @Output() updateQuarterbacks = new EventEmitter<Quarterback[]>();
   @Output() updateRunningBacks = new EventEmitter<Player[]>();
   @Output() updateWideReceivers = new EventEmitter<WideReceiver[]>();
   @Output() updateTightEnds = new EventEmitter<TightEnd[]>();
+  @Output() updateDsts = new EventEmitter<Player[]>();
 
+  // TODO: Remove setTimeouts
   dropQuarterback(event: CdkDragDrop<Quarterback[]>) {
-    console.log('dropQuarterback event: ', event);
     moveItemInArray(this.quarterbacks, event.previousIndex, event.currentIndex);
+
+    console.log('Updated Quarterbacks 1:', this.quarterbacks);
+    setTimeout(() => {
+      console.log('Updated Quarterbacks 2:', this.quarterbacks);
+      this.updateQuarterbacks.emit(this.quarterbacks);
+    }, 0);
   }
 
   dropRunningBack(event: CdkDragDrop<Player[]>) {
-    console.log('dropRunningBack event: ', event);
     moveItemInArray(this.runningBacks, event.previousIndex, event.currentIndex);
 
     console.log('Updated Running Backs 1:', this.runningBacks);
@@ -47,7 +67,6 @@ export class SortPlayerPoolComponent {
   }
 
   dropWideReceiver(event: CdkDragDrop<WideReceiver[]>) {
-    console.log('dropWideReceiver event: ', event);
     moveItemInArray(
       this.wideReceivers,
       event.previousIndex,
@@ -63,7 +82,6 @@ export class SortPlayerPoolComponent {
   }
 
   dropTightEnd(event: CdkDragDrop<TightEnd[]>) {
-    console.log('dropTightEnd event: ', event);
     moveItemInArray(this.tightEnds, event.previousIndex, event.currentIndex);
 
     console.log('Updated Tight Ends 1:', this.tightEnds);
@@ -72,5 +90,12 @@ export class SortPlayerPoolComponent {
       console.log('Updated Tight Ends 2:', this.tightEnds);
       this.updateTightEnds.emit(this.tightEnds);
     }, 0);
+  }
+
+  dropDst(event: CdkDragDrop<Player[]>) {
+    moveItemInArray(this.dsts, event.previousIndex, event.currentIndex);
+
+    console.log('Updated DSTs 1:', this.dsts);
+    this.updateDsts.emit(this.dsts);
   }
 }

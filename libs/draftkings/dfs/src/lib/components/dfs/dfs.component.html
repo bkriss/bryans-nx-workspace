@@ -32,6 +32,7 @@
         [runningBacks]="[]"
         [wideReceivers]="[]"
         [tightEnds]="[]"
+        (updateQuarterbacks)="updateQuarterbacks($event)"
       ></dfs-sort-player-pool>
 
       <!-- <p>
@@ -116,7 +117,7 @@
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="teSelectionFormGroup" label="Select 4-7 TEs">
+  <mat-step [stepControl]="teSelectionFormGroup" label="Select 4-8 TEs">
     <form [formGroup]="teSelectionFormGroup">
       <mat-selection-list #tes formControlName="tePoolCtrl">
         @for (te of availableTightEnds; track te) {
@@ -132,7 +133,14 @@
         }
       </mat-selection-list>
 
-      <p>Options selected: {{ tes.selectedOptions.selected.length }}</p>
+      <dfs-sort-player-pool
+        [quarterbacks]="[]"
+        [runningBacks]="[]"
+        [wideReceivers]="[]"
+        [tightEnds]="teSelectionFormGroup.controls.tePoolCtrl.value || []"
+        (updateTightEnds)="updateTightEnds($event)"
+      ></dfs-sort-player-pool>
+
       <div>
         <button matButton matStepperPrevious>Back</button>
         <button matButton matStepperNext>Next</button>
@@ -155,7 +163,15 @@
         }
       </mat-selection-list>
 
-      <p>Options selected: {{ tes.selectedOptions.selected.length }}</p>
+      <dfs-sort-player-pool
+        [quarterbacks]="[]"
+        [runningBacks]="[]"
+        [wideReceivers]="[]"
+        [tightEnds]="[]"
+        [dsts]="dstSelectionFormGroup.controls.dstPoolCtrl.value || []"
+        (updateDsts)="updateDsts($event)"
+      ></dfs-sort-player-pool>
+
       <div>
         <button matButton matStepperPrevious>Back</button>
         <button matButton matStepperNext>Next</button>

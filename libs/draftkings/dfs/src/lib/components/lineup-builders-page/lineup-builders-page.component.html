@@ -1,5 +1,32 @@
 <div class="p-4">
-  @for (lineup of lineups(); track lineup) {
-  <dfs-lineup-builder [lineup]="lineup"></dfs-lineup-builder>
-  }
+  <mat-accordion class="block mb-4">
+    <mat-expansion-panel hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title> Player Distributions </mat-panel-title>
+        <!-- <mat-panel-description> Dak Prescott </mat-panel-description> -->
+      </mat-expansion-panel-header>
+      <dfs-player-distributions
+        [currentQb]="currentQb()"
+        [quarterbackDistribution]="quarterbackDistribution"
+        [runningBackDistribution]="runningBackDistribution"
+        [wideReceiverDistribution]="wideReceiverDistribution"
+        [tightEndDistribution]="tightEndDistribution"
+        [dstDistribution]="dstDistribution"
+      ></dfs-player-distributions>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <div class="lineup-builders-container">
+    @for (lineup of lineups(); track lineup) {
+    <dfs-lineup-builder
+      [qbPool]="qbPool"
+      [runningBackPool]="rbPool"
+      [wideReceiverPool]="wrPool"
+      [tightEndPool]="tePool"
+      [dstPool]="dstPool"
+      [lineup]="lineup"
+      (updateLineup)="updateLineup($event)"
+    ></dfs-lineup-builder>
+    }
+  </div>
 </div>
