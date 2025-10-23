@@ -21,7 +21,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 export class PlayerDistributionsComponent {
   @Input() currentQb!: Quarterback;
   @Input() runningBackDistribution: Signal<PlayerDistribution[]> = signal([]);
-  @Input() quarterbackDistribution: Signal<PlayerDistribution[]> = signal([]);
   @Input() wideReceiverDistribution: Signal<PlayerDistribution[]> = signal([]);
   @Input() tightEndDistribution: Signal<PlayerDistribution[]> = signal([]);
   @Input() dstDistribution: Signal<PlayerDistribution[]> = signal([]);

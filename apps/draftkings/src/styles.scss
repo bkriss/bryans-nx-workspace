@@ -27,3 +27,29 @@ body {
   font-family: 'Helvetica Neue', 'Segoe UI', helvetica, verdana, sans-serif;
   line-height: 1.35715;
 }
+
+// TODO: Move to different file
+.mat-mdc-form-field-subscript-wrapper.mat-mdc-form-field-bottom-align {
+  height: 0;
+  line-height: 0;
+}
+
+.qb-text-color {
+  color: var(--qb-red);
+}
+
+.rb-text-color {
+  color: var(--rb-green);
+}
+
+.wr-text-color {
+  color: var(--wr-blue);
+}
+
+.te-text-color {
+  color: var(--te-orange);
+}
+
+.dst-text-color {
+  color: var(--dst-brown);
+}

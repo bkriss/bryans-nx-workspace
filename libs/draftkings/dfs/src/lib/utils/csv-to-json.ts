@@ -80,8 +80,9 @@ export const draftKingsPlayers = csvToJson(salaries).map(
 
     const player: Player = {
       gameInfo,
-      // gradeOutOfTen: 0,
+      gradeOutOfTen: 0,
       id: rawPlayer.ID,
+      isSelectedForPlayerPool: false,
       maxOwnershipPercentage: 30,
       minOwnershipPercentage: 10,
       name: rawPlayer.Name,
@@ -112,7 +113,6 @@ export const draftKingsPlayers = csvToJson(salaries).map(
 
     const wideReceiver: WideReceiver = {
       ...player,
-      gradeOutOfTen: 0,
       maxOwnershipPercentage: 25,
       minOwnershipPercentage: 5,
       maxOwnershipWhenPairedWithQb: 80,
@@ -124,7 +124,6 @@ export const draftKingsPlayers = csvToJson(salaries).map(
 
     const tightEnd: TightEnd = {
       ...player,
-      gradeOutOfTen: 0,
       maxOwnershipPercentage: 25,
       minOwnershipPercentage: 5,
       maxOwnershipWhenPairedWithQb: 80,
@@ -179,7 +178,7 @@ const availableQuarterbacks = (numberOfTeams: number) =>
 const availableRunningBacks = (numberOfTeams: number) =>
   draftKingsPlayers
     .filter((player) => player.position === 'RB')
-    .slice(0, numberOfTeams * 2) as Player[];
+    .slice(0, numberOfTeams * 2) as RunningBack[];
 const availableWideReceivers = (numberOfTeams: number) =>
   draftKingsPlayers
     .filter((player) => player.position === 'WR')

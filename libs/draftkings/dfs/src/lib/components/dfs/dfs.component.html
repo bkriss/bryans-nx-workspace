@@ -1,190 +1,180 @@
 <!-- TODO: Change name to player-selection-wizard.component.html -->
-<!-- {{ availableQuarterbacks() | json }} -->
-
-<!-- qbSelectionFormGroup: {{ qbSelectionFormGroup.value | json }} <br /> -->
 
 <mat-stepper [linear]="true" #stepper>
   <mat-step [stepControl]="qbSelectionFormGroup">
     <form [formGroup]="qbSelectionFormGroup">
-      <!-- TODO: Move to separate component -->
-      <ng-template matStepLabel>Select 4-6 QBs</ng-template>
+      <ng-template matStepLabel>Select 4-5 QBs</ng-template>
 
       <mat-selection-list
         #qbs
-        (selectionChange)="onSelectionChanged($event)"
+        class="max-h-[385px] overflow-scroll rounded"
         formControlName="qbPoolCtrl"
       >
-        @for (qb of availableQuarterbacks(); track qb) {
-        <mat-list-option [value]="qb">
-          <span class="qb mr-3">QB</span>
+        @for (qb of availableQuarterbacks(); track qb.id) {
+        <mat-list-option [selected]="qb.isSelectedForPlayerPool" [value]="qb">
+          <span class="qb-text-color mr-3">QB</span>
           <span class="font-bold">{{ qb.name }}</span>
-          <span class="ml-2 text-sm gray-text">
+          <span class="ml-2 text-slate-300 text-sm">
             {{ qb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-sm gray-text">{{ qb.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">{{ qb.gameInfo }}</span>
         </mat-list-option>
         }
       </mat-selection-list>
 
       <dfs-sort-player-pool
+        class="block mt-4"
         [quarterbacks]="qbSelectionFormGroup.controls.qbPoolCtrl.value || []"
-        [runningBacks]="[]"
-        [wideReceivers]="[]"
-        [tightEnds]="[]"
         (updateQuarterbacks)="updateQuarterbacks($event)"
       ></dfs-sort-player-pool>
 
-      <!-- <p>
-        Options selected:
-        {{ qbSelectionFormGroup.controls.qbPoolCtrl?.value?.length }}
-      </p> -->
-
-      <!-- <mat-form-field>
-        <mat-label>Name</mat-label>
-        <input
-          matInput
-          placeholder="Last name, First name"
-          formControlName="qbPoolCtrl"
-          required
-        />
-      </mat-form-field> -->
       <div>
-        <button matButton matStepperNext>Next</button>
+        <button (click)="saveQbSelections()" matButton matStepperNext>
+          Next
+        </button>
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 5-10 RBs">
+  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 6-8 RBs">
     <form [formGroup]="rbSelectionFormGroup">
-      <mat-selection-list #rbs formControlName="rbPoolCtrl">
-        @for (rb of availableRunningBacks; track rb) {
-        <mat-list-option [value]="rb">
-          <span class="rb mr-3">RB</span>
+      <mat-selection-list
+        #rbs
+        class="max-h-[385px] overflow-scroll rounded"
+        formControlName="rbPoolCtrl"
+      >
+        @for (rb of availableRunningBacks; track rb.id) {
+        <mat-list-option [selected]="rb.isSelectedForPlayerPool" [value]="rb">
+          <span class="rb-text-color mr-3">RB</span>
           <span class="font-bold">{{ rb.name }}</span>
-          <span class="ml-2 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">
             {{ rb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-sm">{{ rb.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">{{ rb.gameInfo }}</span>
         </mat-list-option>
         }
       </mat-selection-list>
 
-      <!-- <p>Options selected: {{ rbs.selectedOptions.selected | json }}</p> -->
-
       <dfs-sort-player-pool
-        [quarterbacks]="[]"
+        class="block mt-4"
         [runningBacks]="rbSelectionFormGroup.controls.rbPoolCtrl.value || []"
-        [wideReceivers]="[]"
-        [tightEnds]="[]"
         (updateRunningBacks)="updateRunningBacks($event)"
       ></dfs-sort-player-pool>
       <div>
         <button matButton matStepperPrevious>Back</button>
-        <button matButton matStepperNext>Next</button>
+        <button (click)="saveRBSelections()" matButton matStepperNext>
+          Next
+        </button>
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="wrSelectionFormGroup" label="Select 15-25 WRs">
+  <mat-step [stepControl]="wrSelectionFormGroup" label="Select 18-30 WRs">
     <form [formGroup]="wrSelectionFormGroup">
-      <mat-selection-list #wrs formControlName="wrPoolCtrl">
-        @for (wr of availableWideReceivers; track wr) {
-        <mat-list-option [value]="wr">
-          <span class="wr mr-3">WR</span>
+      <mat-selection-list
+        #wrs
+        class="max-h-[385px] overflow-scroll rounded"
+        formControlName="wrPoolCtrl"
+      >
+        @for (wr of availableWideReceivers; track wr.id) {
+        <mat-list-option [selected]="wr.isSelectedForPlayerPool" [value]="wr">
+          <span class="wr-text-color mr-3">WR</span>
           <span class="font-bold">{{ wr.name }}</span>
-          <span class="ml-2 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">
             {{ wr.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-sm">{{ wr.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">{{ wr.gameInfo }}</span>
         </mat-list-option>
         }
       </mat-selection-list>
 
-      <!-- <p>Options selected: {{ wrs.selectedOptions.selected.length }}</p> -->
-
-      <dfs-sort-player-pool
-        [quarterbacks]="[]"
-        [runningBacks]="[]"
-        [wideReceivers]="wrSelectionFormGroup.controls.wrPoolCtrl.value || []"
-        [tightEnds]="[]"
-        (updateWideReceivers)="updateWideReceivers($event)"
-      ></dfs-sort-player-pool>
+      <dfs-sort-pass-catcher-pool
+        class="block mt-4"
+        [passCatchers]="wrSelectionFormGroup.controls.wrPoolCtrl.value || []"
+        [position]="position.WR"
+        (updatePassCatchers)="updateWideReceivers($event)"
+      ></dfs-sort-pass-catcher-pool>
 
       <div>
         <button matButton matStepperPrevious>Back</button>
-        <button matButton matStepperNext>Next</button>
+        <button (click)="saveWRSelections()" matButton matStepperNext>
+          Next
+        </button>
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="teSelectionFormGroup" label="Select 4-8 TEs">
+  <mat-step [stepControl]="teSelectionFormGroup" label="Select 4-10 TEs">
     <form [formGroup]="teSelectionFormGroup">
-      <mat-selection-list #tes formControlName="tePoolCtrl">
-        @for (te of availableTightEnds; track te) {
-        <mat-list-option [value]="te">
-          <span class="te mr-3">TE</span>
+      <mat-selection-list
+        #tes
+        class="max-h-[385px] overflow-scroll rounded"
+        formControlName="tePoolCtrl"
+      >
+        @for (te of availableTightEnds; track te.id) {
+        <mat-list-option [selected]="te.isSelectedForPlayerPool" [value]="te">
+          <span class="te-text-color mr-3">TE</span>
           <span class="font-bold">{{ te.name }}</span>
-          <span class="ml-2 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">
             {{ te.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-sm">{{ te.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">{{ te.gameInfo }}</span>
         </mat-list-option>
         }
       </mat-selection-list>
 
-      <dfs-sort-player-pool
-        [quarterbacks]="[]"
-        [runningBacks]="[]"
-        [wideReceivers]="[]"
-        [tightEnds]="teSelectionFormGroup.controls.tePoolCtrl.value || []"
-        (updateTightEnds)="updateTightEnds($event)"
-      ></dfs-sort-player-pool>
+      <dfs-sort-pass-catcher-pool
+        class="block mt-4"
+        [passCatchers]="teSelectionFormGroup.controls.tePoolCtrl.value || []"
+        [position]="position.TE"
+        (updatePassCatchers)="updateTightEnds($event)"
+      ></dfs-sort-pass-catcher-pool>
 
       <div>
         <button matButton matStepperPrevious>Back</button>
-        <button matButton matStepperNext>Next</button>
+        <button (click)="saveTightEndSelections()" matButton matStepperNext>
+          Next
+        </button>
       </div>
     </form>
   </mat-step>
   <mat-step [stepControl]="dstSelectionFormGroup" label="Select 4-7 DSTs">
     <form [formGroup]="dstSelectionFormGroup">
-      <mat-selection-list #dsts formControlName="dstPoolCtrl">
-        @for (dst of availableDsts; track dst) {
-        <mat-list-option [value]="dst">
-          <span class="dst mr-3">DST</span>
+      <mat-selection-list
+        #dsts
+        class="max-h-[385px] overflow-scroll rounded"
+        formControlName="dstPoolCtrl"
+      >
+        @for (dst of availableDsts; track dst.id) {
+        <mat-list-option [selected]="dst.isSelectedForPlayerPool" [value]="dst">
+          <span class="dst-text-color mr-3">DST</span>
           <span class="font-bold">{{ dst.name }}</span>
-          <span class="ml-2 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">
             {{ dst.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-sm">{{ dst.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">{{ dst.gameInfo }}</span>
         </mat-list-option>
         }
       </mat-selection-list>
 
       <dfs-sort-player-pool
-        [quarterbacks]="[]"
-        [runningBacks]="[]"
-        [wideReceivers]="[]"
-        [tightEnds]="[]"
+        class="block mt-4"
         [dsts]="dstSelectionFormGroup.controls.dstPoolCtrl.value || []"
         (updateDsts)="updateDsts($event)"
       ></dfs-sort-player-pool>
 
       <div>
         <button matButton matStepperPrevious>Back</button>
-        <button matButton matStepperNext>Next</button>
+        <button (click)="saveDSTSelections()" matButton matStepperNext>
+          Next
+        </button>
       </div>
     </form>
   </mat-step>
   <mat-step>
     <ng-template matStepLabel>Done</ng-template>
-
-    <!-- {{ qbSelectionFormGroup.controls.qbPoolCtrl.value | json }} <br />
-    {{ rbSelectionFormGroup.controls.rbPoolCtrl.value | json }} <br /> -->
-
-    <!-- TODO: Create components for selecting number of each QB, and ordering preferene of RBS -->
 
     <div>
       <button matButton matStepperPrevious>Back</button>

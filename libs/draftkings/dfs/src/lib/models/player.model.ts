@@ -1,6 +1,8 @@
 export interface Player {
   gameInfo: string;
+  gradeOutOfTen: number;
   id: string;
+  isSelectedForPlayerPool: boolean;
   maxOwnershipPercentage: number;
   minOwnershipPercentage: number;
   name: string;
@@ -32,7 +34,6 @@ export interface PassCatcherStack {
 
 // TODO: If WideReceiver and TightEnd remain identical, replace each reference to those models with PassCatcher
 export interface WideReceiver extends Player {
-  gradeOutOfTen: number;
   maxOwnershipWhenPairedWithQb?: number;
   minOwnershipWhenPairedWithQb?: number;
   maxOwnershipWhenPairedWithOpposingQb?: number;
@@ -41,7 +42,6 @@ export interface WideReceiver extends Player {
 }
 
 export interface TightEnd extends Player {
-  gradeOutOfTen: number;
   maxOwnershipWhenPairedWithQb?: number;
   minOwnershipWhenPairedWithQb?: number;
   maxOwnershipWhenPairedWithOpposingQb?: number;
@@ -51,7 +51,6 @@ export interface TightEnd extends Player {
 
 // WR or TE
 export interface PassCatcher extends Player {
-  gradeOutOfTen: number;
   maxOwnershipWhenPairedWithQb?: number;
   minOwnershipWhenPairedWithQb?: number;
   maxOwnershipWhenPairedWithOpposingQb?: number;

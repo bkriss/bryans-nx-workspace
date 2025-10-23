@@ -1,13 +1,39 @@
 <div class="p-4">
+  @if (numberOfInvalidLineups() > 0) {
+  <div
+    class="bg-red-500 flex font-bold h-13 items-center justify-center mb-4 p-2 rounded shadow-sm shadow-black text-lg text-white"
+  >
+    <mat-icon class="mr-1">error</mat-icon>
+    {{ numberOfInvalidLineups() }}/{{ lineups().length }} lineups are invalid
+  </div>
+  }
+
+  <div class="grid justify-end gap-1 grid-flow-col">
+    <button class="mb-4" matFab extended (click)="outputAsJson()">
+      <mat-icon>query_stats</mat-icon>
+      Copy Lineups as JSON
+    </button>
+
+    <dfs-player-overlap-imbalance-button
+      class="inline-block"
+      [lineups]="lineups()"
+      [rbPool]="rbPool"
+      [wrPool]="wrPool"
+      [tePool]="tePool"
+      [dstPool]="dstPool"
+    ></dfs-player-overlap-imbalance-button>
+  </div>
+
   <mat-accordion class="block mb-4">
     <mat-expansion-panel hideToggle>
       <mat-expansion-panel-header>
-        <mat-panel-title> Player Distributions </mat-panel-title>
-        <!-- <mat-panel-description> Dak Prescott </mat-panel-description> -->
+        <mat-panel-title class="text-lg">
+          <mat-icon class="mr-2">format_list_numbered</mat-icon>
+          Player Distributions For {{ currentQb().name }} Lineups
+        </mat-panel-title>
       </mat-expansion-panel-header>
       <dfs-player-distributions
         [currentQb]="currentQb()"
-        [quarterbackDistribution]="quarterbackDistribution"
         [runningBackDistribution]="runningBackDistribution"
         [wideReceiverDistribution]="wideReceiverDistribution"
         [tightEndDistribution]="tightEndDistribution"
@@ -17,7 +43,7 @@
   </mat-accordion>
 
   <div class="lineup-builders-container">
-    @for (lineup of lineups(); track lineup) {
+    @for (lineup of lineups(); track lineup.lineupIndex) {
     <dfs-lineup-builder
       [qbPool]="qbPool"
       [runningBackPool]="rbPool"

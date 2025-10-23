@@ -24,7 +24,7 @@
     } @else {
     <button matButton [matMenuTriggerFor]="menu">Select {{ position }}</button>
     <mat-menu #menu="matMenu">
-      @for (p of availablePlayers; track p) {
+      @for (p of availablePlayers; track p.id) {
       <button
         *ngIf="
           lineup.qb?.id !== p.id &&
@@ -47,7 +47,8 @@
         >
         &bull;
         <!-- TODO: Make player ownership % dynamic -->
-        <span>(20%)</span>
+        <!-- <span>(20%)</span> -->
+        {{ p.gradeOutOfTen }}
       </button>
       }
     </mat-menu>

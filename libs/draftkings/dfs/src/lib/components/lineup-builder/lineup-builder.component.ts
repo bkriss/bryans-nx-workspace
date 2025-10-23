@@ -4,6 +4,7 @@ import {
   EventEmitter,
   inject,
   Input,
+  OnInit,
   Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -34,7 +35,7 @@ import { LineupBuilderPositionComponent } from '../lineup-builder-position/lineu
   styleUrl: './lineup-builder.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LineupBuilderComponent {
+export class LineupBuilderComponent implements OnInit {
   @Input() lineup!: Lineup;
   @Input() qbPool!: Quarterback[];
   @Input() runningBackPool!: Player[];
@@ -43,6 +44,22 @@ export class LineupBuilderComponent {
   @Input() dstPool!: Player[];
   @Output() updateLineup = new EventEmitter<Lineup>();
   dialog = inject(MatDialog);
+  flexPool: Player[] = [];
+
+  ngOnInit() {
+    this.sortPlayerPoolsBySalary();
+  }
+
+  sortPlayerPoolsBySalary() {
+    this.qbPool.sort((a, b) => b.salary - a.salary);
+    this.runningBackPool.sort((a, b) => b.salary - a.salary);
+    this.wideReceiverPool.sort((a, b) => b.salary - a.salary);
+    this.tightEndPool.sort((a, b) => b.salary - a.salary);
+    this.flexPool = [...this.wideReceiverPool, ...this.runningBackPool].sort(
+      (a, b) => b.salary - a.salary
+    );
+    this.dstPool.sort((a, b) => b.salary - a.salary);
+  }
 
   removeQuarterback(playerToRemove: Player): void {
     this.updateLineup.emit({

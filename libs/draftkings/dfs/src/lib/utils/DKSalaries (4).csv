@@ -1,4 +1,4 @@
-export const salaries = `Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame
+Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame
 RB,Jonathan Taylor (40470030),Jonathan Taylor,40470030,RB/FLEX,9500,TEN@IND 10/26/2025 04:25PM ET,IND,26.89
 RB,Christian McCaffrey (40470032),Christian McCaffrey,40470032,RB/FLEX,9000,SF@HOU 10/26/2025 01:00PM ET,SF,27.16
 RB,Bijan Robinson (40470034),Bijan Robinson,40470034,RB/FLEX,8800,MIA@ATL 10/26/2025 01:00PM ET,ATL,26.23
@@ -506,4 +506,3 @@ DST,Dolphins  (40470886),Dolphins ,40470886,DST,2200,MIA@ATL 10/26/2025 01:00PM 
 DST,Panthers  (40470887),Panthers ,40470887,DST,2200,BUF@CAR 10/26/2025 01:00PM ET,CAR,6.29
 DST,Giants  (40470888),Giants ,40470888,DST,2100,NYG@PHI 10/26/2025 01:00PM ET,NYG,3.29
 DST,Titans  (40470889),Titans ,40470889,DST,2000,TEN@IND 10/26/2025 04:25PM ET,TEN,4.29
-`;

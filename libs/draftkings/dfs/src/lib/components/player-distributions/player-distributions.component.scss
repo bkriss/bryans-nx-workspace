@@ -4,23 +4,23 @@
   line-height: normal;
   padding-bottom: 5px;
 
-  &.qb-text-color {
+  &.qb-header {
     border-color: var(--qb-red);
   }
 
-  &.rb-text-color {
+  &.rb-header {
     border-color: var(--rb-green);
   }
 
-  &.wr-text-color {
+  &.wr-header {
     border-color: var(--wr-blue);
   }
 
-  &.te-text-color {
+  &.te-header {
     border-color: var(--te-orange);
   }
 
-  &.dst-text-color {
+  &.dst-header {
     border-color: var(--dst-brown);
   }
 }
