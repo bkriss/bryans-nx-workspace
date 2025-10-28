@@ -23,6 +23,7 @@ export interface Quarterback extends Player {
 
 export interface RunningBack extends Player {
   allowRBFromOpposingTeam: boolean;
+  useAsAlternate: boolean;
 }
 
 export interface PassCatcherStack {
@@ -56,4 +57,13 @@ export interface PassCatcher extends Player {
   maxOwnershipWhenPairedWithOpposingQb?: number;
   minOwnershipWhenPairedWithOpposingQb?: number;
   onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: boolean;
+}
+
+export interface Flex extends Player {
+  allowRBFromOpposingTeam?: boolean;
+  maxOwnershipWhenPairedWithQb?: number;
+  minOwnershipWhenPairedWithQb?: number;
+  maxOwnershipWhenPairedWithOpposingQb?: number;
+  minOwnershipWhenPairedWithOpposingQb?: number;
+  onlyUseIfPartOfStackOrPlayingWithOrAgainstQb?: boolean;
 }

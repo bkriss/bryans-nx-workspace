@@ -35,6 +35,9 @@ import { Position } from '../../enums';
 import {
   selectedQuarterbacks,
   selectedRunningBacks,
+  selectedWideReceivers,
+  selectedTightEnds,
+  selectedDSTs,
 } from '../../utils/selected-players.util';
 
 @Component({
@@ -82,21 +85,21 @@ export class DfsComponent implements OnInit {
   });
   wrSelectionFormGroup = this._formBuilder.group({
     wrPoolCtrl: [
-      [] as WideReceiver[],
+      [...selectedWideReceivers] as WideReceiver[],
       // [Validators.minLength(18), Validators.maxLength(30)],
       [Validators.minLength(0), Validators.maxLength(30)],
     ],
   });
   teSelectionFormGroup = this._formBuilder.group({
     tePoolCtrl: [
-      [] as TightEnd[],
+      [...selectedTightEnds] as TightEnd[],
       // [Validators.minLength(4), Validators.maxLength(10)],
       [Validators.minLength(0), Validators.maxLength(10)],
     ],
   });
   dstSelectionFormGroup = this._formBuilder.group({
     dstPoolCtrl: [
-      [] as Player[],
+      [...selectedDSTs] as Player[],
       // [Validators.minLength(4), Validators.maxLength(7)],
       [Validators.minLength(0), Validators.maxLength(7)],
     ],

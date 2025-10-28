@@ -1,58 +1,104 @@
-<div class="p-4">
-  @if (numberOfInvalidLineups() > 0) {
-  <div
-    class="bg-red-500 flex font-bold h-13 items-center justify-center mb-4 p-2 rounded shadow-sm shadow-black text-lg text-white"
-  >
-    <mat-icon class="mr-1">error</mat-icon>
-    {{ numberOfInvalidLineups() }}/{{ lineups().length }} lineups are invalid
-  </div>
-  }
+<mat-tab-group dynamicHeight>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <span>Lineups</span>
+      @if (numberOfInvalidLineups() > 0) {
+      <span
+        class="flex bg-red-600 ml-3 rounded-full px-3 py-1 text-xs items-center"
+      >
+        {{ numberOfInvalidLineups() }}/{{ lineups().length }} invalid
+      </span>
+      }
+    </ng-template>
 
-  <div class="grid justify-end gap-1 grid-flow-col">
-    <button class="mb-4" matFab extended (click)="outputAsJson()">
-      <mat-icon>query_stats</mat-icon>
-      Copy Lineups as JSON
-    </button>
+    <div class="p-4">
+      <div class="grid gap-1 grid-flow-col justify-between">
+        <mat-form-field class="self-start">
+          <mat-label>Current Quarterback</mat-label>
+          <mat-select
+            (selectionChange)="selectedNewQuarterback($event.value)"
+            [ngModel]="currentQb"
+          >
+            @for (qb of qbPool; track qb.id) {
+            <mat-option [value]="qb">
+              {{ qb.name }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-    <dfs-player-overlap-imbalance-button
-      class="inline-block"
-      [lineups]="lineups()"
-      [rbPool]="rbPool"
-      [wrPool]="wrPool"
-      [tePool]="tePool"
-      [dstPool]="dstPool"
-    ></dfs-player-overlap-imbalance-button>
-  </div>
+        <div>
+          <!-- <button
+            class="mb-4 self-end"
+            matFab
+            extended
+            (click)="outputAsJson()"
+          >
+            <mat-icon>query_stats</mat-icon>
+            Copy Lineups as JSON
+          </button> -->
+          <button class="mb-4 mr-2" matFab extended (click)="saveLineups()">
+            <mat-icon>save</mat-icon>
+            Save Lineups
+          </button>
 
-  <mat-accordion class="block mb-4">
-    <mat-expansion-panel hideToggle>
-      <mat-expansion-panel-header>
-        <mat-panel-title class="text-lg">
-          <mat-icon class="mr-2">format_list_numbered</mat-icon>
-          Player Distributions For {{ currentQb().name }} Lineups
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <dfs-player-distributions
-        [currentQb]="currentQb()"
-        [runningBackDistribution]="runningBackDistribution"
-        [wideReceiverDistribution]="wideReceiverDistribution"
-        [tightEndDistribution]="tightEndDistribution"
-        [dstDistribution]="dstDistribution"
-      ></dfs-player-distributions>
-    </mat-expansion-panel>
-  </mat-accordion>
+          <dfs-player-overlap-imbalance-button
+            class="inline-block self-end"
+            [lineups]="lineups()"
+            [rbPool]="rbPool"
+            [wrPool]="wrPool"
+            [tePool]="tePool"
+            [dstPool]="dstPool"
+          ></dfs-player-overlap-imbalance-button>
+        </div>
+      </div>
 
-  <div class="lineup-builders-container">
-    @for (lineup of lineups(); track lineup.lineupIndex) {
-    <dfs-lineup-builder
-      [qbPool]="qbPool"
-      [runningBackPool]="rbPool"
-      [wideReceiverPool]="wrPool"
-      [tightEndPool]="tePool"
-      [dstPool]="dstPool"
-      [lineup]="lineup"
-      (updateLineup)="updateLineup($event)"
-    ></dfs-lineup-builder>
-    }
-  </div>
-</div>
+      <mat-accordion class="block mb-4">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <!-- <mat-panel-title class="text-lg font-">
+              <mat-icon class="mr-2">format_list_numbered</mat-icon>
+              Player Distributions For
+              <span class="text-white px-[5px] qb-text-color">{{
+                currentQb().name
+              }}</span>
+              Lineups
+            </mat-panel-title> -->
+            <mat-panel-title class="text-lg">
+              <mat-icon class="mr-2">format_list_numbered</mat-icon>
+              Player Distributions
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <dfs-player-distributions
+            [currentQb]="currentQb()"
+            [runningBackDistribution]="runningBackDistribution"
+            [wideReceiverDistribution]="wideReceiverDistribution"
+            [tightEndDistribution]="tightEndDistribution"
+            [dstDistribution]="dstDistribution"
+          ></dfs-player-distributions>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+      <div class="lineup-builders-container">
+        @for (lineup of lineups(); track lineup.lineupId) {
+        <dfs-lineup-builder
+          [qbPool]="qbPool"
+          [runningBackPool]="rbPool"
+          [wideReceiverPool]="wrPool"
+          [tightEndPool]="tePool"
+          [dstPool]="dstPool"
+          [lineup]="lineup"
+          (updateLineup)="updateLineup($event)"
+        ></dfs-lineup-builder>
+        }
+      </div>
+    </div>
+  </mat-tab>
+  <mat-tab label="Entries">
+    <ng-template matTabContent>
+      <div class="p-4">
+        <dfs-entries [numberOfQbs]="qbPool.length"></dfs-entries>
+      </div>
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

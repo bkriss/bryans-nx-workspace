@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -9,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTabsModule } from '@angular/material/tabs';
 import {
   Lineup,
   PassCatcher,
@@ -36,17 +38,29 @@ import { MatIconModule } from '@angular/material/icon';
 import { PlayerOverlapImbalanceButtonComponent } from '../player-overlap-imbalance-button/player-overlap-imbalance-button.component';
 import { MatButtonModule } from '@angular/material/button';
 import {
+  selectedDSTs,
   selectedQuarterbacks,
   selectedRunningBacks,
+  selectedTightEnds,
+  selectedWideReceivers,
 } from '../../utils/selected-players.util';
+import { EntriesComponent } from '../contests/entries.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   imports: [
     CommonModule,
+    EntriesComponent,
+    FormsModule,
     LineupBuilderComponent,
     MatButtonModule, // TODO: Remove
+    MatFormFieldModule,
     MatIconModule,
     MatExpansionModule,
+    MatSelectModule,
+    MatTabsModule,
     PlayerDistributionsComponent,
     PlayerOverlapImbalanceButtonComponent,
   ],
@@ -64,767 +78,10 @@ export class LineupBuildersPageComponent implements OnInit {
 
   qbPool: Quarterback[] = [...selectedQuarterbacks];
   rbPool: RunningBack[] = [...selectedRunningBacks];
-  wrPool: WideReceiver[] = [
-    {
-      gameInfo: 'DAL@DEN',
-      gradeOutOfTen: 9,
-      id: '40470280',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Courtland Sutton',
-      nameAbbrev: 'C. Sutton',
-      opposingTeamAbbrev: 'DAL',
-      position: 'WR',
-      salary: 6200,
-      teamAbbrev: 'DEN',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'MIA@ATL',
-      gradeOutOfTen: 8.9,
-      id: '40470276',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Drake London',
-      nameAbbrev: 'D. London',
-      opposingTeamAbbrev: 'MIA',
-      position: 'WR',
-      salary: 6400,
-      teamAbbrev: 'ATL',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'CHI@BAL',
-      gradeOutOfTen: 8.8,
-      id: '40470278',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Rome Odunze',
-      nameAbbrev: 'R. Odunze',
-      opposingTeamAbbrev: 'BAL',
-      position: 'WR',
-      salary: 6300,
-      teamAbbrev: 'CHI',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'BUF@CAR',
-      gradeOutOfTen: 8.7,
-      id: '40470292',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Tetairoa McMillan',
-      nameAbbrev: 'T. McMillan',
-      opposingTeamAbbrev: 'BUF',
-      position: 'WR',
-      salary: 5700,
-      teamAbbrev: 'CAR',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TB@NO',
-      gradeOutOfTen: 8.6,
-      id: '40470272',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Emeka Egbuka',
-      nameAbbrev: 'E. Egbuka',
-      opposingTeamAbbrev: 'NO',
-      position: 'WR',
-      salary: 7000,
-      teamAbbrev: 'TB',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TB@NO',
-      gradeOutOfTen: 8.5,
-      id: '40470290',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Chris Olave',
-      nameAbbrev: 'C. Olave',
-      opposingTeamAbbrev: 'TB',
-      position: 'WR',
-      salary: 5800,
-      teamAbbrev: 'NO',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'DAL@DEN',
-      gradeOutOfTen: 8.4,
-      id: '40470266',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'CeeDee Lamb',
-      nameAbbrev: 'C. Lamb',
-      opposingTeamAbbrev: 'DEN',
-      position: 'WR',
-      salary: 7800,
-      teamAbbrev: 'DAL',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'DAL@DEN',
-      gradeOutOfTen: 8.3,
-      id: '40470270',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'George Pickens',
-      nameAbbrev: 'G. Pickens',
-      opposingTeamAbbrev: 'DEN',
-      position: 'WR',
-      salary: 7100,
-      teamAbbrev: 'DAL',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'NYG@PHI',
-      gradeOutOfTen: 8.2,
-      id: '40470282',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'A.J. Brown',
-      nameAbbrev: 'A. Brown',
-      opposingTeamAbbrev: 'NYG',
-      position: 'WR',
-      salary: 6100,
-      teamAbbrev: 'PHI',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'CLE@NE',
-      gradeOutOfTen: 8.1,
-      id: '40470288',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Stefon Diggs',
-      nameAbbrev: 'S. Diggs',
-      opposingTeamAbbrev: 'CLE',
-      position: 'WR',
-      salary: 5800,
-      teamAbbrev: 'NE',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'MIA@ATL',
-      gradeOutOfTen: 8,
-      id: '40470294',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Jaylen Waddle',
-      nameAbbrev: 'J. Waddle',
-      opposingTeamAbbrev: 'ATL',
-      position: 'WR',
-      salary: 5700,
-      teamAbbrev: 'MIA',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'NYJ@CIN',
-      gradeOutOfTen: 7.9,
-      id: '40470296',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Tee Higgins',
-      nameAbbrev: 'T. Higgins',
-      opposingTeamAbbrev: 'NYJ',
-      position: 'WR',
-      salary: 5600,
-      teamAbbrev: 'CIN',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TB@NO',
-      gradeOutOfTen: 7.8,
-      id: '40470336',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Tez Johnson',
-      nameAbbrev: 'T. Johnson',
-      opposingTeamAbbrev: 'NO',
-      position: 'WR',
-      salary: 4300,
-      teamAbbrev: 'TB',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TEN@IND',
-      gradeOutOfTen: 7.7,
-      id: '40470298',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Michael Pittman Jr.',
-      nameAbbrev: 'M. Pittman Jr.',
-      opposingTeamAbbrev: 'TEN',
-      position: 'WR',
-      salary: 5600,
-      teamAbbrev: 'IND',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'CHI@BAL',
-      gradeOutOfTen: 7.6,
-      id: '40470302',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Zay Flowers',
-      nameAbbrev: 'Z. Flowers',
-      opposingTeamAbbrev: 'CHI',
-      position: 'WR',
-      salary: 5400,
-      teamAbbrev: 'BAL',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'NYG@PHI',
-      gradeOutOfTen: 7.5,
-      id: '40470308',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: "Wan'Dale Robinson",
-      nameAbbrev: 'W. Robinson',
-      opposingTeamAbbrev: 'PHI',
-      position: 'WR',
-      salary: 5200,
-      teamAbbrev: 'NYG',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'BUF@CAR',
-      gradeOutOfTen: 7.4,
-      id: '40470310',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Khalil Shakir',
-      nameAbbrev: 'K. Shakir',
-      opposingTeamAbbrev: 'CAR',
-      position: 'WR',
-      salary: 5100,
-      teamAbbrev: 'BUF',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TB@NO',
-      gradeOutOfTen: 7.3,
-      id: '40470324',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Rashid Shaheed',
-      nameAbbrev: 'R. Shaheed',
-      opposingTeamAbbrev: 'TB',
-      position: 'WR',
-      salary: 4700,
-      teamAbbrev: 'NO',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'MIA@ATL',
-      gradeOutOfTen: 7.2,
-      id: '40470332',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Darnell Mooney',
-      nameAbbrev: 'D. Mooney',
-      opposingTeamAbbrev: 'MIA',
-      position: 'WR',
-      salary: 4400,
-      teamAbbrev: 'ATL',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'CLE@NE',
-      gradeOutOfTen: 7.1,
-      id: '40470320',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Kayshon Boutte',
-      nameAbbrev: 'K. Boutte',
-      opposingTeamAbbrev: 'CLE',
-      position: 'WR',
-      salary: 4800,
-      teamAbbrev: 'NE',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TB@NO',
-      gradeOutOfTen: 7,
-      id: '40470330',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Sterling Shepard',
-      nameAbbrev: 'S. Shepard',
-      opposingTeamAbbrev: 'NO',
-      position: 'WR',
-      salary: 4500,
-      teamAbbrev: 'TB',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'NYJ@CIN',
-      gradeOutOfTen: 6.9,
-      id: '40470264',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: "Ja'Marr Chase",
-      nameAbbrev: 'J. Chase',
-      opposingTeamAbbrev: 'NYJ',
-      position: 'WR',
-      salary: 8100,
-      teamAbbrev: 'CIN',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'DAL@DEN',
-      gradeOutOfTen: 6.8,
-      id: '40470338',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Troy Franklin',
-      nameAbbrev: 'T. Franklin',
-      opposingTeamAbbrev: 'DAL',
-      position: 'WR',
-      salary: 4200,
-      teamAbbrev: 'DEN',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'CLE@NE',
-      gradeOutOfTen: 6.7,
-      id: '40470342',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Jerry Jeudy',
-      nameAbbrev: 'J. Jeudy',
-      opposingTeamAbbrev: 'NE',
-      position: 'WR',
-      salary: 4100,
-      teamAbbrev: 'CLE',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'SF@HOU',
-      gradeOutOfTen: 6.6,
-      id: '40470380',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Jaylin Noel',
-      nameAbbrev: 'J. Noel',
-      opposingTeamAbbrev: 'SF',
-      position: 'WR',
-      salary: 3500,
-      teamAbbrev: 'HOU',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'DAL@DEN',
-      gradeOutOfTen: 6.5,
-      id: '40470354',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Marvin Mims Jr.',
-      nameAbbrev: 'M. Mims Jr.',
-      opposingTeamAbbrev: 'DAL',
-      position: 'WR',
-      salary: 3900,
-      teamAbbrev: 'DEN',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TEN@IND',
-      gradeOutOfTen: 6.4,
-      id: '40470356',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Elic Ayomanor',
-      nameAbbrev: 'E. Ayomanor',
-      opposingTeamAbbrev: 'IND',
-      position: 'WR',
-      salary: 3900,
-      teamAbbrev: 'TEN',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'BUF@CAR',
-      gradeOutOfTen: 6.3,
-      id: '40470358',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Jalen Coker',
-      nameAbbrev: 'J. Coker',
-      opposingTeamAbbrev: 'BUF',
-      position: 'WR',
-      salary: 3800,
-      teamAbbrev: 'CAR',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-  ];
-  tePool: TightEnd[] = [
-    {
-      gameInfo: 'CLE@NE',
-      gradeOutOfTen: 9,
-      id: '40470662',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Harold Fannin Jr.',
-      nameAbbrev: 'H. Fannin Jr.',
-      opposingTeamAbbrev: 'NE',
-      position: 'TE',
-      salary: 4400,
-      teamAbbrev: 'CLE',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'NYJ@CIN',
-      gradeOutOfTen: 8.9,
-      id: '40470680',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Mason Taylor',
-      nameAbbrev: 'M. Taylor',
-      opposingTeamAbbrev: 'CIN',
-      position: 'TE',
-      salary: 3500,
-      teamAbbrev: 'NYJ',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'NYJ@CIN',
-      gradeOutOfTen: 8.8,
-      id: '40470690',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Noah Fant',
-      nameAbbrev: 'N. Fant',
-      opposingTeamAbbrev: 'NYJ',
-      position: 'TE',
-      salary: 3200,
-      teamAbbrev: 'CIN',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TEN@IND',
-      gradeOutOfTen: 8.7,
-      id: '40470658',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Tyler Warren',
-      nameAbbrev: 'T. Warren',
-      opposingTeamAbbrev: 'TEN',
-      position: 'TE',
-      salary: 5500,
-      teamAbbrev: 'IND',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'TB@NO',
-      gradeOutOfTen: 8.6,
-      id: '40470684',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Cade Otton',
-      nameAbbrev: 'C. Otton',
-      opposingTeamAbbrev: 'NO',
-      position: 'TE',
-      salary: 3400,
-      teamAbbrev: 'TB',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'CHI@BAL',
-      gradeOutOfTen: 8.5,
-      id: '40470698',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Colston Loveland',
-      nameAbbrev: 'C. Loveland',
-      opposingTeamAbbrev: 'BAL',
-      position: 'TE',
-      salary: 3000,
-      teamAbbrev: 'CHI',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'SF@HOU',
-      gradeOutOfTen: 8.4,
-      id: '40470660',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'George Kittle',
-      nameAbbrev: 'G. Kittle',
-      opposingTeamAbbrev: 'HOU',
-      position: 'TE',
-      salary: 4500,
-      teamAbbrev: 'SF',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-    {
-      gameInfo: 'DAL@DEN',
-      gradeOutOfTen: 8.3,
-      id: '40470668',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      name: 'Evan Engram',
-      nameAbbrev: 'E. Engram',
-      opposingTeamAbbrev: 'DAL',
-      position: 'TE',
-      salary: 4100,
-      teamAbbrev: 'DEN',
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    },
-  ];
-  dstPool: Player[] = [
-    {
-      gameInfo: 'SF@HOU',
-      gradeOutOfTen: 9,
-      id: '40470878',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 30,
-      minOwnershipPercentage: 10,
-      name: '49ers',
-      nameAbbrev: '49ers',
-      opposingTeamAbbrev: 'HOU',
-      position: 'DST',
-      salary: 2900,
-      teamAbbrev: 'SF',
-    },
-    {
-      gameInfo: 'NYJ@CIN',
-      gradeOutOfTen: 8.9,
-      id: '40470880',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 30,
-      minOwnershipPercentage: 10,
-      name: 'Bengals',
-      nameAbbrev: 'Bengals',
-      opposingTeamAbbrev: 'NYJ',
-      position: 'DST',
-      salary: 2700,
-      teamAbbrev: 'CIN',
-    },
-    {
-      gameInfo: 'CHI@BAL',
-      gradeOutOfTen: 8.8,
-      id: '40470881',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 30,
-      minOwnershipPercentage: 10,
-      name: 'Bears',
-      nameAbbrev: 'Bears',
-      opposingTeamAbbrev: 'BAL',
-      position: 'DST',
-      salary: 2600,
-      teamAbbrev: 'CHI',
-    },
-    {
-      gameInfo: 'NYJ@CIN',
-      gradeOutOfTen: 8.7,
-      id: '40470885',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 30,
-      minOwnershipPercentage: 10,
-      name: 'Jets',
-      nameAbbrev: 'Jets',
-      opposingTeamAbbrev: 'CIN',
-      position: 'DST',
-      salary: 2300,
-      teamAbbrev: 'NYJ',
-    },
-    {
-      gameInfo: 'BUF@CAR',
-      gradeOutOfTen: 8.6,
-      id: '40470874',
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 30,
-      minOwnershipPercentage: 10,
-      name: 'Bills',
-      nameAbbrev: 'Bills',
-      opposingTeamAbbrev: 'CAR',
-      position: 'DST',
-      salary: 3300,
-      teamAbbrev: 'BUF',
-    },
-  ];
-
+  wrPool: WideReceiver[] = [...selectedWideReceivers];
+  tePool: TightEnd[] = [...selectedTightEnds];
+  dstPool: Player[] = [...selectedDSTs];
+  // TODO: Set this value after view initialization so the select shows correct initial value?
   currentQb: WritableSignal<Quarterback> = signal(this.qbPool[0]);
 
   // TODO: Remove quarterbackDistribution?
@@ -1285,319 +542,337 @@ export class LineupBuildersPageComponent implements OnInit {
   // TOOD: Add logic to account for requirePassCatcherFromOpposingTeam flag
   // TOOD: Add logic to increase probability of certain players being in certain lineups
   generateLineups(): void {
+    console.log('Generating Lineups...');
     const rbCombosWithDuplicates = this.generateRbCombos(4);
     const lineupsArray: Lineup[] = [];
-    this.qbPool.forEach((qb) => {
-      if (!qb.numberOfLineupsWithThisPlayer) return;
+    const qb = this.currentQb();
+    // this.qbPool.forEach((qb) => {
+    if (!qb.numberOfLineupsWithThisPlayer) return;
 
-      const filteredRbCombos = rbCombosWithDuplicates.filter(
-        (rbCombo) =>
-          rbCombo[0].teamAbbrev !== qb.teamAbbrev &&
-          rbCombo[1].teamAbbrev !== qb.teamAbbrev &&
-          rbCombo[0].teamAbbrev !== rbCombo[1].teamAbbrev
-      );
+    const filteredRbCombos = rbCombosWithDuplicates.filter(
+      (rbCombo) =>
+        rbCombo[0].teamAbbrev !== qb.teamAbbrev &&
+        rbCombo[1].teamAbbrev !== qb.teamAbbrev &&
+        rbCombo[0].teamAbbrev !== rbCombo[1].teamAbbrev
+    );
 
-      for (let i = 0; i < qb.numberOfLineupsWithThisPlayer; i++) {
-        const rb1 = filteredRbCombos[i][0];
-        const rb2 = filteredRbCombos[i][1];
-        const totalRbComboSalary = rb1.salary + rb2.salary;
-        let wr1: WideReceiver | null = null;
-        let wr2: WideReceiver | null = null;
-        let wr3: WideReceiver | null = null;
-        let te: TightEnd | null = null;
-        let flex: WideReceiver | null = null;
-        let dst: Player | null = null;
-        let remainingSalary = 50000;
+    for (let i = 0; i < qb.numberOfLineupsWithThisPlayer; i++) {
+      const rb1 = filteredRbCombos[i][0];
+      const rb2 = filteredRbCombos[i][1];
+      const totalRbComboSalary = rb1.salary + rb2.salary;
+      let wr1: WideReceiver | null = null;
+      let wr2: WideReceiver | null = null;
+      let wr3: WideReceiver | null = null;
+      let te: TightEnd | null = null;
+      let flex: WideReceiver | null = null;
+      let dst: Player | null = null;
+      let remainingSalary = 50000;
 
-        // TODO: If this doesn't end up being used, then delete addRandomizedGradeToQbPassCatcherPairings
-        // const qbPassCatcherPairingsSortedByRandomGrade: PassCatcherStack[] =
-        //   this.addRandomizedGradeToQbPassCatcherPairings(
-        //     qb.qbPassCatcherPairings
-        //   );
+      // TODO: If this doesn't end up being used, then delete addRandomizedGradeToQbPassCatcherPairings
+      // const qbPassCatcherPairingsSortedByRandomGrade: PassCatcherStack[] =
+      //   this.addRandomizedGradeToQbPassCatcherPairings(
+      //     qb.qbPassCatcherPairings
+      //   );
 
-        const qbPassCatcherPairingsAccountingForPlayerLimits =
-          qb.qbPassCatcherPairings.filter((pairing) => {
-            const foundPlayerThatisOverLimit = pairing.passCatchers.some(
-              (pc) => {
-                let passCatcherDistribution: PlayerDistribution | undefined;
+      const qbPassCatcherPairingsAccountingForPlayerLimits =
+        qb.qbPassCatcherPairings.filter((pairing) => {
+          const foundPlayerThatisOverLimit = pairing.passCatchers.some((pc) => {
+            let passCatcherDistribution: PlayerDistribution | undefined;
 
-                if (pc.position === 'WR') {
-                  passCatcherDistribution =
-                    this.wideReceiverDistribution().find(
-                      (dist) => dist.playerId === pc.id
-                    );
-                } else {
-                  passCatcherDistribution = this.tightEndDistribution().find(
-                    (dist) => dist.playerId === pc.id
-                  );
-                }
-
-                if (!passCatcherDistribution) return true;
-
-                const { percentageOfLineups } = passCatcherDistribution;
-
-                const pairedWithQb = pc.teamAbbrev === qb.teamAbbrev;
-                const pairedWithOpposingQb =
-                  pc.teamAbbrev === qb.opposingTeamAbbrev;
-
-                return (
-                  (pairedWithQb &&
-                    percentageOfLineups >=
-                      (pc.maxOwnershipWhenPairedWithQb || 0)) ||
-                  (pairedWithOpposingQb &&
-                    percentageOfLineups >=
-                      (pc.maxOwnershipWhenPairedWithOpposingQb || 0))
-                );
-              }
-            );
-            return !foundPlayerThatisOverLimit;
-          });
-
-        const qbPassCatcherPairingsSortedByRandomGrade: PassCatcherStack[] =
-          this.addRandomizedGradeToQbPassCatcherPairings(
-            qbPassCatcherPairingsAccountingForPlayerLimits
-          );
-
-        console.log('qbPassCatcherPairings 1', qb.qbPassCatcherPairings);
-        console.log(
-          'qbPassCatcherPairings 2',
-          qbPassCatcherPairingsAccountingForPlayerLimits
-        );
-        console.log(
-          'qbPassCatcherPairings 3',
-          qbPassCatcherPairingsSortedByRandomGrade
-        );
-        // console.log(
-        //   'qbPassCatcherPairingsAccountingForPlayerLimits',
-        //   qbPassCatcherPairingsAccountingForPlayerLimits
-        // );
-
-        for (const passCatcherStack of qbPassCatcherPairingsSortedByRandomGrade) {
-          const totalCostOfQbRbComboAndThisPassCatcherCombo =
-            qb.salary -
-            totalRbComboSalary -
-            passCatcherStack.totalCostOfThisPassCatcherCombo;
-
-          const totalCostOfCheapestPossibleRemainingPlayers =
-            this.calculateTotalCostOfCheapestPossibleRemainingPlayers(
-              passCatcherStack.passCatchers,
-              qb,
-              rb1,
-              rb2
-            );
-
-          remainingSalary =
-            50000 -
-            totalCostOfQbRbComboAndThisPassCatcherCombo -
-            totalCostOfCheapestPossibleRemainingPlayers;
-
-          if (
-            remainingSalary - totalCostOfCheapestPossibleRemainingPlayers >=
-            0
-          ) {
-            if (passCatcherStack.passCatchers.length === 1) {
-              if (passCatcherStack.passCatchers[0].position === 'TE') {
-                te = passCatcherStack.passCatchers[0] as TightEnd;
-              } else {
-                wr1 = passCatcherStack.passCatchers[0] as WideReceiver;
-              }
-            } else if (passCatcherStack.passCatchers.length === 2) {
-              if (passCatcherStack.passCatchers[0].position === 'TE') {
-                te = passCatcherStack.passCatchers[0] as TightEnd;
-                wr1 = passCatcherStack.passCatchers[1] as WideReceiver;
-              } else if (passCatcherStack.passCatchers[1].position === 'TE') {
-                te = passCatcherStack.passCatchers[1] as TightEnd;
-                wr1 = passCatcherStack.passCatchers[0] as WideReceiver;
-              } else {
-                wr1 = passCatcherStack.passCatchers[0] as WideReceiver;
-                wr2 = passCatcherStack.passCatchers[1] as WideReceiver;
-              }
-            } else if (passCatcherStack.passCatchers.length === 3) {
-              const wrs = passCatcherStack.passCatchers.filter(
-                (pc) => pc.position === 'WR'
-              ) as WideReceiver[];
-              te =
-                (passCatcherStack.passCatchers.find(
-                  (pc) => pc.position === 'TE'
-                ) as TightEnd) || null;
-              wr1 = wrs[0] || null;
-              wr2 = wrs[1] || null;
-              wr3 = wrs[2] || null;
+            if (pc.position === 'WR') {
+              passCatcherDistribution = this.wideReceiverDistribution().find(
+                (dist) => dist.playerId === pc.id
+              );
+            } else {
+              passCatcherDistribution = this.tightEndDistribution().find(
+                (dist) => dist.playerId === pc.id
+              );
             }
 
-            break;
+            if (!passCatcherDistribution) return true;
+
+            const { percentageOfLineups } = passCatcherDistribution;
+
+            const pairedWithQb = pc.teamAbbrev === qb.teamAbbrev;
+            const pairedWithOpposingQb =
+              pc.teamAbbrev === qb.opposingTeamAbbrev;
+
+            return (
+              (pairedWithQb &&
+                percentageOfLineups >=
+                  (pc.maxOwnershipWhenPairedWithQb || 0)) ||
+              (pairedWithOpposingQb &&
+                percentageOfLineups >=
+                  (pc.maxOwnershipWhenPairedWithOpposingQb || 0))
+            );
+          });
+          return !foundPlayerThatisOverLimit;
+        });
+
+      const qbPassCatcherPairingsSortedByRandomGrade: PassCatcherStack[] =
+        this.addRandomizedGradeToQbPassCatcherPairings(
+          qbPassCatcherPairingsAccountingForPlayerLimits
+        );
+
+      console.log('qbPassCatcherPairings 1', qb.qbPassCatcherPairings);
+      console.log(
+        'qbPassCatcherPairings 2',
+        qbPassCatcherPairingsAccountingForPlayerLimits
+      );
+      console.log(
+        'qbPassCatcherPairings 3',
+        qbPassCatcherPairingsSortedByRandomGrade
+      );
+      // console.log(
+      //   'qbPassCatcherPairingsAccountingForPlayerLimits',
+      //   qbPassCatcherPairingsAccountingForPlayerLimits
+      // );
+
+      for (const passCatcherStack of qbPassCatcherPairingsSortedByRandomGrade) {
+        const totalCostOfQbRbComboAndThisPassCatcherCombo =
+          qb.salary -
+          totalRbComboSalary -
+          passCatcherStack.totalCostOfThisPassCatcherCombo;
+
+        const totalCostOfCheapestPossibleRemainingPlayers =
+          this.calculateTotalCostOfCheapestPossibleRemainingPlayers(
+            passCatcherStack.passCatchers,
+            qb,
+            rb1,
+            rb2
+          );
+
+        remainingSalary =
+          50000 -
+          totalCostOfQbRbComboAndThisPassCatcherCombo -
+          totalCostOfCheapestPossibleRemainingPlayers;
+
+        if (
+          remainingSalary - totalCostOfCheapestPossibleRemainingPlayers >=
+          0
+        ) {
+          if (passCatcherStack.passCatchers.length === 1) {
+            if (passCatcherStack.passCatchers[0].position === 'TE') {
+              te = passCatcherStack.passCatchers[0] as TightEnd;
+            } else {
+              wr1 = passCatcherStack.passCatchers[0] as WideReceiver;
+            }
+          } else if (passCatcherStack.passCatchers.length === 2) {
+            if (passCatcherStack.passCatchers[0].position === 'TE') {
+              te = passCatcherStack.passCatchers[0] as TightEnd;
+              wr1 = passCatcherStack.passCatchers[1] as WideReceiver;
+            } else if (passCatcherStack.passCatchers[1].position === 'TE') {
+              te = passCatcherStack.passCatchers[1] as TightEnd;
+              wr1 = passCatcherStack.passCatchers[0] as WideReceiver;
+            } else {
+              wr1 = passCatcherStack.passCatchers[0] as WideReceiver;
+              wr2 = passCatcherStack.passCatchers[1] as WideReceiver;
+            }
+          } else if (passCatcherStack.passCatchers.length === 3) {
+            const wrs = passCatcherStack.passCatchers.filter(
+              (pc) => pc.position === 'WR'
+            ) as WideReceiver[];
+            te =
+              (passCatcherStack.passCatchers.find(
+                (pc) => pc.position === 'TE'
+              ) as TightEnd) || null;
+            wr1 = wrs[0] || null;
+            wr2 = wrs[1] || null;
+            wr3 = wrs[2] || null;
           }
 
           break;
         }
 
-        let currentCost =
-          qb.salary +
-          rb1.salary +
-          rb2.salary +
-          (wr1?.salary || 0) +
-          (wr2?.salary || 0) +
-          (wr3?.salary || 0) +
-          (te?.salary || 0);
-
-        const currentLineup: Lineup = {
-          lineupGroup: qb.id,
-          lineupIndex: i,
-          qb,
-          rb1,
-          rb2,
-          wr1,
-          wr2,
-          wr3,
-          te,
-          flex,
-          dst,
-          remainingSalary: 50000 - currentCost,
-        };
-
-        let restrictedPassCatcherTeams = [
-          qb.teamAbbrev,
-          qb.opposingTeamAbbrev,
-          rb1.teamAbbrev,
-          rb2.teamAbbrev,
-        ];
-
-        if (!wr1) {
-          const costOfCheapestPossibleRemainingPlayers =
-            this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
-              currentLineup,
-              'WR1'
-            );
-          wr1 = this.findWideReceiverThatFitsBudget(
-            currentLineup.remainingSalary,
-            restrictedPassCatcherTeams,
-            costOfCheapestPossibleRemainingPlayers
-          );
-
-          if (wr1) {
-            currentLineup.wr1 = wr1;
-            currentLineup.remainingSalary =
-              currentLineup.remainingSalary - wr1.salary;
-            currentCost += wr1.salary;
-            restrictedPassCatcherTeams = [
-              ...restrictedPassCatcherTeams,
-              wr1.teamAbbrev,
-            ];
-          }
-        }
-
-        if (!wr2) {
-          const costOfCheapestPossibleRemainingPlayers =
-            this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
-              currentLineup,
-              'WR2'
-            );
-          wr2 = this.findWideReceiverThatFitsBudget(
-            currentLineup.remainingSalary,
-            restrictedPassCatcherTeams,
-            costOfCheapestPossibleRemainingPlayers
-          );
-
-          if (wr2) {
-            currentLineup.wr2 = wr2;
-            currentLineup.remainingSalary =
-              currentLineup.remainingSalary - wr2.salary;
-            currentCost += wr2.salary;
-            restrictedPassCatcherTeams = [
-              ...restrictedPassCatcherTeams,
-              wr2.teamAbbrev,
-            ];
-          }
-        }
-
-        if (!wr3) {
-          const costOfCheapestPossibleRemainingPlayers =
-            this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
-              currentLineup,
-              'WR3'
-            );
-          wr3 = this.findWideReceiverThatFitsBudget(
-            currentLineup.remainingSalary,
-            restrictedPassCatcherTeams,
-            costOfCheapestPossibleRemainingPlayers
-          );
-
-          if (wr3) {
-            currentLineup.wr3 = wr3;
-            currentLineup.remainingSalary =
-              currentLineup.remainingSalary - wr3.salary;
-            currentCost += wr3.salary;
-            restrictedPassCatcherTeams = [
-              ...restrictedPassCatcherTeams,
-              wr3.teamAbbrev,
-            ];
-          }
-        }
-
-        if (!flex) {
-          const costOfCheapestPossibleRemainingPlayers =
-            this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
-              currentLineup,
-              'FLEX'
-            );
-          flex = this.findWideReceiverThatFitsBudget(
-            currentLineup.remainingSalary,
-            restrictedPassCatcherTeams,
-            costOfCheapestPossibleRemainingPlayers
-          );
-
-          if (flex) {
-            currentLineup.flex = flex;
-            // TODO: Use Signal to automatically update the remainingSalary and currentCost
-            currentLineup.remainingSalary =
-              currentLineup.remainingSalary - flex.salary;
-            currentCost += flex.salary;
-            restrictedPassCatcherTeams = [
-              ...restrictedPassCatcherTeams,
-              flex.teamAbbrev,
-            ];
-          }
-        }
-
-        if (!te) {
-          const costOfCheapestPossibleRemainingPlayers =
-            this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
-              currentLineup,
-              'TE'
-            );
-          te = this.findTightEndThatFitsBudget(
-            currentLineup.remainingSalary,
-            restrictedPassCatcherTeams,
-            costOfCheapestPossibleRemainingPlayers
-          );
-
-          if (te) {
-            currentLineup.te = te;
-            currentLineup.remainingSalary =
-              currentLineup.remainingSalary - te.salary;
-            currentCost += te.salary;
-            restrictedPassCatcherTeams = [
-              ...restrictedPassCatcherTeams,
-              te.teamAbbrev,
-            ];
-          }
-        }
-
-        dst = this.findDstThatFitsBudget(currentLineup);
-
-        if (dst) {
-          currentLineup.dst = dst;
-          currentLineup.remainingSalary =
-            currentLineup.remainingSalary - dst.salary;
-          currentCost += dst.salary;
-        }
-
-        // lineupsArray.push(currentLineup);
-        this.lineups.update((lineups) => [...lineups, currentLineup]);
+        break;
       }
-    });
+
+      let currentCost =
+        qb.salary +
+        rb1.salary +
+        rb2.salary +
+        (wr1?.salary || 0) +
+        (wr2?.salary || 0) +
+        (wr3?.salary || 0) +
+        (te?.salary || 0);
+
+      const currentLineup: Lineup = {
+        // lineupGroup: qb.id,
+        // lineupIndex: i,
+        lineupId: `${qb.id}-${i}`,
+        lineupGrade: 0,
+        qb: { ...qb, qbPassCatcherPairings: [] },
+        rb1,
+        rb2,
+        wr1,
+        wr2,
+        wr3,
+        te,
+        flex,
+        dst,
+        remainingSalary: 50000 - currentCost,
+      };
+
+      let restrictedPassCatcherTeams = [
+        qb.teamAbbrev,
+        qb.opposingTeamAbbrev,
+        rb1.teamAbbrev,
+        rb2.teamAbbrev,
+      ];
+
+      if (!wr1) {
+        const costOfCheapestPossibleRemainingPlayers =
+          this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
+            currentLineup,
+            'WR1'
+          );
+        wr1 = this.findWideReceiverThatFitsBudget(
+          currentLineup.remainingSalary,
+          restrictedPassCatcherTeams,
+          costOfCheapestPossibleRemainingPlayers
+        );
+
+        if (wr1) {
+          currentLineup.wr1 = wr1;
+          currentLineup.remainingSalary =
+            currentLineup.remainingSalary - wr1.salary;
+          currentCost += wr1.salary;
+          restrictedPassCatcherTeams = [
+            ...restrictedPassCatcherTeams,
+            wr1.teamAbbrev,
+          ];
+        }
+      }
+
+      if (!wr2) {
+        const costOfCheapestPossibleRemainingPlayers =
+          this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
+            currentLineup,
+            'WR2'
+          );
+        wr2 = this.findWideReceiverThatFitsBudget(
+          currentLineup.remainingSalary,
+          restrictedPassCatcherTeams,
+          costOfCheapestPossibleRemainingPlayers
+        );
+
+        if (wr2) {
+          currentLineup.wr2 = wr2;
+          currentLineup.remainingSalary =
+            currentLineup.remainingSalary - wr2.salary;
+          currentCost += wr2.salary;
+          restrictedPassCatcherTeams = [
+            ...restrictedPassCatcherTeams,
+            wr2.teamAbbrev,
+          ];
+        }
+      }
+
+      if (!wr3) {
+        const costOfCheapestPossibleRemainingPlayers =
+          this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
+            currentLineup,
+            'WR3'
+          );
+        wr3 = this.findWideReceiverThatFitsBudget(
+          currentLineup.remainingSalary,
+          restrictedPassCatcherTeams,
+          costOfCheapestPossibleRemainingPlayers
+        );
+
+        if (wr3) {
+          currentLineup.wr3 = wr3;
+          currentLineup.remainingSalary =
+            currentLineup.remainingSalary - wr3.salary;
+          currentCost += wr3.salary;
+          restrictedPassCatcherTeams = [
+            ...restrictedPassCatcherTeams,
+            wr3.teamAbbrev,
+          ];
+        }
+      }
+
+      if (!flex) {
+        const costOfCheapestPossibleRemainingPlayers =
+          this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
+            currentLineup,
+            'FLEX'
+          );
+        flex = this.findWideReceiverThatFitsBudget(
+          currentLineup.remainingSalary,
+          restrictedPassCatcherTeams,
+          costOfCheapestPossibleRemainingPlayers
+        );
+
+        if (flex) {
+          currentLineup.flex = flex;
+          // TODO: Use Signal to automatically update the remainingSalary and currentCost
+          currentLineup.remainingSalary =
+            currentLineup.remainingSalary - flex.salary;
+          currentCost += flex.salary;
+          restrictedPassCatcherTeams = [
+            ...restrictedPassCatcherTeams,
+            flex.teamAbbrev,
+          ];
+        }
+      }
+
+      if (!te) {
+        const costOfCheapestPossibleRemainingPlayers =
+          this.calculateTotalCostOfCheapestPossibleRemainingPlayers2(
+            currentLineup,
+            'TE'
+          );
+        te = this.findTightEndThatFitsBudget(
+          currentLineup.remainingSalary,
+          restrictedPassCatcherTeams,
+          costOfCheapestPossibleRemainingPlayers
+        );
+
+        if (te) {
+          currentLineup.te = te;
+          currentLineup.remainingSalary =
+            currentLineup.remainingSalary - te.salary;
+          currentCost += te.salary;
+          restrictedPassCatcherTeams = [
+            ...restrictedPassCatcherTeams,
+            te.teamAbbrev,
+          ];
+        }
+      }
+
+      dst = this.findDstThatFitsBudget(currentLineup);
+
+      if (dst) {
+        currentLineup.dst = dst;
+        currentLineup.remainingSalary =
+          currentLineup.remainingSalary - dst.salary;
+        currentCost += dst.salary;
+      }
+
+      currentLineup.lineupGrade = this.calculateLineupGrade(currentLineup);
+
+      // lineupsArray.push(currentLineup);
+      this.lineups.update((lineups) => [...lineups, currentLineup]);
+    }
+    // });
 
     // this.lineups.set(lineupsArray);
+  }
+
+  calculateLineupGrade(lineup: Lineup): number {
+    const { qb, rb1, rb2, wr1, wr2, wr3, te, flex, dst } = lineup;
+    const qbGrade = qb?.gradeOutOfTen || 0;
+    const rbGrade = (rb1?.gradeOutOfTen || 0) + (rb2?.gradeOutOfTen || 0);
+    const wrGrade =
+      (wr1?.gradeOutOfTen || 0) +
+      (wr2?.gradeOutOfTen || 0) +
+      (wr3?.gradeOutOfTen || 0);
+    const teGrade = te?.gradeOutOfTen || 0;
+    const flexGrade = flex?.gradeOutOfTen || 0;
+    const dstGrade = dst?.gradeOutOfTen || 0;
+
+    return (qbGrade + rbGrade + wrGrade + teGrade + flexGrade + dstGrade) / 90;
   }
 
   findTightEndThatFitsBudget(
@@ -1710,11 +985,11 @@ export class LineupBuildersPageComponent implements OnInit {
     return dst;
   }
 
-  generateRbCombos(numbberOfRb1s: number): Player[][] {
+  generateRbCombos(numbberOfRb1s: number): RunningBack[][] {
     // TODO: Set maxNumberOfLineups value dynamically
     const maxNumberOfLineups = 100;
     const rbCombos = [];
-    const rbCombosWithDuplicates: Player[][] = [];
+    const rbCombosWithDuplicates: RunningBack[][] = [];
     let numberOfDuplicateRbGroups = 0;
 
     for (let groupIndex = 0; groupIndex < numbberOfRb1s; groupIndex++) {
@@ -1872,13 +1147,46 @@ export class LineupBuildersPageComponent implements OnInit {
     }));
   }
 
+  selectedNewQuarterback(qb: Quarterback) {
+    // TODO: Save current lineups to DB
+    const sortedQbsByGrade = this.qbPool.sort(
+      (a, b) => b.gradeOutOfTen - a.gradeOutOfTen
+    );
+    console.log('sortedQbsByGrade', sortedQbsByGrade);
+    const qb1 = sortedQbsByGrade[0];
+    const qb2 = sortedQbsByGrade[1];
+    const qb3 = sortedQbsByGrade[2];
+    const qb4 = sortedQbsByGrade[3];
+
+    if (this.currentQb().id === qb1.id) {
+      // TOOD: Save lineups for QB1
+      console.log('saving lineups for QB1', this.lineups());
+    } else if (this.currentQb().id === qb2.id) {
+      // TOOD: Save lineups for QB2
+      console.log('saving lineups for QB2', this.lineups());
+    } else if (this.currentQb().id === qb3.id) {
+      // TOOD: Save lineups for QB3
+      console.log('saving lineups for QB3', this.lineups());
+    } else if (this.currentQb().id === qb4.id) {
+      // TOOD: Save lineups for QB4
+      console.log('saving lineups for QB4', this.lineups());
+    }
+
+    // TODO: Make sure this happens after saving is complete and successful
+
+    this.currentQb.set(qb);
+    this.lineups.set([]);
+    this.generateLineups();
+  }
+
   updateLineup(updatedLineup: Lineup) {
     console.log('updatedLineup', updatedLineup);
     // TODO: is it more efficient to use find function?
     const updatedLineups: Lineup[] = this.lineups().map((lineup) => {
       if (
-        lineup.lineupIndex === updatedLineup.lineupIndex &&
-        lineup.lineupGroup === updatedLineup.lineupGroup
+        // lineup.lineupIndex === updatedLineup.lineupIndex &&
+        // lineup.lineupGroup === updatedLineup.lineupGroup
+        lineup.lineupId === updatedLineup.lineupId
       ) {
         return updatedLineup;
       }
@@ -1915,6 +1223,7 @@ export class LineupBuildersPageComponent implements OnInit {
     return numberOfInvalidLineups;
   }
 
+  // TODO: Remove?
   outputAsJson() {
     const lineupsArrayJSON = JSON.stringify(
       this.convertLineupsToDraftKingsFormat()
@@ -1923,5 +1232,10 @@ export class LineupBuildersPageComponent implements OnInit {
     // TODO: Save this to CSV instead of copying text
     navigator.clipboard.writeText(lineupsArrayJSON);
     console.log(lineupsArrayJSON);
+  }
+
+  saveLineups() {
+    // TODO: Save lineups to DB
+    console.log('Saving lineups to DB...', this.lineups());
   }
 }

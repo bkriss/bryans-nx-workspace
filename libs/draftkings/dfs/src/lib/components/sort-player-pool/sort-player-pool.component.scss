@@ -54,15 +54,12 @@
 .sort-order {
   height: 45px;
   width: 45px;
-  color: var(--wr-blue);
-
   color: white;
-
   border-radius: 50%;
   display: inline-block;
   line-height: 45px;
   text-align: center;
-  font-weight: bold;
+  // font-weight: bold;
 
   &.qb-rank {
     background-color: var(--qb-red);

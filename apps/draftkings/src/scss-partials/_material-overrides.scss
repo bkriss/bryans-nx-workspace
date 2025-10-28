@@ -1,0 +1,10 @@
+@use '@angular/material' as mat;
+
+:root {
+  @include mat.table-overrides(
+    (
+      background-color: #2a3846,
+      header-headline-weight: 600,
+    )
+  );
+}

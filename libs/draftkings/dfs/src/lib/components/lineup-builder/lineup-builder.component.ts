@@ -55,9 +55,11 @@ export class LineupBuilderComponent implements OnInit {
     this.runningBackPool.sort((a, b) => b.salary - a.salary);
     this.wideReceiverPool.sort((a, b) => b.salary - a.salary);
     this.tightEndPool.sort((a, b) => b.salary - a.salary);
-    this.flexPool = [...this.wideReceiverPool, ...this.runningBackPool].sort(
-      (a, b) => b.salary - a.salary
-    );
+    this.flexPool = [
+      ...this.wideReceiverPool,
+      ...this.runningBackPool,
+      ...this.tightEndPool,
+    ].sort((a, b) => b.salary - a.salary);
     this.dstPool.sort((a, b) => b.salary - a.salary);
   }
 

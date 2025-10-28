@@ -18,6 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Player, Quarterback, RunningBack } from '../../models';
 import { calculateGrade } from '../../utils';
+import { Position } from '../../enums';
 
 @Component({
   selector: 'dfs-sort-player-pool',
@@ -81,9 +82,14 @@ export class SortPlayerPoolComponent {
     moveItemInArray(this.dsts, event.previousIndex, event.currentIndex);
 
     const dsts = this.dsts.map((dst, i) => {
+      const generalMax = 28 - Math.ceil(i * 2.5);
+      const generalMin = 18 - Math.ceil(i * 2.5);
+
       return {
         ...dst,
-        gradeOutOfTen: calculateGrade(i),
+        gradeOutOfTen: calculateGrade(i, 1),
+        maxOwnershipPercentage: generalMax >= 0 ? generalMax : 0,
+        minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
       };
     });
 

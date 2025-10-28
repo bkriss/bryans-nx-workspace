@@ -6,6 +6,7 @@ import {
   TightEnd,
   WideReceiver,
 } from '../models';
+import { csvToJson } from './csv-to-json.util';
 
 interface RawPlayer {
   AvgPointsPerGame: string;
@@ -18,40 +19,6 @@ interface RawPlayer {
   Salary: string;
   TeamAbbrev: string;
 }
-
-export const csvToJson = (csvString: string) => {
-  const rows = csvString.split('\n');
-  const headers = rows[0].split(',');
-  const jsonData = [];
-
-  for (let i = 1; i < rows.length; i++) {
-    const values = rows[i].split(',');
-    // const obj: Player = {
-    //   AvgPointsPerGame: '',
-    //   'Game Info': '',
-    //   ID: '',
-    //   Name: '',
-    //   'Name + ID': '',
-    //   Position: '',
-    //   'Roster Position': '',
-    //   Salary: '',
-    //   TeamAbbrev: '',
-    // };
-    const obj: any = {};
-
-    for (let j = 0; j < headers.length; j++) {
-      const key = headers[j].trim();
-      const value = values[j] ? values[j].trim() : ''; // Handle potential missing values
-      obj[key] = value;
-    }
-
-    // console.log('Row Object:', obj); // Debugging line to inspect each row object
-    jsonData.push(obj);
-  }
-  //   return JSON.stringify(jsonData); // Returns a JSON string
-
-  return jsonData;
-};
 
 const renderLastName = (fullName: string): string => {
   const brokenUpName = fullName.split(' ');
@@ -98,6 +65,7 @@ export const draftKingsPlayers = csvToJson(salaries).map(
       allowRBFromOpposingTeam: false,
       maxOwnershipPercentage: 35,
       minOwnershipPercentage: 10,
+      useAsAlternate: false,
     };
 
     const quarterback: Quarterback = {

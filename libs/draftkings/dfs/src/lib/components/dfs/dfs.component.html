@@ -29,7 +29,7 @@
         (updateQuarterbacks)="updateQuarterbacks($event)"
       ></dfs-sort-player-pool>
 
-      <div>
+      <div class="mt-1">
         <button (click)="saveQbSelections()" matButton matStepperNext>
           Next
         </button>
@@ -61,7 +61,7 @@
         [runningBacks]="rbSelectionFormGroup.controls.rbPoolCtrl.value || []"
         (updateRunningBacks)="updateRunningBacks($event)"
       ></dfs-sort-player-pool>
-      <div>
+      <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
         <button (click)="saveRBSelections()" matButton matStepperNext>
           Next
@@ -96,7 +96,7 @@
         (updatePassCatchers)="updateWideReceivers($event)"
       ></dfs-sort-pass-catcher-pool>
 
-      <div>
+      <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
         <button (click)="saveWRSelections()" matButton matStepperNext>
           Next
@@ -131,7 +131,7 @@
         (updatePassCatchers)="updateTightEnds($event)"
       ></dfs-sort-pass-catcher-pool>
 
-      <div>
+      <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
         <button (click)="saveTightEndSelections()" matButton matStepperNext>
           Next
@@ -165,7 +165,7 @@
         (updateDsts)="updateDsts($event)"
       ></dfs-sort-player-pool>
 
-      <div>
+      <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
         <button (click)="saveDSTSelections()" matButton matStepperNext>
           Next
