@@ -7,4 +7,28 @@
       header-headline-weight: 600,
     )
   );
+
+  @include mat.expansion-overrides(
+    (
+      container-background-color: #2a3846,
+      // TODO: Change this (and other instances) to variable
+    )
+  );
+}
+
+mat-expansion-panel {
+  border: 1px solid var(--border-color);
+}
+
+// @use '@angular/material' as mat;
+
+// // Customize the entire app. Change :root to your selector if you want to scope the styles.
+// :root {
+//   @include mat.toolbar-overrides((
+//     container-background-color: orange,
+//     container-text-color: red,
+//   ));
+// }
+.mat-mdc-tab-link .mdc-tab__text-label {
+  transition: none !important;
 }

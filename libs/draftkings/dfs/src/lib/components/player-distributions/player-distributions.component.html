@@ -1,51 +1,14 @@
-<!-- TODO: Convert *ngIf and *ngFor to use structural directives -->
 <!-- TODO: Convert each distribution container into new component -->
 
-<!-- <div class="grid grid-flow-col gap-4 justify-start mb-4">
-  <mat-form-field>
-    <mat-label>Quarterback</mat-label>
-    <mat-select>
-      @for (qb of quarterbackDistribution(); track qb.id) {
-      <mat-option [value]="qb.playerId">{{ qb.name }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-label>Running Back</mat-label>
-    <mat-select>
-      @for (rb of runningBackDistribution(); track rb.id) {
-      <mat-option [value]="rb.playerId">{{ rb.name }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-</div> -->
 <div class="grid grid-cols-4 gap-4">
-  <!-- <div class="grid grid-cols-[auto_1fr_1fr_1fr_1fr] gap-4"> -->
-  <!-- Quarterbacks -->
-  <!-- <div class="qb-distribution">
-    <h3 class="mb-1 font-bold position-header qb-header">
-      Quarterback Distribution
-    </h3> 
-    <ol>
-      <li *ngFor="let player of quarterbackDistribution()">
-        <span class="text-sm">
-          {{ player.name }} <span class="bullet">&rarr;</span>
-        </span>
-        <span class="count">
-          {{ player.count }}
-        </span>
-      </li>
-    </ol>
-  </div>-->
-
   <!-- Running Backs -->
   <div class="rb-distribution">
     <h3 class="mb-1 font-bold position-header rb-header">
       Running Back Distribution
     </h3>
     <ol>
-      <li *ngFor="let player of runningBackDistribution()">
+      @for (player of runningBackDistribution(); track player.playerId) {
+      <li>
         <span class="text-sm">
           <span
             class="player-name"
@@ -70,6 +33,7 @@
         </span>
         }
       </li>
+      }
     </ol>
   </div>
 
@@ -79,7 +43,8 @@
       Wide Receiver Distribution
     </h3>
     <ol>
-      <li *ngFor="let player of wideReceiverDistribution()">
+      @for (player of wideReceiverDistribution(); track player.playerId) {
+      <li>
         <span class="text-sm">
           <span
             class="player-name"
@@ -106,6 +71,7 @@
         </span>
         }
       </li>
+      }
     </ol>
   </div>
 
@@ -115,7 +81,8 @@
       Tight End Distribution
     </h3>
     <ol>
-      <li *ngFor="let player of tightEndDistribution()">
+      @for (player of tightEndDistribution(); track player.playerId) {
+      <li>
         <span class="text-sm">
           <span
             class="player-name"
@@ -140,6 +107,7 @@
         </span>
         }
       </li>
+      }
     </ol>
   </div>
 
@@ -147,7 +115,8 @@
   <div class="dst-distribution">
     <h3 class="mb-1 font-bold position-header dst-header">DST Distribution</h3>
     <ol>
-      <li *ngFor="let player of dstDistribution()">
+      @for (player of dstDistribution(); track player.playerId) {
+      <li>
         <span class="text-sm">
           <span
             class="player-name"
@@ -172,6 +141,7 @@
         </span>
         }
       </li>
+      }
     </ol>
   </div>
 </div>

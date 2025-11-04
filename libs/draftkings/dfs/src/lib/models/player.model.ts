@@ -17,11 +17,14 @@ export interface Quarterback extends Player {
   maxNumberOfTeammatePasscatchers: number;
   minNumberOfTeammatePasscatchers: number;
   numberOfLineupsWithThisPlayer: number;
-  requirePassCatcherFromOpposingTeam: boolean;
   qbPassCatcherPairings: PassCatcherStack[];
+  requirePassCatcherFromOpposingTeam: boolean;
+  sortOrder: number;
 }
 
 export interface RunningBack extends Player {
+  // TODO: Confirm logic is setup for allowOnlyAsFlex and useAsAlternate
+  allowOnlyAsFlex: boolean;
   allowRBFromOpposingTeam: boolean;
   useAsAlternate: boolean;
 }
@@ -66,4 +69,17 @@ export interface Flex extends Player {
   maxOwnershipWhenPairedWithOpposingQb?: number;
   minOwnershipWhenPairedWithOpposingQb?: number;
   onlyUseIfPartOfStackOrPlayingWithOrAgainstQb?: boolean;
+}
+
+export interface SimplePlayer {
+  gradeOutOfTen?: number;
+  id: string;
+
+  name?: string; // TODO: Make required later
+  nameAbbrev: string;
+  position?: string;
+  salary?: number;
+  teamAbbrev?: string;
+  opposingTeamAbbrev?: string;
+  requirePassCatcherFromOpposingTeam?: boolean;
 }

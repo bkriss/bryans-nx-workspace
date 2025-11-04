@@ -135,15 +135,6 @@ export class LineupBuilderComponent implements OnInit {
     });
   }
 
-  selectQb(): void {
-    console.log('Select QB clicked');
-  }
-
-  selectRb(): void {
-    console.log('Select RB clicked');
-  }
-
-  // TODO: Delete modal component and related code
   selectPlayer(position: string, player: Player): void {
     console.log(`${player.name} selected for position: ${position}`);
 
@@ -152,25 +143,5 @@ export class LineupBuilderComponent implements OnInit {
       [position.toLowerCase()]: player,
       remainingSalary: this.lineup.remainingSalary - player.salary,
     });
-
-    // console.log('Opening dialog...', this.availableWideReceivers);
-    // const availableWideReceivers = this.wideReceiverPool.filter(
-    //   (player) =>
-    //     player.id !== this.lineup.wr1?.id &&
-    //     player.id !== this.lineup.wr2?.id &&
-    //     player.id !== this.lineup.wr3?.id &&
-    //     player.id !== this.lineup.flex?.id
-    // );
-
-    // this.dialog.open(SelectPlayerModalComponent, {
-    //   data: {
-    //     position,
-    //     // availableQuarterbacks: this.availableQuarterbacks,
-    //     // availableRunningBacks: this.availableRunningBacks,
-    //     availableWideReceivers,
-    //     // availableTightEnds: this.availableTightEnds,
-    //     // availableDsts: this.availableDsts,
-    //   },
-    // });
   }
 }

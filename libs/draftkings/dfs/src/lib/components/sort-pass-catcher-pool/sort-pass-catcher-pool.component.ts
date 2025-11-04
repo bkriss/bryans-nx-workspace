@@ -13,6 +13,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -27,6 +28,7 @@ import { Position } from '../../enums';
     CdkDrag,
     CommonModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatSelectModule,
     MatSlideToggleModule,
@@ -53,7 +55,7 @@ export class SortPassCatcherPoolComponentComponent {
       return {
         ...player,
         gradeOutOfTen: Number(calculateGrade(i)),
-        maxOwnershipPercentage: generalMax >= 0 ? generalMax : 0,
+        maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
         minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
         maxOwnershipWhenPairedWithQb: Number(
           player.maxOwnershipWhenPairedWithQb

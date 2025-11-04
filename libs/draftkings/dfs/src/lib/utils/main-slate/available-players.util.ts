@@ -1,12 +1,13 @@
-import { salaries } from './salaries';
+// import { earlyOnlySalaries } from '../early-only/salaries';
+import { mainSlateSalaries } from './salaries';
 import {
   Player,
   Quarterback,
   RunningBack,
   TightEnd,
   WideReceiver,
-} from '../models';
-import { csvToJson } from './csv-to-json.util';
+} from '../../models';
+import { csvToJson } from '../csv-to-json.util';
 
 interface RawPlayer {
   AvgPointsPerGame: string;
@@ -31,7 +32,8 @@ const renderLastName = (fullName: string): string => {
   return lastName;
 };
 
-export const draftKingsPlayers = csvToJson(salaries).map(
+export const draftKingsPlayers = csvToJson(mainSlateSalaries).map(
+  // export const draftKingsPlayers = csvToJson(earlyOnlySalaries).map(
   (rawPlayer: RawPlayer) => {
     const firstName = rawPlayer.Name.split(' ')[0];
     const lastName = renderLastName(rawPlayer.Name);
@@ -62,6 +64,7 @@ export const draftKingsPlayers = csvToJson(salaries).map(
 
     const runningBack: RunningBack = {
       ...player,
+      allowOnlyAsFlex: false,
       allowRBFromOpposingTeam: false,
       maxOwnershipPercentage: 35,
       minOwnershipPercentage: 10,
@@ -75,8 +78,9 @@ export const draftKingsPlayers = csvToJson(salaries).map(
       maxOwnershipPercentage: 100,
       minOwnershipPercentage: 100,
       numberOfLineupsWithThisPlayer: 10,
-      requirePassCatcherFromOpposingTeam: true,
       qbPassCatcherPairings: [],
+      requirePassCatcherFromOpposingTeam: true,
+      sortOrder: 0,
     };
 
     const wideReceiver: WideReceiver = {
@@ -121,15 +125,6 @@ export const draftKingsPlayers = csvToJson(salaries).map(
   }
 );
 
-// export const draftKingsPlayers = () => {
-//   //   return JSON.parse(csvToJson(salaries));
-//   return csvToJson(salaries);
-// };
-
-// const csvData = 'name,age,city\nAlice,30,New York\nBob,25,London';
-// const jsonData = csvToJson(csvData);
-// console.log(jsonData);
-
 const availableQuarterbacks = (numberOfTeams: number) =>
   draftKingsPlayers
     .filter((player) => player.position === 'QB')
@@ -139,8 +134,9 @@ const availableQuarterbacks = (numberOfTeams: number) =>
       maxNumberOfTeammatePasscatchers: 2,
       minNumberOfTeammatePasscatchers: 1,
       numberOfLineupsWithThisPlayer: 0,
-      requirePassCatcherFromOpposingTeam: true,
       qbPassCatcherPairings: [],
+      requirePassCatcherFromOpposingTeam: true,
+      sortOrder: 0,
     })) as Quarterback[];
 
 const availableRunningBacks = (numberOfTeams: number) =>

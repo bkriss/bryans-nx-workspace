@@ -13,12 +13,12 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Player, Quarterback, RunningBack } from '../../models';
 import { calculateGrade } from '../../utils';
-import { Position } from '../../enums';
 
 @Component({
   selector: 'dfs-sort-player-pool',
@@ -27,6 +27,7 @@ import { Position } from '../../enums';
     CdkDrag,
     CommonModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatSelectModule,
     MatSlideToggleModule,
@@ -43,7 +44,6 @@ export class SortPlayerPoolComponent {
   @Output() updateRunningBacks = new EventEmitter<RunningBack[]>();
   @Output() updateDsts = new EventEmitter<Player[]>();
 
-  // TODO: Remove setTimeouts
   dropQuarterback(event: CdkDragDrop<Quarterback[]>) {
     moveItemInArray(this.quarterbacks, event.previousIndex, event.currentIndex);
 
@@ -51,31 +51,32 @@ export class SortPlayerPoolComponent {
       return {
         ...qb,
         gradeOutOfTen: calculateGrade(i),
+        sortOrder: i + 1,
+        numberOfLineupsWithThisPlayer: +qb.numberOfLineupsWithThisPlayer,
       };
     });
 
-    console.log('Updated Quarterbacks 1:', quarterbacks);
-    setTimeout(() => {
-      console.log('Updated Quarterbacks 2:', quarterbacks);
-      this.updateQuarterbacks.emit(quarterbacks);
-    }, 0);
+    console.log('Updated Quarterbacks:', quarterbacks);
+    this.updateQuarterbacks.emit(quarterbacks);
   }
 
   dropRunningBack(event: CdkDragDrop<RunningBack[]>) {
     moveItemInArray(this.runningBacks, event.previousIndex, event.currentIndex);
 
     const runningBacks = this.runningBacks.map((rb, i) => {
+      const generalMax = 35 - Math.ceil(i * 2.5);
+      const generalMin = 25 - Math.ceil(i * 2.5);
+
       return {
         ...rb,
         gradeOutOfTen: calculateGrade(i),
+        maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
+        minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
       };
     });
 
-    console.log('Updated Running Backs 1:', runningBacks);
-    setTimeout(() => {
-      console.log('Updated Running Backs 2:', runningBacks);
-      this.updateRunningBacks.emit(runningBacks);
-    }, 0);
+    console.log('Updated Running Backs:', runningBacks);
+    this.updateRunningBacks.emit(runningBacks);
   }
 
   dropDst(event: CdkDragDrop<Player[]>) {
@@ -88,7 +89,7 @@ export class SortPlayerPoolComponent {
       return {
         ...dst,
         gradeOutOfTen: calculateGrade(i, 1),
-        maxOwnershipPercentage: generalMax >= 0 ? generalMax : 0,
+        maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
         minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
       };
     });

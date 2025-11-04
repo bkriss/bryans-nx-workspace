@@ -40,8 +40,11 @@
         mat-menu-item
         (click)="selectPlayer.emit(p)"
       >
-        {{ p.name }}
-        &bull;
+        <span class="text-base">{{ p.name }}</span>
+
+        @if (p.position === 'DST') { &bull;
+        <span class="text-xs">{{ p.gameInfo }}</span>
+        } &bull;
         <span [class.text-red-500]="lineup.remainingSalary < p.salary">
           {{ p.salary | currency : 'USD' : 'symbol' : '1.0-0' }}</span
         >

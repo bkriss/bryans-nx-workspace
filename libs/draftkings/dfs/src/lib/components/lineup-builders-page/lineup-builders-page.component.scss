@@ -1,19 +1,1 @@
-@use '@angular/material' as mat;
 
-mat-accordion {
-  @include mat.expansion-overrides(
-    (
-      container-background-color: #2a3846,
-      // TODO: Change this (and other instances) to variable
-    )
-  );
-}
-mat-expansion-panel {
-  border: 1px solid var(--border-color);
-}
-
-.lineup-builders-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(335px, 1fr));
-  gap: 16px;
-}

@@ -32,13 +32,20 @@ import { Router } from '@angular/router';
 import { SortPlayerPoolComponent } from '../sort-player-pool/sort-player-pool.component';
 import { SortPassCatcherPoolComponentComponent } from '../sort-pass-catcher-pool/sort-pass-catcher-pool.component';
 import { Position } from '../../enums';
+// import {
+//   selectedDSTs,
+//   selectedQuarterbacks,
+//   selectedRunningBacks,
+//   selectedTightEnds,
+//   selectedWideReceivers,
+// } from '../../utils/early-only/selected-players.util';
 import {
   selectedQuarterbacks,
   selectedRunningBacks,
   selectedWideReceivers,
   selectedTightEnds,
   selectedDSTs,
-} from '../../utils/selected-players.util';
+} from '../../utils/main-slate/selected-players.util';
 
 @Component({
   imports: [
@@ -79,15 +86,15 @@ export class DfsComponent implements OnInit {
   rbSelectionFormGroup = this._formBuilder.group({
     rbPoolCtrl: [
       [...selectedRunningBacks] as RunningBack[],
-      // [Validators.minLength(6), Validators.maxLength(8)],
-      [Validators.minLength(0), Validators.maxLength(8)],
+      // [Validators.minLength(7), Validators.maxLength(9)],
+      [Validators.minLength(0), Validators.maxLength(9)],
     ],
   });
   wrSelectionFormGroup = this._formBuilder.group({
     wrPoolCtrl: [
       [...selectedWideReceivers] as WideReceiver[],
-      // [Validators.minLength(18), Validators.maxLength(30)],
-      [Validators.minLength(0), Validators.maxLength(30)],
+      // [Validators.minLength(30), Validators.maxLength(40)],
+      [Validators.minLength(0), Validators.maxLength(40)],
     ],
   });
   teSelectionFormGroup = this._formBuilder.group({
@@ -100,8 +107,8 @@ export class DfsComponent implements OnInit {
   dstSelectionFormGroup = this._formBuilder.group({
     dstPoolCtrl: [
       [...selectedDSTs] as Player[],
-      // [Validators.minLength(4), Validators.maxLength(7)],
-      [Validators.minLength(0), Validators.maxLength(7)],
+      // [Validators.minLength(5), Validators.maxLength(10)],
+      [Validators.minLength(0), Validators.maxLength(10)],
     ],
   });
 
@@ -112,12 +119,6 @@ export class DfsComponent implements OnInit {
     this.availableWideReceivers = wrs;
     this.availableTightEnds = tes;
     this.availableDsts = dsts;
-
-    console.log('Available Quarterbacks:', qbs);
-    console.log('Available Running Backs:', rbs);
-    console.log('Available Wide Receivers:', wrs);
-    console.log('Available Tight Ends:', tes);
-    console.log('Available Defenses:', dsts);
   }
 
   saveQbSelections() {
@@ -218,27 +219,22 @@ export class DfsComponent implements OnInit {
   }
 
   updateQuarterbacks(newQuarterbacks: Quarterback[]) {
-    console.log('Updated Quarterbacks:', newQuarterbacks);
     this.qbSelectionFormGroup.controls.qbPoolCtrl.setValue(newQuarterbacks);
   }
 
   updateRunningBacks(newRunningBacks: RunningBack[]) {
-    console.log('Updated Running Backs:', newRunningBacks);
     this.rbSelectionFormGroup.controls.rbPoolCtrl.setValue(newRunningBacks);
   }
 
   updateWideReceivers(newWideReceivers: WideReceiver[]) {
-    console.log('Updated Wide Receivers:', newWideReceivers);
     this.wrSelectionFormGroup.controls.wrPoolCtrl.setValue(newWideReceivers);
   }
 
   updateTightEnds(newTightEnds: TightEnd[]) {
-    console.log('Updated Tight ends:', newTightEnds);
     this.teSelectionFormGroup.controls.tePoolCtrl.setValue(newTightEnds);
   }
 
   updateDsts(newDsts: Player[]) {
-    console.log('Updated DSTs:', newDsts);
     this.dstSelectionFormGroup.controls.dstPoolCtrl.setValue(newDsts);
   }
 }

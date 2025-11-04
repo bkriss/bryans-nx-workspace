@@ -45,11 +45,15 @@ export class PlayerOverlapImbalanceButtonComponent {
     // const numberOfTEsToReview = 5;
     // const numberOfDSTsToReview = 5;
 
+    const sortedWrPool = [...this.wrPool].sort(
+      (a, b) => b.maxOwnershipPercentage - a.maxOwnershipPercentage
+    );
+
     // WR review
     for (let wrLoopIndex = 0; wrLoopIndex < 10; wrLoopIndex++) {
       playerOverlapReview.push({
-        name: this.wrPool[wrLoopIndex].name,
-        playerId: this.wrPool[wrLoopIndex].id,
+        name: sortedWrPool[wrLoopIndex].name,
+        playerId: sortedWrPool[wrLoopIndex].id,
         position: Position.WR,
         rbsInLineupsWithThisPlayer: [],
         wrsInLineupsWithThisPlayer: [],
@@ -59,18 +63,22 @@ export class PlayerOverlapImbalanceButtonComponent {
 
       const lineupsWithCurrentWrToReview = this.findAllLineupsWithPlayer(
         this.lineups,
-        this.wrPool[wrLoopIndex].id
+        sortedWrPool[wrLoopIndex].id
+      );
+
+      const eligibleRbs = this.rbPool.filter(
+        (rb) => rb.teamAbbrev !== this.lineups[0].qb?.teamAbbrev
       );
 
       // # of instances with RBs
       for (
         let rbLoopIndex = 0;
-        rbLoopIndex < this.rbPool.length;
+        rbLoopIndex < eligibleRbs.length;
         rbLoopIndex++
       ) {
         const lineupsWithWrAndThisRb = this.findAllLineupsWithPlayer(
           lineupsWithCurrentWrToReview,
-          this.rbPool[rbLoopIndex].id,
+          eligibleRbs[rbLoopIndex].id,
           Position.RB
         );
         const percentageOfLineupsWithThisPlayer =
@@ -81,12 +89,12 @@ export class PlayerOverlapImbalanceButtonComponent {
           percentageOfLineupsWithThisPlayer > 0.5
         ) {
           playerOverlapReview[wrLoopIndex].rbsInLineupsWithThisPlayer.push({
-            name: this.rbPool[rbLoopIndex].name,
+            name: eligibleRbs[rbLoopIndex].name,
             numberOfLineupsWithThisPlayer: lineupsWithWrAndThisRb.length,
             percentageOfLineupsWithThisPlayer:
               lineupsWithWrAndThisRb.length /
               lineupsWithCurrentWrToReview.length,
-            playerId: this.rbPool[rbLoopIndex].id,
+            playerId: eligibleRbs[rbLoopIndex].id,
           });
         }
       }
@@ -99,7 +107,7 @@ export class PlayerOverlapImbalanceButtonComponent {
       ) {
         const lineupsWithTheseTwoWrs = this.findAllLineupsWithPlayer(
           lineupsWithCurrentWrToReview,
-          this.wrPool[innerWrLoopIndex].id,
+          sortedWrPool[innerWrLoopIndex].id,
           Position.WR
         );
         const percentageOfLineupsWithThisPlayer =
@@ -110,12 +118,12 @@ export class PlayerOverlapImbalanceButtonComponent {
           percentageOfLineupsWithThisPlayer > 0.5
         ) {
           playerOverlapReview[wrLoopIndex].wrsInLineupsWithThisPlayer.push({
-            name: this.wrPool[innerWrLoopIndex].name,
+            name: sortedWrPool[innerWrLoopIndex].name,
             numberOfLineupsWithThisPlayer: lineupsWithTheseTwoWrs.length,
             percentageOfLineupsWithThisPlayer:
               lineupsWithTheseTwoWrs.length /
               lineupsWithCurrentWrToReview.length,
-            playerId: this.wrPool[innerWrLoopIndex].id,
+            playerId: sortedWrPool[innerWrLoopIndex].id,
           });
         }
       }
@@ -146,7 +154,7 @@ export class PlayerOverlapImbalanceButtonComponent {
       }
       // const numberOfLineupsWithRb1 = this.findAllLineupsWithPlayer(
       //   lineupsWithCurrentWrToReview,
-      //   this.rbPool[0].id,
+      //   eligibleRbs[0].id,
       //   Position.RB
       // );
     }

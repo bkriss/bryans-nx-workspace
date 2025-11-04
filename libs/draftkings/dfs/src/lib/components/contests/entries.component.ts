@@ -19,16 +19,23 @@ import {
   DraftKingsEntry,
   Lineup,
   Player,
+  SimpleLineup,
   TableFriendlyDraftKingsEntry,
 } from '../../models';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+// import {
+//   lineupsForQb1,
+//   lineupsForQb2,
+//   lineupsForQb3,
+//   lineupsForQb4,
+// } from '../../utils/main-slate/lineups';
 import {
   lineupsForQb1,
   lineupsForQb2,
   lineupsForQb3,
   lineupsForQb4,
-} from '../../utils/lineups';
+} from '../../utils/early-only/lineups';
 
 @Component({
   selector: 'dfs-entries',
@@ -38,22 +45,25 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntriesComponent implements OnInit {
-  @Input() numberOfQbs = 0;
+  @Input() numberOfQbs = 0; // TODO: Get this from store
   draftKingsEntries = draftKingsEntries;
-
-  lineupsForQb1: WritableSignal<Lineup[]> = signal([]);
-  lineupsForQb2: WritableSignal<Lineup[]> = signal([]);
-  lineupsForQb3: WritableSignal<Lineup[]> = signal([]);
-  lineupsForQb4: WritableSignal<Lineup[]> = signal([]);
-  lineupsForAllQbs: Signal<Lineup[]> = computed(() => {
-    // console.log('computing lineupsForAllQbs', this.lineupsForAllQbs());
+  lineupsForQb1: WritableSignal<SimpleLineup[]> = signal([]);
+  lineupsForQb2: WritableSignal<SimpleLineup[]> = signal([]);
+  lineupsForQb3: WritableSignal<SimpleLineup[]> = signal([]);
+  lineupsForQb4: WritableSignal<SimpleLineup[]> = signal([]);
+  lineupsForAllQbs: Signal<SimpleLineup[]> = computed(() => {
     return [
       ...this.lineupsForQb1(),
       ...this.lineupsForQb2(),
       ...this.lineupsForQb3(),
       ...this.lineupsForQb4(),
-    ];
+    ].sort((a, b) => b.lineupGrade - a.lineupGrade);
   });
+
+  // assignLineups = computed(() => {
+  //   console.log('computing lineupsForAllQbs', this.lineupsForQb1());
+  //   this.assignLineupsToContests([...this.lineupsForQb1()]);
+  // });
 
   numberOfLineupsMatchNumberOfEntries = computed(() => {
     return this.lineupsForAllQbs().length === this.entries().length;
@@ -74,8 +84,11 @@ export class EntriesComponent implements OnInit {
     'DST',
     'lineupGrade',
   ];
-  entries: WritableSignal<TableFriendlyDraftKingsEntry[]> =
-    signal(draftKingsEntries);
+  // entries: WritableSignal<TableFriendlyDraftKingsEntry[]> =
+  //   signal(draftKingsEntries);
+  entries = computed(() => {
+    return this.assignLineupsToContests(this.lineupsForAllQbs());
+  });
 
   ngOnInit(): void {
     console.log('EntriesComponent initialized');
@@ -87,18 +100,19 @@ export class EntriesComponent implements OnInit {
   }
 
   renderEntryPosition(player: Player): string {
-    return player?.id ? `${player.name} (${player.id})` : '- -';
+    // return player?.id ? `${player.name} (${player.id})` : '- -';
+    return player?.id;
   }
 
-  assignLineupsToContests(): void {
-    console.log('assignLineupsToContests');
-
-    const sortedLineups = this.lineupsForAllQbs().sort(
+  assignLineupsToContests(
+    lineupsForAllQbs: SimpleLineup[]
+  ): TableFriendlyDraftKingsEntry[] {
+    const sortedLineups = lineupsForAllQbs.sort(
       (a, b) => b.lineupGrade - a.lineupGrade
     );
     console.log('sortedLineups', sortedLineups);
 
-    const defaultEntries: TableFriendlyDraftKingsEntry[] = this.entries().map(
+    const entries: TableFriendlyDraftKingsEntry[] = draftKingsEntries.map(
       (entry, i) => {
         const qb = sortedLineups[i]?.qb as Player;
         const rb1 = sortedLineups[i]?.rb1 as Player;
@@ -135,16 +149,17 @@ export class EntriesComponent implements OnInit {
       }
     );
 
-    console.log('defaultEntries', defaultEntries);
+    console.log('entries', entries);
 
-    this.entries.update(() => defaultEntries);
+    // this.entries.update(() => defaultEntries);
+    return entries;
   }
 
   fetchLineupsForQb1(): void {
     console.log('fetchLineupsForQb1');
 
     // TODO: Replace with actual fetching logic
-    this.lineupsForQb1.update(() => [...lineupsForQb1]);
+    this.lineupsForQb1.set([...lineupsForQb1]);
   }
 
   fetchLineupsForQb2(): void {
@@ -178,15 +193,15 @@ export class EntriesComponent implements OnInit {
         'Contest Name': entry['Contest Name'],
         'Contest ID': entry['Contest ID'],
         'Entry Fee': entry['Entry Fee'],
-        QB: entry.QB_NAME,
-        RB1: entry.RB1_NAME,
-        RB2: entry.RB2_NAME,
-        WR1: entry.WR1_NAME,
-        WR2: entry.WR2_NAME,
-        WR3: entry.WR3_NAME,
-        TE: entry.TE_NAME,
-        FLEX: entry.FLEX_NAME,
-        DST: entry.DST_NAME,
+        QB: entry.QB,
+        RB1: entry.RB1,
+        RB2: entry.RB2,
+        WR1: entry.WR1,
+        WR2: entry.WR2,
+        WR3: entry.WR3,
+        TE: entry.TE,
+        FLEX: entry.FLEX,
+        DST: entry.DST,
       };
     });
     const csv = convertJsonToCsv(entries);
