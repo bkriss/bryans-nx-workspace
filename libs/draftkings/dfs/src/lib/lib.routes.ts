@@ -1,9 +1,11 @@
 import { Route } from '@angular/router';
-import { DfsComponent } from './components/dfs/dfs.component';
-import { LineupBuildersPageComponent } from './components/lineup-builders-page/lineup-builders-page.component';
-import { EntriesComponent } from './components/contests/entries.component';
+import {
+  DfsComponent,
+  EntriesComponent,
+  LineupBuildersPageComponent,
+} from './components';
 
-// TOOD: setup lazy loading
+// TODO: setup lazy loading
 export const dfsRoutes: Route[] = [
   { path: '', redirectTo: 'player-selection', pathMatch: 'full' },
   { path: 'player-selection', component: DfsComponent },

@@ -1,5 +1,5 @@
 export enum Slate {
   MAIN = 'MAIN',
-  EARLY = 'EARLY',
+  EARLY_ONLY = 'EARLY_ONLY',
   SUN_TO_MON = 'SUN_TO_MON',
 }

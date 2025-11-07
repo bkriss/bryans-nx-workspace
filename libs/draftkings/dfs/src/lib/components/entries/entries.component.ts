@@ -92,8 +92,7 @@ export class EntriesComponent implements OnInit {
   }
 
   renderEntryPosition(player: Player): string {
-    // return player?.id ? `${player.name} (${player.id})` : '- -';
-    return player?.id;
+    return player?.id ? `${player.name} (${player.id})` : '- -';
   }
 
   mapLineupsToEntries(
@@ -247,12 +246,19 @@ export class EntriesComponent implements OnInit {
     });
 
     let csvFileName = 'draftkings-entries-main-slate.csv';
-    if (this.currentSlate === Slate.EARLY) {
+    if (this.currentSlate === Slate.EARLY_ONLY) {
       csvFileName = csvFileName.replace('main-slate', 'early-only');
     } else if (this.currentSlate === Slate.SUN_TO_MON) {
       csvFileName = csvFileName.replace('main-slate', 'sun-to-mon');
     }
-    const csv = convertJsonToCsv(entries);
+
+    const csv = convertJsonToCsv(entries)
+      .replace('RB1', 'RB')
+      .replace('RB2', 'RB')
+      .replace('WR1', 'WR')
+      .replace('WR2', 'WR')
+      .replace('WR3', 'WR');
+
     downloadCsvFile(csv, csvFileName);
   }
 }

@@ -52,7 +52,6 @@ export class LineupBuildersPageComponent implements OnInit {
   wrPool: PassCatcher[] = [...selectedWideReceivers];
   tePool: PassCatcher[] = [...selectedTightEnds];
   dstPool: Player[] = [...selectedDSTs];
-  // TODO: Figure out why the default value isn't displayed on page load
   currentQb: WritableSignal<Quarterback> = signal({} as Quarterback);
 
   ngOnInit(): void {
@@ -138,7 +137,6 @@ export class LineupBuildersPageComponent implements OnInit {
         );
       })
       .sort((a, b) => b.gradeOutOfTen - a.gradeOutOfTen);
-    // TODO: Remove sorting once we're fetching from DB, as we can sort there
   }
 
   findEligibleDstsForLineup(currentLineup: Lineup): Player[] {
@@ -297,8 +295,6 @@ export class LineupBuildersPageComponent implements OnInit {
               finalRemainingSalaryIfThisDstisUsed < 300
             );
           })?.salary || costOfCheapestDst;
-
-        // console.log('costOfAffordableDst', costOfAffordableDst);
 
         costOfThisPlayerAndEstimatedCostOfRemainingPlayers +=
           costOfAffordableDst;
@@ -724,7 +720,6 @@ export class LineupBuildersPageComponent implements OnInit {
         }
 
         const pairedWithQb = pc.teamAbbrev === qb.teamAbbrev;
-        // const pairedWithOpposingQb = pc.teamAbbrev === qb.opposingTeamAbbrev;
 
         const maxNumberOfLineupsWithThisPassCatcher = Math.ceil(
           pairedWithQb
@@ -733,14 +728,6 @@ export class LineupBuildersPageComponent implements OnInit {
             : numberOfLineupsWithThisQb *
                 ((pc.maxOwnershipWhenPairedWithOpposingQb || 0) / 100)
         );
-
-        // console.log(`Checking limits for ${pc.name}`, {
-        //   currentNumberOfLineupsWithThisPassCatcher,
-        //   maxNumberOfLineupsWithThisPassCatcher,
-        //   overLimit:
-        //     currentNumberOfLineupsWithThisPassCatcher >=
-        //     maxNumberOfLineupsWithThisPassCatcher,
-        // });
 
         return (
           currentNumberOfLineupsWithThisPassCatcher >=
@@ -786,9 +773,7 @@ export class LineupBuildersPageComponent implements OnInit {
 
   findTightEndThatFitsBudget(
     currentLineup: Lineup,
-    // currentRemainingSalary: number,
     restrictedPassCatcherTeams: string[]
-    // costOfCheapestPossibleRemainingPlayers: number
   ): PassCatcher | null {
     const eligibleTightEnds = this.findEligibleTightEndsForLineup(
       restrictedPassCatcherTeams
@@ -799,32 +784,18 @@ export class LineupBuildersPageComponent implements OnInit {
 
     const tightEnd: PassCatcher | null =
       eligibleTightEnds.find((te) => {
-        // const currentPercentageOfLineupsWithThisPlayer =
-        //   this.tightEndDistribution().find(
-        //     (player) => player.playerId === te.id
-        //   )?.percentageOfLineups || 0;
-
         const willThisBeAffordable =
           this.checkIfRestOfRosterIsAffordableIfThisPassCatcherIsAdded(
-            { ...currentLineup },
+            { ...currentLineup }, // TODO: Once everything is working, change to just currentLineup and see if anything breaks
             te,
             eligibleWideReceivers,
             eligibleTightEnds
-            // restrictedPassCatcherTeams
           );
-
-        // return (
-        //   !restrictedPassCatcherTeams.includes(te.teamAbbrev) &&
-        //   te.salary + currentLineupCost <=
-        //     costOfCheapestPossibleRemainingPlayers
-        // );
 
         return (
           !te.onlyUseIfPartOfStackOrPlayingWithOrAgainstQb &&
           !restrictedPassCatcherTeams.includes(te.teamAbbrev) &&
-          // remainingSalaryAfterAddingTeAndCheapestRemainingPlayers >= 0 &&
           willThisBeAffordable === true
-          // currentPercentageOfLineupsWithThisPlayer <= te.maxOwnershipPercentage
         );
       }) || null;
 
@@ -853,9 +824,7 @@ export class LineupBuildersPageComponent implements OnInit {
 
   findWideReceiverThatFitsBudget(
     currentLineup: Lineup,
-    // currentRemainingSalary: number,
     restrictedPassCatcherTeams: string[],
-    // costOfCheapestPossibleRemainingPlayers: number
     fillingFlexPosition = false
   ): PassCatcher | null {
     const eligibleTightEnds = this.findEligibleTightEndsForLineup(
@@ -896,15 +865,18 @@ export class LineupBuildersPageComponent implements OnInit {
       rb1?.opposingTeamAbbrev,
       rb2?.opposingTeamAbbrev,
       wr1?.opposingTeamAbbrev,
+      wr1?.teamAbbrev,
       wr2?.opposingTeamAbbrev,
+      wr2?.teamAbbrev,
       wr3?.opposingTeamAbbrev,
+      wr3?.teamAbbrev,
       te?.opposingTeamAbbrev,
+      te?.teamAbbrev,
       flex?.opposingTeamAbbrev,
+      flex?.teamAbbrev,
     ];
 
-    // const remainingSalaryAfterDstIsAdded
-
-    // Sort DSTs by descending salary to try to get the highest possible DST within budget
+    // Put most expensive DSTs first so we use as much of remaining salary as possible
     const dst: Player | null =
       [...this.dstPool]
         .sort((a, b) => b.salary - a.salary)
@@ -974,11 +946,6 @@ export class LineupBuildersPageComponent implements OnInit {
         groupIndex < passCatchersForQbsTeam.length;
         groupIndex++
       ) {
-        // console.log(
-        //   `passCatchersForQbsTeam[${groupIndex}]`,
-        //   passCatchersForQbsTeam[groupIndex]
-        // );
-
         if (qb.maxNumberOfTeammatePasscatchers === 1) {
           passCatcherCombosWithoutOpponent.push([
             passCatchersForQbsTeam[groupIndex],
@@ -1042,54 +1009,19 @@ export class LineupBuildersPageComponent implements OnInit {
     });
 
     // Make sure currentQb has updated passCatcherStacks
-    // TODO: Why doesn't the Select component show the current value when sigal is set programatically?
     this.currentQb.set(this.qbPool[0]);
   }
 
-  // addTotalCostToQbPassCatcherStacks(
-  //   passCatcherStacks: PassCatcher[][]
-  // ): PassCatcherStack[] {
-  //   return passCatcherStacks.map((passCatchers: PassCatcher[]) => {
-  //     return {
-  //       passCatchers,
-  //       totalCostOfThisPassCatcherCombo: passCatchers.reduce(
-  //         (acc, player) => acc + player.salary,
-  //         0
-  //       ),
-  //     };
-  //   });
-  // }
-
-  // TODO: Delete?
-  // convertLineupsToDraftKingsFormat() {
-  //   return this.lineups().map((lineup) => ({
-  //     'Entry ID': lineup.contestDetails?.entryId || 'abc123',
-  //     'Contest Name': lineup.contestDetails?.contestName || 'xyz123',
-  //     'Contest ID': lineup.contestDetails?.contestId || 'abc567',
-  //     'Entry Fee': lineup.contestDetails?.entryFee || '$50',
-  //     QB: lineup.qb?.id,
-  //     RB1: lineup.rb1?.id,
-  //     RB2: lineup.rb2?.id,
-  //     WR1: lineup.wr1?.id,
-  //     WR2: lineup.wr2?.id,
-  //     WR3: lineup.wr3?.id,
-  //     TE: lineup.te?.id,
-  //     FLEX: lineup.flex?.id,
-  //     DST: lineup.dst?.id,
-  //   }));
-  // }
-
-  selectedNewQuarterback(qb: Quarterback) {
+  selectedNewQuarterback(quarterback: Quarterback) {
     this.saveLineups();
 
     // TODO: Make sure this happens after saveLineups() is complete and successful
-    this.currentQb.set(qb);
+    this.currentQb.set(quarterback);
     this.lineups.set([]);
     this.generateLineups();
   }
 
   updateLineup(updatedLineup: Lineup) {
-    console.log('updatedLineup', updatedLineup);
     // TODO: is it more efficient to use find function?
     const updatedLineups: Lineup[] = this.lineups().map((lineup) => {
       if (lineup.lineupId === updatedLineup.lineupId) {
@@ -1187,8 +1119,8 @@ export class LineupBuildersPageComponent implements OnInit {
       // TODO: Save lineups for QB5
       console.log('saving lineups for QB5', this.simplifyLineupData());
     } else if (sortOrder === 6) {
-      // TODO: Save lineups for QB5
-      console.log('saving lineups for QB5', this.simplifyLineupData());
+      // TODO: Save lineups for QB6
+      console.log('saving lineups for QB6', this.simplifyLineupData());
     }
   }
 }

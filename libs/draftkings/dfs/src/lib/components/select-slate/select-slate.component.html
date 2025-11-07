@@ -1,0 +1,13 @@
+<mat-form-field class="justify-self-end">
+  <mat-label>Current Slate</mat-label>
+  <mat-select
+    (selectionChange)="selectedNewSlate($event.value)"
+    [ngModel]="currentSlate"
+  >
+    @for (slate of slatePool; track slate.id) {
+    <mat-option [value]="slate.id">
+      {{ slate.name }}
+    </mat-option>
+    }
+  </mat-select>
+</mat-form-field>
