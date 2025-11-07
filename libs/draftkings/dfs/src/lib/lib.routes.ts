@@ -5,8 +5,8 @@ import { EntriesComponent } from './components/contests/entries.component';
 
 // TOOD: setup lazy loading
 export const dfsRoutes: Route[] = [
-  { path: '', redirectTo: 'setup', pathMatch: 'full' },
-  { path: 'setup', component: DfsComponent },
+  { path: '', redirectTo: 'player-selection', pathMatch: 'full' },
+  { path: 'player-selection', component: DfsComponent },
   { path: 'lineup-builders', component: LineupBuildersPageComponent },
   { path: 'entries', component: EntriesComponent },
 ];

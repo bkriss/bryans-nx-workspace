@@ -34,16 +34,17 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title class="text-lg">
-        <mat-icon class="mr-2">format_list_numbered</mat-icon>
+        <mat-icon class="mr-2">format_list_numbered_rtl</mat-icon>
         Player Distributions
       </mat-panel-title>
     </mat-expansion-panel-header>
     <dfs-player-distributions
       [currentQb]="currentQb()"
-      [runningBackDistribution]="runningBackDistribution"
-      [wideReceiverDistribution]="wideReceiverDistribution"
-      [tightEndDistribution]="tightEndDistribution"
-      [dstDistribution]="dstDistribution"
+      [lineups]="lineups()"
+      [rbPool]="rbPool"
+      [wrPool]="wrPool"
+      [tePool]="tePool"
+      [dstPool]="dstPool"
     ></dfs-player-distributions>
   </mat-expansion-panel>
 </mat-accordion>

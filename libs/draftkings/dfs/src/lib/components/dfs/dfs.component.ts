@@ -22,11 +22,12 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { getAvailablePlayers } from '../../utils';
 import {
+  PassCatcher,
   Player,
   Quarterback,
   RunningBack,
-  TightEnd,
-  WideReceiver,
+  // TightEnd,
+  // WideReceiver,
 } from '../../models';
 import { Router } from '@angular/router';
 import { SortPlayerPoolComponent } from '../sort-player-pool/sort-player-pool.component';
@@ -68,8 +69,8 @@ export class DfsComponent implements OnInit {
   private router = inject(Router);
   availableQuarterbacks: WritableSignal<Quarterback[]> = signal([]);
   availableRunningBacks: RunningBack[] = [];
-  availableWideReceivers: WideReceiver[] = [];
-  availableTightEnds: TightEnd[] = [];
+  availableWideReceivers: PassCatcher[] = [];
+  availableTightEnds: PassCatcher[] = [];
   availableDsts: Player[] = [];
   position = Position;
 
@@ -92,14 +93,14 @@ export class DfsComponent implements OnInit {
   });
   wrSelectionFormGroup = this._formBuilder.group({
     wrPoolCtrl: [
-      [...selectedWideReceivers] as WideReceiver[],
+      [...selectedWideReceivers] as PassCatcher[],
       // [Validators.minLength(30), Validators.maxLength(40)],
       [Validators.minLength(0), Validators.maxLength(40)],
     ],
   });
   teSelectionFormGroup = this._formBuilder.group({
     tePoolCtrl: [
-      [...selectedTightEnds] as TightEnd[],
+      [...selectedTightEnds] as PassCatcher[],
       // [Validators.minLength(4), Validators.maxLength(10)],
       [Validators.minLength(0), Validators.maxLength(10)],
     ],
@@ -226,11 +227,11 @@ export class DfsComponent implements OnInit {
     this.rbSelectionFormGroup.controls.rbPoolCtrl.setValue(newRunningBacks);
   }
 
-  updateWideReceivers(newWideReceivers: WideReceiver[]) {
+  updateWideReceivers(newWideReceivers: PassCatcher[]) {
     this.wrSelectionFormGroup.controls.wrPoolCtrl.setValue(newWideReceivers);
   }
 
-  updateTightEnds(newTightEnds: TightEnd[]) {
+  updateTightEnds(newTightEnds: PassCatcher[]) {
     this.teSelectionFormGroup.controls.tePoolCtrl.setValue(newTightEnds);
   }
 

@@ -3,20 +3,16 @@ import {
   Component,
   inject,
   Input,
-  Signal,
-  signal,
-  WritableSignal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { Position } from '../../enums';
 import {
   Lineup,
+  PassCatcher,
   Player,
   PlayerOverlapReview,
   RunningBack,
-  TightEnd,
-  WideReceiver,
 } from '../../models';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerOverlapImbalanceModalComponent } from '../player-overlap-imbalance-modal/player-overlap-imbalance-modal.component';
@@ -33,8 +29,8 @@ export class PlayerOverlapImbalanceButtonComponent {
   // @Input() lineups: Signal<Lineup[]> = signal([]);
   @Input() lineups: Lineup[] = [];
   @Input() rbPool: RunningBack[] = [];
-  @Input() wrPool: WideReceiver[] = [];
-  @Input() tePool: TightEnd[] = [];
+  @Input() wrPool: PassCatcher[] = [];
+  @Input() tePool: PassCatcher[] = [];
   @Input() dstPool: Player[] = [];
   readonly dialog = inject(MatDialog);
 

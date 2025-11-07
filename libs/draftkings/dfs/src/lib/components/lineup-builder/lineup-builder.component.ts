@@ -8,13 +8,7 @@ import {
   Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  Lineup,
-  Player,
-  Quarterback,
-  TightEnd,
-  WideReceiver,
-} from '../../models';
+import { Lineup, PassCatcher, Player, Quarterback } from '../../models';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -39,8 +33,8 @@ export class LineupBuilderComponent implements OnInit {
   @Input() lineup!: Lineup;
   @Input() qbPool!: Quarterback[];
   @Input() runningBackPool!: Player[];
-  @Input() wideReceiverPool!: WideReceiver[];
-  @Input() tightEndPool!: TightEnd[];
+  @Input() wideReceiverPool!: PassCatcher[];
+  @Input() tightEndPool!: PassCatcher[];
   @Input() dstPool!: Player[];
   @Output() updateLineup = new EventEmitter<Lineup>();
   dialog = inject(MatDialog);

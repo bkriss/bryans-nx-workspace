@@ -11,13 +11,14 @@ export interface Player {
   salary: number;
   teamAbbrev: string;
   opposingTeamAbbrev: string;
+  onlyUseInLargerFieldContests?: boolean;
 }
 
 export interface Quarterback extends Player {
   maxNumberOfTeammatePasscatchers: number;
   minNumberOfTeammatePasscatchers: number;
   numberOfLineupsWithThisPlayer: number;
-  qbPassCatcherPairings: PassCatcherStack[];
+  passCatcherStacks: PassCatcherStack[];
   requirePassCatcherFromOpposingTeam: boolean;
   sortOrder: number;
 }
@@ -31,27 +32,29 @@ export interface RunningBack extends Player {
 
 export interface PassCatcherStack {
   passCatchers: PassCatcher[];
-  randomizedGrade: number;
+  // randomizedGrade: number;
   // avgGradeOutOfTen: number;
   totalCostOfThisPassCatcherCombo: number;
 }
 
 // TODO: If WideReceiver and TightEnd remain identical, replace each reference to those models with PassCatcher
-export interface WideReceiver extends Player {
-  maxOwnershipWhenPairedWithQb?: number;
-  minOwnershipWhenPairedWithQb?: number;
-  maxOwnershipWhenPairedWithOpposingQb?: number;
-  minOwnershipWhenPairedWithOpposingQb?: number;
-  onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: boolean;
-}
+// export interface WideReceiver extends Player {
+//   maxOwnershipWhenPairedWithQb?: number;
+//   minOwnershipWhenPairedWithQb?: number;
+//   maxOwnershipWhenPairedWithOpposingQb?: number;
+//   minOwnershipWhenPairedWithOpposingQb?: number;
+//   onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: boolean;
+//   onlyUseInLargerFieldContests?: boolean;
+// }
 
-export interface TightEnd extends Player {
-  maxOwnershipWhenPairedWithQb?: number;
-  minOwnershipWhenPairedWithQb?: number;
-  maxOwnershipWhenPairedWithOpposingQb?: number;
-  minOwnershipWhenPairedWithOpposingQb?: number;
-  onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: boolean;
-}
+// export interface TightEnd extends Player {
+//   maxOwnershipWhenPairedWithQb?: number;
+//   minOwnershipWhenPairedWithQb?: number;
+//   maxOwnershipWhenPairedWithOpposingQb?: number;
+//   minOwnershipWhenPairedWithOpposingQb?: number;
+//   onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: boolean;
+//   onlyUseInLargerFieldContests?: boolean;
+// }
 
 // WR or TE
 export interface PassCatcher extends Player {
@@ -60,6 +63,7 @@ export interface PassCatcher extends Player {
   maxOwnershipWhenPairedWithOpposingQb?: number;
   minOwnershipWhenPairedWithOpposingQb?: number;
   onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: boolean;
+  onlyUseInLargerFieldContests?: boolean;
 }
 
 export interface Flex extends Player {
@@ -69,17 +73,18 @@ export interface Flex extends Player {
   maxOwnershipWhenPairedWithOpposingQb?: number;
   minOwnershipWhenPairedWithOpposingQb?: number;
   onlyUseIfPartOfStackOrPlayingWithOrAgainstQb?: boolean;
+  onlyUseInLargerFieldContests?: boolean;
 }
 
 export interface SimplePlayer {
-  gradeOutOfTen?: number;
+  // gradeOutOfTen?: number;
   id: string;
-
-  name?: string; // TODO: Make required later
+  name: string; // TODO: Make required later
   nameAbbrev: string;
+  onlyUseInLargerFieldContests?: boolean;
   position?: string;
-  salary?: number;
-  teamAbbrev?: string;
-  opposingTeamAbbrev?: string;
-  requirePassCatcherFromOpposingTeam?: boolean;
+  // salary?: number;
+  // teamAbbrev?: string;
+  // opposingTeamAbbrev?: string;
+  // requirePassCatcherFromOpposingTeam?: boolean;
 }

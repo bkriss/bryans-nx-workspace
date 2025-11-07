@@ -11,12 +11,12 @@ import { CommonModule } from '@angular/common';
 import { PlayerOverlapImbalanceButtonComponent } from '../player-overlap-imbalance-button/player-overlap-imbalance-button.component';
 import {
   Lineup,
+  PassCatcher,
   Player,
-  PlayerDistribution,
   Quarterback,
   RunningBack,
-  TightEnd,
-  WideReceiver,
+  // TightEnd,
+  // WideReceiver,
 } from '../../models';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -50,15 +50,9 @@ export class LineupsComponent {
   @Input() lineups: Signal<Lineup[]> = signal([]);
   @Input() qbPool: Quarterback[] = [];
   @Input() rbPool: RunningBack[] = [];
-  @Input() wrPool: WideReceiver[] = [];
-  @Input() tePool: TightEnd[] = [];
+  @Input() wrPool: PassCatcher[] = [];
+  @Input() tePool: PassCatcher[] = [];
   @Input() dstPool: Player[] = [];
-
-  @Input() runningBackDistribution: Signal<PlayerDistribution[]> = signal([]);
-  @Input() wideReceiverDistribution: Signal<PlayerDistribution[]> = signal([]);
-  @Input() tightEndDistribution: Signal<PlayerDistribution[]> = signal([]);
-  @Input() dstDistribution: Signal<PlayerDistribution[]> = signal([]);
-
   @Output() saveLineups = new EventEmitter<void>();
   @Output() updateLineup = new EventEmitter<Lineup>();
   @Output() selectedNewQuarterback = new EventEmitter<Quarterback>();

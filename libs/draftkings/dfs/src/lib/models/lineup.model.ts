@@ -1,11 +1,10 @@
 import {
   Flex,
+  PassCatcher,
   Player,
   Quarterback,
   RunningBack,
   SimplePlayer,
-  TightEnd,
-  WideReceiver,
 } from './player.model';
 
 export interface Lineup {
@@ -15,10 +14,10 @@ export interface Lineup {
   qb: Quarterback | null;
   rb1: RunningBack | null;
   rb2: RunningBack | null;
-  wr1: WideReceiver | null;
-  wr2: WideReceiver | null;
-  wr3: WideReceiver | null;
-  te: TightEnd | null;
+  wr1: PassCatcher | null;
+  wr2: PassCatcher | null;
+  wr3: PassCatcher | null;
+  te: PassCatcher | null;
   flex: Flex | null;
   dst: Player | null;
   remainingSalary: number;

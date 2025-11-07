@@ -18,6 +18,21 @@ interface RawEntry {
 
 export const contestSizes = [
   {
+    name: 'NFL $700K Play-Action [20 Entry Max]',
+    entries: 277400,
+    topPrize: 50000,
+  },
+  {
+    name: 'NFL $100K Fair Catch [Single Entry]',
+    entries: 9803,
+    topPrize: 10000,
+  },
+  {
+    name: 'NFL $40K Front Four [$10K to 1st]',
+    entries: 11800,
+    topPrize: 10000,
+  },
+  {
     name: 'NFL $50K Bootleg [$10K to 1st] (Early Only)',
     entries: 1766,
     topPrize: 10000,

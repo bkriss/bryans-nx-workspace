@@ -165,7 +165,7 @@
       </div>
     </div>
 
-    <div class="grid h-[56px] self-end items-center">
+    <div class="gap-2 grid self-end">
       <mat-slide-toggle
         name="onlyUseIfPartOfStackOrPlayingWithOrAgainstQb"
         [checked]="passCatchers[i].onlyUseIfPartOfStackOrPlayingWithOrAgainstQb"
@@ -174,7 +174,18 @@
             !passCatchers[i].onlyUseIfPartOfStackOrPlayingWithOrAgainstQb
         "
       >
-        Only use w/ or against QB
+        With/Against QB Only
+      </mat-slide-toggle>
+
+      <mat-slide-toggle
+        name="onlyUseInLargerFieldContests"
+        [checked]="passCatchers[i].onlyUseInLargerFieldContests"
+        (change)="
+          passCatchers[i].onlyUseInLargerFieldContests =
+            !passCatchers[i].onlyUseInLargerFieldContests
+        "
+      >
+        Large Field Only
       </mat-slide-toggle>
     </div>
   </div>

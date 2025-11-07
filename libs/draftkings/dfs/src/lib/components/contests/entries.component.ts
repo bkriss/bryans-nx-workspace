@@ -17,25 +17,25 @@ import {
 } from '../../utils';
 import {
   DraftKingsEntry,
-  Lineup,
   Player,
   SimpleLineup,
   TableFriendlyDraftKingsEntry,
 } from '../../models';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-// import {
-//   lineupsForQb1,
-//   lineupsForQb2,
-//   lineupsForQb3,
-//   lineupsForQb4,
-// } from '../../utils/main-slate/lineups';
 import {
   lineupsForQb1,
   lineupsForQb2,
   lineupsForQb3,
   lineupsForQb4,
-} from '../../utils/early-only/lineups';
+} from '../../utils/main-slate/lineups';
+// import {
+//   lineupsForQb1,
+//   lineupsForQb2,
+//   lineupsForQb3,
+//   lineupsForQb4,
+// } from '../../utils/early-only/lineups';
+import { Slate } from '../../enums';
 
 @Component({
   selector: 'dfs-entries',
@@ -45,7 +45,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntriesComponent implements OnInit {
-  @Input() numberOfQbs = 0; // TODO: Get this from store
+  @Input() numberOfQbs = 4; // TODO: Get this from NgRx Signal Store
+  currentSlate = Slate.MAIN; // TODO: Get this from NgRx Signal Store
   draftKingsEntries = draftKingsEntries;
   lineupsForQb1: WritableSignal<SimpleLineup[]> = signal([]);
   lineupsForQb2: WritableSignal<SimpleLineup[]> = signal([]);
@@ -59,11 +60,6 @@ export class EntriesComponent implements OnInit {
       ...this.lineupsForQb4(),
     ].sort((a, b) => b.lineupGrade - a.lineupGrade);
   });
-
-  // assignLineups = computed(() => {
-  //   console.log('computing lineupsForAllQbs', this.lineupsForQb1());
-  //   this.assignLineupsToContests([...this.lineupsForQb1()]);
-  // });
 
   numberOfLineupsMatchNumberOfEntries = computed(() => {
     return this.lineupsForAllQbs().length === this.entries().length;
@@ -84,15 +80,11 @@ export class EntriesComponent implements OnInit {
     'DST',
     'lineupGrade',
   ];
-  // entries: WritableSignal<TableFriendlyDraftKingsEntry[]> =
-  //   signal(draftKingsEntries);
   entries = computed(() => {
     return this.assignLineupsToContests(this.lineupsForAllQbs());
   });
 
   ngOnInit(): void {
-    console.log('EntriesComponent initialized');
-
     this.fetchLineupsForQb1();
     this.fetchLineupsForQb2();
     this.fetchLineupsForQb3();
@@ -104,86 +96,135 @@ export class EntriesComponent implements OnInit {
     return player?.id;
   }
 
+  mapLineupsToEntries(
+    entries: TableFriendlyDraftKingsEntry[],
+    lineups: SimpleLineup[]
+  ): TableFriendlyDraftKingsEntry[] {
+    const sortedLineups = lineups.sort((a, b) => b.lineupGrade - a.lineupGrade);
+    return entries.map((entry, i) => {
+      const qb = sortedLineups[i]?.qb as Player;
+      const rb1 = sortedLineups[i]?.rb1 as Player;
+      const rb2 = sortedLineups[i]?.rb2 as Player;
+      const wr1 = sortedLineups[i]?.wr1 as Player;
+      const wr2 = sortedLineups[i]?.wr2 as Player;
+      const wr3 = sortedLineups[i]?.wr3 as Player;
+      const te = sortedLineups[i]?.te as Player;
+      const flex = sortedLineups[i]?.flex as Player;
+      const dst = sortedLineups[i]?.dst as Player;
+
+      return {
+        ...entry,
+        QB: this.renderEntryPosition(qb),
+        RB1: this.renderEntryPosition(rb1),
+        RB2: this.renderEntryPosition(rb2),
+        WR1: this.renderEntryPosition(wr1),
+        WR2: this.renderEntryPosition(wr2),
+        WR3: this.renderEntryPosition(wr3),
+        TE: this.renderEntryPosition(te),
+        FLEX: this.renderEntryPosition(flex),
+        DST: this.renderEntryPosition(dst),
+        QB_NAME: qb?.nameAbbrev || '',
+        RB1_NAME: rb1?.nameAbbrev || '',
+        RB2_NAME: rb2?.nameAbbrev || '',
+        WR1_NAME: wr1?.nameAbbrev || '',
+        WR2_NAME: wr2?.nameAbbrev || '',
+        WR3_NAME: wr3?.nameAbbrev || '',
+        TE_NAME: te?.nameAbbrev || '',
+        FLEX_NAME: flex?.nameAbbrev || '',
+        DST_NAME: dst?.nameAbbrev || '',
+        lineupGrade: sortedLineups[i]?.lineupGrade || 0,
+      };
+    });
+  }
+
   assignLineupsToContests(
     lineupsForAllQbs: SimpleLineup[]
   ): TableFriendlyDraftKingsEntry[] {
-    const sortedLineups = lineupsForAllQbs.sort(
-      (a, b) => b.lineupGrade - a.lineupGrade
+    const lineupsForLargeFieldContests = lineupsForAllQbs
+      .filter((lineup) => {
+        const { wr1, wr2, wr3, te, flex } = lineup;
+
+        return (
+          wr1?.onlyUseInLargerFieldContests ||
+          wr2?.onlyUseInLargerFieldContests ||
+          wr3?.onlyUseInLargerFieldContests ||
+          te?.onlyUseInLargerFieldContests ||
+          flex?.onlyUseInLargerFieldContests
+        );
+      })
+      .sort((a, b) => b.lineupGrade - a.lineupGrade);
+
+    const lineupsForRemainingContests = lineupsForAllQbs
+      .filter((lineup) => {
+        const { wr1, wr2, wr3, te, flex } = lineup;
+
+        return (
+          !wr1?.onlyUseInLargerFieldContests &&
+          !wr2?.onlyUseInLargerFieldContests &&
+          !wr3?.onlyUseInLargerFieldContests &&
+          !te?.onlyUseInLargerFieldContests &&
+          !flex?.onlyUseInLargerFieldContests
+        );
+      })
+      .sort((a, b) => b.lineupGrade - a.lineupGrade);
+
+    const entriesSortedBySize = [...draftKingsEntries].sort(
+      (a, b) => b.contestSize - a.contestSize
     );
-    console.log('sortedLineups', sortedLineups);
-
-    const entries: TableFriendlyDraftKingsEntry[] = draftKingsEntries.map(
-      (entry, i) => {
-        const qb = sortedLineups[i]?.qb as Player;
-        const rb1 = sortedLineups[i]?.rb1 as Player;
-        const rb2 = sortedLineups[i]?.rb2 as Player;
-        const wr1 = sortedLineups[i]?.wr1 as Player;
-        const wr2 = sortedLineups[i]?.wr2 as Player;
-        const wr3 = sortedLineups[i]?.wr3 as Player;
-        const te = sortedLineups[i]?.te as Player;
-        const flex = sortedLineups[i]?.flex as Player;
-        const dst = sortedLineups[i]?.dst as Player;
-
-        return {
-          ...entry,
-          QB: this.renderEntryPosition(qb),
-          RB1: this.renderEntryPosition(rb1),
-          RB2: this.renderEntryPosition(rb2),
-          WR1: this.renderEntryPosition(wr1),
-          WR2: this.renderEntryPosition(wr2),
-          WR3: this.renderEntryPosition(wr3),
-          TE: this.renderEntryPosition(te),
-          FLEX: this.renderEntryPosition(flex),
-          DST: this.renderEntryPosition(dst),
-          QB_NAME: qb?.nameAbbrev || '',
-          RB1_NAME: rb1?.nameAbbrev || '',
-          RB2_NAME: rb2?.nameAbbrev || '',
-          WR1_NAME: wr1?.nameAbbrev || '',
-          WR2_NAME: wr2?.nameAbbrev || '',
-          WR3_NAME: wr3?.nameAbbrev || '',
-          TE_NAME: te?.nameAbbrev || '',
-          FLEX_NAME: flex?.nameAbbrev || '',
-          DST_NAME: dst?.nameAbbrev || '',
-          lineupGrade: sortedLineups[i]?.lineupGrade || 0,
-        };
-      }
+    const largerFieldEntries = entriesSortedBySize.slice(
+      0,
+      lineupsForLargeFieldContests.length
+    );
+    const remainingEntries = entriesSortedBySize.slice(
+      largerFieldEntries.length
     );
 
-    console.log('entries', entries);
+    const mappedEntriesForLargeFieldContests = this.mapLineupsToEntries(
+      largerFieldEntries,
+      lineupsForLargeFieldContests
+    );
+    const mappedEntriesForRemainingContests = this.mapLineupsToEntries(
+      remainingEntries,
+      lineupsForRemainingContests
+    );
 
-    // this.entries.update(() => defaultEntries);
+    const entries: TableFriendlyDraftKingsEntry[] = [
+      ...mappedEntriesForRemainingContests,
+      ...mappedEntriesForLargeFieldContests,
+    ].sort((a, b) => b.contestScore - a.contestScore);
+
     return entries;
   }
 
   fetchLineupsForQb1(): void {
     console.log('fetchLineupsForQb1');
 
-    // TODO: Replace with actual fetching logic
+    // TODO: Fetch lineupsForQb1 from NgRx Signal Store Service
     this.lineupsForQb1.set([...lineupsForQb1]);
   }
 
   fetchLineupsForQb2(): void {
     if (this.numberOfQbs < 2) return;
-    console.log('fetchLineupsForQb2');
+    console.log('fetchLineupsForQb2', lineupsForQb2);
 
-    // TODO: Replace with actual fetching logic
-    this.lineupsForQb2.update(() => [...lineupsForQb2]);
+    // TODO: Fetch lineupsForQb2 from NgRx Signal Store Service
+    this.lineupsForQb2.set([...lineupsForQb2]);
   }
 
   fetchLineupsForQb3(): void {
     if (this.numberOfQbs < 3) return;
     console.log('fetchLineupsForQb3');
 
-    // TODO: Replace with actual fetching logic
-    this.lineupsForQb3.update(() => [...lineupsForQb3]);
+    // TODO: Fetch lineupsForQb3 from NgRx Signal Store Service
+    this.lineupsForQb3.set([...lineupsForQb3]);
   }
 
   fetchLineupsForQb4(): void {
     if (this.numberOfQbs < 4) return;
     console.log('fetchLineupsForQb4');
 
-    // TODO: Replace with actual fetching logic
-    this.lineupsForQb4.update(() => [...lineupsForQb4]);
+    // TODO: Fetch lineupsForQb4 from NgRx Signal Store Service
+    this.lineupsForQb4.set([...lineupsForQb4]);
   }
 
   downloadCsv(): void {
@@ -204,7 +245,14 @@ export class EntriesComponent implements OnInit {
         DST: entry.DST,
       };
     });
+
+    let csvFileName = 'draftkings-entries-main-slate.csv';
+    if (this.currentSlate === Slate.EARLY) {
+      csvFileName = csvFileName.replace('main-slate', 'early-only');
+    } else if (this.currentSlate === Slate.SUN_TO_MON) {
+      csvFileName = csvFileName.replace('main-slate', 'sun-to-mon');
+    }
     const csv = convertJsonToCsv(entries);
-    downloadCsvFile(csv, 'draftkings-entries.csv');
+    downloadCsvFile(csv, csvFileName);
   }
 }

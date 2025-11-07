@@ -48,15 +48,23 @@ export class SortPassCatcherPoolComponentComponent {
     const passCatchers: PassCatcher[] = this.passCatchers.map((player, i) => {
       const { position } = player;
       const generalMax =
-        position === Position.WR ? 28 - i : 25 - Math.ceil(i * 3);
+        position === Position.WR ? 30 - i : 25 - Math.ceil(i * 3);
       const generalMin =
-        position === Position.WR ? 20 - i : 17 - Math.ceil(i * 3);
+        position === Position.WR ? 22 - i : 17 - Math.ceil(i * 3);
 
+      const maxOwnershipPercentage = generalMax >= 3 ? generalMax : 3;
+      const minOwnershipPercentage = generalMin >= 0 ? generalMin : 0;
       return {
         ...player,
         gradeOutOfTen: Number(calculateGrade(i)),
-        maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
-        minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
+        maxOwnershipPercentage:
+          player.onlyUseIfPartOfStackOrPlayingWithOrAgainstQb
+            ? 0
+            : maxOwnershipPercentage,
+        minOwnershipPercentage:
+          player.onlyUseIfPartOfStackOrPlayingWithOrAgainstQb
+            ? 0
+            : minOwnershipPercentage,
         maxOwnershipWhenPairedWithQb: Number(
           player.maxOwnershipWhenPairedWithQb
         ),

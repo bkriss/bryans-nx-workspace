@@ -69,9 +69,11 @@ export class SortPlayerPoolComponent {
 
       return {
         ...rb,
+        allowOnlyAsFlex: i >= 8,
         gradeOutOfTen: calculateGrade(i),
         maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
         minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
+        useAsAlternate: i === 7,
       };
     });
 
@@ -82,9 +84,16 @@ export class SortPlayerPoolComponent {
   dropDst(event: CdkDragDrop<Player[]>) {
     moveItemInArray(this.dsts, event.previousIndex, event.currentIndex);
 
+    const totalOwnershipPercentage = 125;
+
+    const maxOwnershipForTopDst = Math.ceil(
+      totalOwnershipPercentage / this.dsts.length + this.dsts.length
+    );
+
     const dsts = this.dsts.map((dst, i) => {
-      const generalMax = 28 - Math.ceil(i * 2.5);
-      const generalMin = 18 - Math.ceil(i * 2.5);
+      const generalMax = maxOwnershipForTopDst - Math.ceil(i * 2);
+      const generalMin =
+        maxOwnershipForTopDst - this.dsts.length - Math.ceil(i * 2);
 
       return {
         ...dst,

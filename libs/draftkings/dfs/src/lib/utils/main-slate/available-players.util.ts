@@ -1,11 +1,12 @@
 // import { earlyOnlySalaries } from '../early-only/salaries';
 import { mainSlateSalaries } from './salaries';
 import {
+  PassCatcher,
   Player,
   Quarterback,
   RunningBack,
-  TightEnd,
-  WideReceiver,
+  // TightEnd,
+  // WideReceiver,
 } from '../../models';
 import { csvToJson } from '../csv-to-json.util';
 
@@ -78,31 +79,21 @@ export const draftKingsPlayers = csvToJson(mainSlateSalaries).map(
       maxOwnershipPercentage: 100,
       minOwnershipPercentage: 100,
       numberOfLineupsWithThisPlayer: 10,
-      qbPassCatcherPairings: [],
+      passCatcherStacks: [],
       requirePassCatcherFromOpposingTeam: true,
       sortOrder: 0,
     };
 
-    const wideReceiver: WideReceiver = {
+    const passCatcher: PassCatcher = {
       ...player,
       maxOwnershipPercentage: 25,
       minOwnershipPercentage: 5,
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
+      maxOwnershipWhenPairedWithQb: 70,
+      minOwnershipWhenPairedWithQb: 50,
+      maxOwnershipWhenPairedWithOpposingQb: 60,
+      minOwnershipWhenPairedWithOpposingQb: 50,
       onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    };
-
-    const tightEnd: TightEnd = {
-      ...player,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      maxOwnershipWhenPairedWithQb: 80,
-      minOwnershipWhenPairedWithQb: 20,
-      maxOwnershipWhenPairedWithOpposingQb: 65,
-      minOwnershipWhenPairedWithOpposingQb: 20,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
+      onlyUseInLargerFieldContests: false,
     };
 
     if (player.position === 'QB') {
@@ -113,12 +104,8 @@ export const draftKingsPlayers = csvToJson(mainSlateSalaries).map(
       return runningBack;
     }
 
-    if (player.position === 'WR') {
-      return wideReceiver;
-    }
-
-    if (player.position === 'TE') {
-      return tightEnd;
+    if (player.position === 'WR' || player.position === 'TE') {
+      return passCatcher;
     }
 
     return player;
@@ -134,7 +121,7 @@ const availableQuarterbacks = (numberOfTeams: number) =>
       maxNumberOfTeammatePasscatchers: 2,
       minNumberOfTeammatePasscatchers: 1,
       numberOfLineupsWithThisPlayer: 0,
-      qbPassCatcherPairings: [],
+      passCatcherStacks: [],
       requirePassCatcherFromOpposingTeam: true,
       sortOrder: 0,
     })) as Quarterback[];
@@ -150,7 +137,7 @@ const availableWideReceivers = (numberOfTeams: number) =>
     .map((player) => ({
       ...player,
       onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    })) as WideReceiver[];
+    })) as PassCatcher[];
 const availableTightEnds = (numberOfTeams: number) =>
   draftKingsPlayers
     .filter((player) => player.position === 'TE')
@@ -158,7 +145,7 @@ const availableTightEnds = (numberOfTeams: number) =>
     .map((player) => ({
       ...player,
       onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    })) as TightEnd[];
+    })) as PassCatcher[];
 const availableDefenses = draftKingsPlayers.filter(
   (player) => player.position === 'DST'
 ) as Player[];
