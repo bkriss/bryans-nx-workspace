@@ -32,3 +32,13 @@ mat-expansion-panel {
 .mat-mdc-tab-link .mdc-tab__text-label {
   transition: none !important;
 }
+
+// Reducing horizontal padding for player selection stepper so that it is aligned with other components
+mat-stepper {
+  .mat-horizontal-stepper-header {
+    padding: 0 16px;
+  }
+  .mat-horizontal-content-container {
+    padding: 0 16px 16px 16px;
+  }
+}

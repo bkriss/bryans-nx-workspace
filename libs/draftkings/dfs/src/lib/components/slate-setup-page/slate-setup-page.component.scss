@@ -1,0 +1,14 @@
+.slate-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: #2a3846;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  padding: 16px;
+
+  .slate-title {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+}

@@ -1,4 +1,3 @@
-export * from './dfs/dfs.component';
 export * from './entries/entries.component';
 export * from './lineup-builder/lineup-builder.component';
 export * from './lineup-builder-position/lineup-builder-position.component';
@@ -7,6 +6,7 @@ export * from './lineups/lineups.component';
 export * from './player-distributions/player-distributions.component';
 export * from './player-overlap-imbalance-button/player-overlap-imbalance-button.component';
 export * from './player-overlap-imbalance-modal/player-overlap-imbalance-modal.component';
+export * from './player-pool-selection/player-pool-selection.component';
 export * from './select-slate/select-slate.component';
 export * from './sort-pass-catcher-pool/sort-pass-catcher-pool.component';
 export * from './sort-player-pool/sort-player-pool.component';

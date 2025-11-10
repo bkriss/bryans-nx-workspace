@@ -16,23 +16,16 @@ import {
 } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatListModule, MatSelectionListChange } from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 
-import { getAvailablePlayers } from '../../utils';
-import {
-  PassCatcher,
-  Player,
-  Quarterback,
-  RunningBack,
-  // TightEnd,
-  // WideReceiver,
-} from '../../models';
+import { getAvailablePlayers, defaultPlayerRankings } from '../../utils';
+import { PassCatcher, Player, Quarterback, RunningBack } from '../../models';
 import { Router } from '@angular/router';
 import { SortPlayerPoolComponent } from '../sort-player-pool/sort-player-pool.component';
 import { SortPassCatcherPoolComponentComponent } from '../sort-pass-catcher-pool/sort-pass-catcher-pool.component';
-import { Position } from '../../enums';
+import { Position, Slate } from '../../enums';
 // import {
 //   selectedDSTs,
 //   selectedQuarterbacks,
@@ -61,11 +54,11 @@ import {
     SortPassCatcherPoolComponentComponent,
     SortPlayerPoolComponent,
   ],
-  templateUrl: './dfs.component.html',
-  styleUrl: './dfs.component.scss',
+  templateUrl: './player-pool-selection.component.html',
+  styleUrl: './player-pool-selection.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DfsComponent implements OnInit {
+export class PlayerPoolSelectionComponent implements OnInit {
   private router = inject(Router);
   availableQuarterbacks: WritableSignal<Quarterback[]> = signal([]);
   availableRunningBacks: RunningBack[] = [];
@@ -120,6 +113,43 @@ export class DfsComponent implements OnInit {
     this.availableWideReceivers = wrs;
     this.availableTightEnds = tes;
     this.availableDsts = dsts;
+
+    this.getDefaultPlayerRankings();
+  }
+
+  getDefaultPlayerRankings() {
+    // const espn_s2 = 'AEBE2zy0mVnl5LTVCjanOWtLlgp9F9vfWc06WDPhhpcHop7PuMQI3NlL1d1MJzmOfe7fAKznFYB%2BY%2BGAhw0Lsm8EeZFlccn1sl9%2BXS%2FPUJml%2BeFZLOBgUDxC6pNsq2XX5BOEaaeTYYW98vpeFCHulrAQRjBmafxvRpzGVcgkWaDd8ePA%2FRqkreEchDnwPPz5u34wDzSufxHzZXQP%2F2n4iPi7eHk9jQh696imuYlocolJ54anlxoBvIu2w%2FckbKVY0GS6vYNkm382zNJmbJLTxPiygrwWGB8THoI%2F4h%2Bb8OEjwA%3D%3D';
+    // const SWID = '{F9A0366F-B19B-4481-AA52-06D9FC8634CA}';
+    // const params = {
+    //   season: '2025',
+    //   scoringPeriodId: 10,
+    //   leagueId: 44091,
+    // };
+    const defaultQbRankings = defaultPlayerRankings(
+      Position.QB,
+      Slate.SUN_TO_MON
+    );
+    const defaultRBRankings = defaultPlayerRankings(
+      Position.RB,
+      Slate.SUN_TO_MON
+    );
+    const defaultWRRankings = defaultPlayerRankings(
+      Position.WR,
+      Slate.SUN_TO_MON
+    );
+    const defaultTERankings = defaultPlayerRankings(
+      Position.TE,
+      Slate.SUN_TO_MON
+    );
+    const defaultDSTRankings = defaultPlayerRankings(
+      Position.DST,
+      Slate.SUN_TO_MON
+    );
+    console.log('defaultQbRankings', defaultQbRankings);
+    console.log('defaultRBRankings', defaultRBRankings);
+    console.log('defaultWRRankings', defaultWRRankings);
+    console.log('defaultTERankings', defaultTERankings);
+    console.log('defaultDSTRankings', defaultDSTRankings);
   }
 
   saveQbSelections() {
@@ -136,8 +166,8 @@ export class DfsComponent implements OnInit {
       };
     });
 
-    // TODO: Save this to DB
-    console.log('availableQuarterbacksss', availableQuarterbacks);
+    // TODO: Use service from NgRx Signal Store to save Quarterback selections to Firebase Firestore
+    console.log('availableQuarterbacks', availableQuarterbacks);
   }
 
   saveRBSelections() {
@@ -154,7 +184,7 @@ export class DfsComponent implements OnInit {
       };
     });
 
-    // TODO: Save this to DB
+    // TODO: Use service from NgRx Signal Store to save Running Back selections to Firebase Firestore
     console.log('saving availableRunningBacks', availableRunningBacks);
   }
 
@@ -172,7 +202,7 @@ export class DfsComponent implements OnInit {
       };
     });
 
-    // TODO: Save this to DB
+    // TODO: Use service from NgRx Signal Store to save Wide Receiver selections to Firebase Firestore
     console.log('saving availableWideReceivers', availableWideReceivers);
   }
 
@@ -190,7 +220,7 @@ export class DfsComponent implements OnInit {
       };
     });
 
-    // TODO: Save this to DB
+    // TODO: Use service from NgRx Signal Store to save Tight End selections to Firebase Firestore
     console.log('saving availableTightEnds', availableTightEnds);
   }
 
@@ -208,14 +238,11 @@ export class DfsComponent implements OnInit {
       };
     });
 
-    // TODO: Save this to DB
+    // TODO: Use service from NgRx Signal Store to save DST selections to Firebase Firestore
     console.log('saving availableDsts', availableDsts);
   }
 
   generateLineupBuilders() {
-    // Implement your lineup generation logic here
-
-    // TODO: Save selections to state and navigate to lineup builders page
     this.router.navigate(['/dfs/lineup-builders']);
   }
 

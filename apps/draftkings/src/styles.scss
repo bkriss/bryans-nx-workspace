@@ -1,5 +1,5 @@
 @use 'tailwindcss';
-@use './scss-partials/_material-overrides';
+@use './scss-partials/material-overrides';
 
 // @tailwind base;
 // @tailwind components;
@@ -53,4 +53,24 @@ body {
 
 .dst-text-color {
   color: var(--dst-brown);
+}
+
+.link {
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.note {
+  border-radius: 8px;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px;
+  padding: 16px 40px;
+  background-color: var(--wr-blue);
+  color: #101414;
 }

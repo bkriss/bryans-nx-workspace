@@ -1,0 +1,139 @@
+<div class="p-4">
+  <div class="grid justify-between gap-1 grid-flow-col mb-4">
+    <h1 class="text-2xl self-end">Slate Setup</h1>
+    <dfs-select-slate></dfs-select-slate>
+  </div>
+
+  <p class="mb-4 note">
+    <mat-icon>star</mat-icon>
+
+    <span>
+      Before you can generate lineups for your contests, you'll need to upload
+      some CSV files provided by DraftKings. The DKSalaries.csv file lets the
+      system know which players are available and how much they cost. The
+      DKEntries.csv file allows the system to take your lineups and generate a
+      new CSV file for you to upload to DraftKings. Click
+      <a class="link" (click)="help()" (keydown.enter)="help()" tabindex="0">
+        here
+      </a>
+      for help.
+    </span>
+  </p>
+
+  <div class="grid gap-4 grid-cols-3">
+    <!-- MAIN -->
+    <div class="slate-card">
+      <h3 class="text-lg mb-2 slate-title">Main Slate</h3>
+
+      <p class="mb-4">
+        If you entered contests in the
+        <span class="italic">main slate</span>, you can upload your CSV files
+        below.
+      </p>
+
+      <div class="grid gap-2 grid-flow-col justify-center">
+        <!-- Salary CSV upload for Main Slate -->
+        <input
+          accept=".csv"
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event, slateEnum.MAIN, 'salaries')"
+          #mainSalariesInput
+        />
+        <button (click)="mainSalariesInput.click()" matButton>
+          <mat-icon>upload_file</mat-icon>
+          Upload DKSalaries
+        </button>
+
+        <!-- Entries CSV upload for Main Slate -->
+        <input
+          accept=".csv"
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event, slateEnum.MAIN, 'entries')"
+          #mainEntriesInput
+        />
+        <button matButton (click)="mainEntriesInput.click()">
+          <mat-icon>upload_file</mat-icon>
+          Upload DKEntries
+        </button>
+      </div>
+    </div>
+
+    <!-- EARLY ONLY -->
+    <div class="slate-card">
+      <h3 class="text-lg mb-2 slate-title">Early Only Slate</h3>
+      <p class="mb-4">
+        If you entered contests in the
+        <span class="italic">early only</span> slate, you can upload your CSV
+        files below.
+      </p>
+
+      <div class="grid gap-2 grid-flow-col justify-center">
+        <!-- Salary CSV upload for Early Only Slate -->
+        <input
+          accept=".csv"
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event, slateEnum.EARLY_ONLY, 'salaries')"
+          #earlyOnlySalariesInput
+        />
+        <button (click)="earlyOnlySalariesInput.click()" matButton>
+          <mat-icon>upload_file</mat-icon>
+          Upload DKSalaries
+        </button>
+
+        <!-- Entries CSV upload for Early Only Slate -->
+        <input
+          accept=".csv"
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event, slateEnum.EARLY_ONLY, 'entries')"
+          #earlyOnlyEntriesInput
+        />
+        <button matButton (click)="earlyOnlyEntriesInput.click()">
+          <mat-icon>upload_file</mat-icon>
+          Upload DKEntries
+        </button>
+      </div>
+    </div>
+
+    <!-- SUN TO MON -->
+    <div class="slate-card">
+      <h3 class="text-lg mb-2 slate-title">Sunday To Monday Slate</h3>
+      <p class="mb-4">
+        If you entered contests in the
+        <span class="italic">Sun-Mon</span> slate, you can upload your CSV files
+        below.
+      </p>
+
+      <div class="grid gap-2 grid-flow-col justify-center">
+        <!-- Salary CSV upload for Sun-Mon Slate -->
+        <input
+          accept=".csv"
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event, slateEnum.SUN_TO_MON, 'salaries')"
+          #sunMonSalariesInput
+        />
+        <button (click)="sunMonSalariesInput.click()" matButton>
+          <mat-icon>upload_file</mat-icon>
+          Upload DKSalaries
+        </button>
+
+        <!-- Entries CSV upload for Sun-Mon Slate -->
+        <input
+          accept=".csv"
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event, slateEnum.SUN_TO_MON, 'entries')"
+          #sunMonEntriesInput
+        />
+        <button matButton (click)="sunMonEntriesInput.click()">
+          <mat-icon>upload_file</mat-icon>
+          Upload DKEntries
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

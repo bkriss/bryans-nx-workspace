@@ -897,9 +897,20 @@ export class LineupBuildersPageComponent implements OnInit {
     const rbCombosWithDuplicates: RunningBack[][] = [];
     let numberOfDuplicateRbGroups = 0;
 
-    const rbPool = this.rbPool
-      .filter((rb) => !rb.allowOnlyAsFlex && !rb.useAsAlternate)
-      .sort((a, b) => b.maxOwnershipPercentage - a.maxOwnershipPercentage);
+    const qbPlaysOnSameTeamAsOneOfTheRbs = this.rbPool.some(
+      (rb) => rb.teamAbbrev === this.currentQb().teamAbbrev
+    );
+
+    let rbPool: RunningBack[] = this.rbPool.filter(
+      (rb) =>
+        !rb.allowOnlyAsFlex && rb.teamAbbrev !== this.currentQb().teamAbbrev
+    );
+
+    if (!qbPlaysOnSameTeamAsOneOfTheRbs) {
+      rbPool = rbPool.filter((rb) => !rb.useAsAlternate);
+    }
+
+    rbPool.sort((a, b) => b.maxOwnershipPercentage - a.maxOwnershipPercentage);
 
     for (let groupIndex = 0; groupIndex < numberOfRb1s; groupIndex++) {
       for (let i = groupIndex + 1; i < rbPool.length; i++) {
@@ -1099,7 +1110,7 @@ export class LineupBuildersPageComponent implements OnInit {
   }
 
   saveLineups() {
-    // TODO: Use service to save current lineups to DB
+    // TODO: Use service from NgRx Signal Store to save current lineups to Firebase Firestore
 
     const { sortOrder } = this.currentQb();
 

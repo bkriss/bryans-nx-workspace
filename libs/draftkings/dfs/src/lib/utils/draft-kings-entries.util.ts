@@ -18,6 +18,46 @@ interface RawEntry {
 
 export const contestSizes = [
   {
+    name: 'NFL $10K Huddle [Single Entry] (Sun-Mon)',
+    entries: 2378,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $15K Sun-Mon Special [$5K to 1st] (Sun-Mon)',
+    entries: 1470,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $5K Play-Action [20 Entry Max] (Sun-Mon)',
+    entries: 1981,
+    topPrize: 500,
+  },
+  {
+    name: 'NFL $3K First Down [20 Entry Max] (Sun-Mon)',
+    entries: 3567,
+    topPrize: 300,
+  },
+  {
+    name: 'NFL $5K Fair Catch [Single Entry] (Sun-Mon)',
+    entries: 490,
+    topPrize: 500,
+  },
+  {
+    name: 'NFL $25K Fair Catch [Single Entry] (Early Only)',
+    entries: 2450,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $15K Fair Catch [Single Entry] (Early Only)',
+    entries: 1470,
+    topPrize: 1500,
+  },
+  {
+    name: 'NFL $50K Huddle [Single Entry] (Early Only)',
+    entries: 11800,
+    topPrize: 5000,
+  },
+  {
     name: 'NFL $700K Play-Action [20 Entry Max]',
     entries: 277400,
     topPrize: 50000,

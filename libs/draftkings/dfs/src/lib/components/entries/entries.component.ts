@@ -46,7 +46,7 @@ import { Slate } from '../../enums';
 })
 export class EntriesComponent implements OnInit {
   @Input() numberOfQbs = 4; // TODO: Get this from NgRx Signal Store
-  currentSlate = Slate.MAIN; // TODO: Get this from NgRx Signal Store
+  currentSlate = Slate.SUN_TO_MON; // TODO: Get this from NgRx Signal Store
   draftKingsEntries = draftKingsEntries;
   lineupsForQb1: WritableSignal<SimpleLineup[]> = signal([]);
   lineupsForQb2: WritableSignal<SimpleLineup[]> = signal([]);
@@ -100,40 +100,42 @@ export class EntriesComponent implements OnInit {
     lineups: SimpleLineup[]
   ): TableFriendlyDraftKingsEntry[] {
     const sortedLineups = lineups.sort((a, b) => b.lineupGrade - a.lineupGrade);
-    return entries.map((entry, i) => {
-      const qb = sortedLineups[i]?.qb as Player;
-      const rb1 = sortedLineups[i]?.rb1 as Player;
-      const rb2 = sortedLineups[i]?.rb2 as Player;
-      const wr1 = sortedLineups[i]?.wr1 as Player;
-      const wr2 = sortedLineups[i]?.wr2 as Player;
-      const wr3 = sortedLineups[i]?.wr3 as Player;
-      const te = sortedLineups[i]?.te as Player;
-      const flex = sortedLineups[i]?.flex as Player;
-      const dst = sortedLineups[i]?.dst as Player;
+    return entries
+      .sort((a, b) => b.contestScore - a.contestScore)
+      .map((entry, i) => {
+        const qb = sortedLineups[i]?.qb as Player;
+        const rb1 = sortedLineups[i]?.rb1 as Player;
+        const rb2 = sortedLineups[i]?.rb2 as Player;
+        const wr1 = sortedLineups[i]?.wr1 as Player;
+        const wr2 = sortedLineups[i]?.wr2 as Player;
+        const wr3 = sortedLineups[i]?.wr3 as Player;
+        const te = sortedLineups[i]?.te as Player;
+        const flex = sortedLineups[i]?.flex as Player;
+        const dst = sortedLineups[i]?.dst as Player;
 
-      return {
-        ...entry,
-        QB: this.renderEntryPosition(qb),
-        RB1: this.renderEntryPosition(rb1),
-        RB2: this.renderEntryPosition(rb2),
-        WR1: this.renderEntryPosition(wr1),
-        WR2: this.renderEntryPosition(wr2),
-        WR3: this.renderEntryPosition(wr3),
-        TE: this.renderEntryPosition(te),
-        FLEX: this.renderEntryPosition(flex),
-        DST: this.renderEntryPosition(dst),
-        QB_NAME: qb?.nameAbbrev || '',
-        RB1_NAME: rb1?.nameAbbrev || '',
-        RB2_NAME: rb2?.nameAbbrev || '',
-        WR1_NAME: wr1?.nameAbbrev || '',
-        WR2_NAME: wr2?.nameAbbrev || '',
-        WR3_NAME: wr3?.nameAbbrev || '',
-        TE_NAME: te?.nameAbbrev || '',
-        FLEX_NAME: flex?.nameAbbrev || '',
-        DST_NAME: dst?.nameAbbrev || '',
-        lineupGrade: sortedLineups[i]?.lineupGrade || 0,
-      };
-    });
+        return {
+          ...entry,
+          QB: this.renderEntryPosition(qb),
+          RB1: this.renderEntryPosition(rb1),
+          RB2: this.renderEntryPosition(rb2),
+          WR1: this.renderEntryPosition(wr1),
+          WR2: this.renderEntryPosition(wr2),
+          WR3: this.renderEntryPosition(wr3),
+          TE: this.renderEntryPosition(te),
+          FLEX: this.renderEntryPosition(flex),
+          DST: this.renderEntryPosition(dst),
+          QB_NAME: qb?.nameAbbrev || '',
+          RB1_NAME: rb1?.nameAbbrev || '',
+          RB2_NAME: rb2?.nameAbbrev || '',
+          WR1_NAME: wr1?.nameAbbrev || '',
+          WR2_NAME: wr2?.nameAbbrev || '',
+          WR3_NAME: wr3?.nameAbbrev || '',
+          TE_NAME: te?.nameAbbrev || '',
+          FLEX_NAME: flex?.nameAbbrev || '',
+          DST_NAME: dst?.nameAbbrev || '',
+          lineupGrade: sortedLineups[i]?.lineupGrade || 0,
+        };
+      });
   }
 
   assignLineupsToContests(

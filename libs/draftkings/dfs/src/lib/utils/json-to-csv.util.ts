@@ -13,7 +13,6 @@ export const convertJsonToCsv = (jsonData: DraftKingsEntry[]): string => {
 
   // Add data rows
   for (const row of jsonData) {
-    console.log('row data', typeof row, row);
     const values = headers.map((header) => {
       const value = (row as any)[header];
       // Handle potential commas within values by enclosing them in quotes

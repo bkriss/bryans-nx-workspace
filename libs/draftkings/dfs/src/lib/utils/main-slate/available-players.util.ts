@@ -1,13 +1,6 @@
-// import { earlyOnlySalaries } from '../early-only/salaries';
-import { mainSlateSalaries } from './salaries';
-import {
-  PassCatcher,
-  Player,
-  Quarterback,
-  RunningBack,
-  // TightEnd,
-  // WideReceiver,
-} from '../../models';
+import { earlyOnlySalaries } from '../early-only/salaries';
+// import { mainSlateSalaries } from './salaries';
+import { PassCatcher, Player, Quarterback, RunningBack } from '../../models';
 import { csvToJson } from '../csv-to-json.util';
 
 interface RawPlayer {
@@ -33,8 +26,8 @@ const renderLastName = (fullName: string): string => {
   return lastName;
 };
 
-export const draftKingsPlayers = csvToJson(mainSlateSalaries).map(
-  // export const draftKingsPlayers = csvToJson(earlyOnlySalaries).map(
+// export const draftKingsPlayers = csvToJson(mainSlateSalaries).map(
+export const draftKingsPlayers = csvToJson(earlyOnlySalaries).map(
   (rawPlayer: RawPlayer) => {
     const firstName = rawPlayer.Name.split(' ')[0];
     const lastName = renderLastName(rawPlayer.Name);

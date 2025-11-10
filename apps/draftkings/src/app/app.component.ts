@@ -14,6 +14,7 @@ import { NavLink } from '../models';
 export class AppComponent {
   activeRoute = window.location.pathname;
   links: NavLink[] = [
+    { iconName: 'upload_file', label: 'Slate', path: '/dfs/slate-setup' },
     { iconName: 'groups', label: 'Players', path: '/dfs/player-selection' },
     {
       iconName: 'construction',

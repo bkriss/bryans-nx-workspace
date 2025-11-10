@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   Input,
+  signal,
   Signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -30,7 +31,7 @@ import { Position } from '../../enums';
 })
 export class PlayerDistributionsComponent {
   @Input() currentQb!: Quarterback;
-  @Input() lineups: Lineup[] = [];
+  @Input() lineups: Signal<Lineup[]> = signal([]);
   @Input() rbPool: RunningBack[] = [];
   @Input() wrPool: PassCatcher[] = [];
   @Input() tePool: PassCatcher[] = [];
@@ -100,18 +101,18 @@ export class PlayerDistributionsComponent {
     let minRequirement = 0;
 
     if (position === Position.QB) {
-      count = this.lineups.filter(
+      count = this.lineups().filter(
         (lineup) => lineup.qb?.id === player.id
       ).length;
     } else if (position === Position.RB) {
-      count = this.lineups.filter(
+      count = this.lineups().filter(
         (lineup) =>
           lineup.rb1?.id === player.id ||
           lineup.rb2?.id === player.id ||
           lineup.flex?.id === player.id
       ).length;
     } else if (position === Position.WR) {
-      count = this.lineups.filter(
+      count = this.lineups().filter(
         (lineup) =>
           lineup.wr1?.id === player.id ||
           lineup.wr2?.id === player.id ||
@@ -119,11 +120,11 @@ export class PlayerDistributionsComponent {
           lineup.flex?.id === player.id
       ).length;
     } else if (position === Position.TE) {
-      count = this.lineups.filter(
+      count = this.lineups().filter(
         (lineup) => lineup.te?.id === player.id || lineup.flex?.id === player.id
       ).length;
     } else if (position === Position.DST) {
-      count = this.lineups.filter(
+      count = this.lineups().filter(
         (lineup) => lineup.dst?.id === player.id
       ).length;
     }

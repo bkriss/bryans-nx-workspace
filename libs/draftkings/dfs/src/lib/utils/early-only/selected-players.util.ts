@@ -1,6 +1,6 @@
 // ****** EARLY SLATE ****** \\
 
-// TODO: Delete this file and fetch from DB once app is connected to Firestore
+// TODO: Delete this file and store this data in NgRx Signal Store instead
 import { Player, Quarterback, RunningBack, PassCatcher } from '../../models';
 
 export const selectedQuarterbacks: Quarterback[] = [];

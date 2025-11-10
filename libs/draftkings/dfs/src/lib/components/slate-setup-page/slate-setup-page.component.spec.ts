@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DfsComponent } from './dfs.component';
+import { SlateSetupPageComponent } from './slate-setup-page.component';
 
-describe('DfsComponent', () => {
-  let component: DfsComponent;
-  let fixture: ComponentFixture<DfsComponent>;
+describe('SlateSetupPageComponent', () => {
+  let component: SlateSetupPageComponent;
+  let fixture: ComponentFixture<SlateSetupPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DfsComponent],
+      imports: [SlateSetupPageComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DfsComponent);
+    fixture = TestBed.createComponent(SlateSetupPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
