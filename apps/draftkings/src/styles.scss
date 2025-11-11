@@ -1,11 +1,9 @@
 @use 'tailwindcss';
 @use './scss-partials/material-overrides';
 
-// @tailwind base;
-// @tailwind components;
-// @tailwind utilities;
-
-// @use 'styles/_dx-overrides';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --qb-red: #fc2b6d;
@@ -27,12 +25,6 @@ body {
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', helvetica, verdana, sans-serif;
   line-height: 1.35715;
-}
-
-// TODO: Move to different file
-.mat-mdc-form-field-subscript-wrapper.mat-mdc-form-field-bottom-align {
-  height: 0;
-  line-height: 0;
 }
 
 .qb-text-color {

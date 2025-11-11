@@ -42,3 +42,9 @@ mat-stepper {
     padding: 0 16px 16px 16px;
   }
 }
+
+// Form Field overrides
+.mat-mdc-form-field-subscript-wrapper.mat-mdc-form-field-bottom-align {
+  height: 0;
+  line-height: 0;
+}
