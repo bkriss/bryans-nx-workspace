@@ -1,7 +1,6 @@
-import { earlyOnlySalaries } from '../early-only/salaries';
-// import { mainSlateSalaries } from './salaries';
 import { PassCatcher, Player, Quarterback, RunningBack } from '../../models';
 import { csvToJson } from '../csv-to-json.util';
+import { Position } from '../../enums';
 
 interface RawPlayer {
   AvgPointsPerGame: string;
@@ -26,9 +25,8 @@ const renderLastName = (fullName: string): string => {
   return lastName;
 };
 
-// export const draftKingsPlayers = csvToJson(mainSlateSalaries).map(
-export const draftKingsPlayers = csvToJson(earlyOnlySalaries).map(
-  (rawPlayer: RawPlayer) => {
+export const draftKingsPlayers = (playerSalaries: string) =>
+  csvToJson(playerSalaries).map((rawPlayer: RawPlayer) => {
     const firstName = rawPlayer.Name.split(' ')[0];
     const lastName = renderLastName(rawPlayer.Name);
     const nameAbbrev =
@@ -102,11 +100,10 @@ export const draftKingsPlayers = csvToJson(earlyOnlySalaries).map(
     }
 
     return player;
-  }
-);
+  });
 
-const availableQuarterbacks = (numberOfTeams: number) =>
-  draftKingsPlayers
+const availableQuarterbacks = (numberOfTeams: number, playerSalaries: string) =>
+  draftKingsPlayers(playerSalaries)
     .filter((player) => player.position === 'QB')
     .slice(0, numberOfTeams)
     .map((player) => ({
@@ -119,36 +116,43 @@ const availableQuarterbacks = (numberOfTeams: number) =>
       sortOrder: 0,
     })) as Quarterback[];
 
-const availableRunningBacks = (numberOfTeams: number) =>
-  draftKingsPlayers
+const availableRunningBacks = (numberOfTeams: number, playerSalaries: string) =>
+  draftKingsPlayers(playerSalaries)
     .filter((player) => player.position === 'RB')
     .slice(0, numberOfTeams * 2) as RunningBack[];
-const availableWideReceivers = (numberOfTeams: number) =>
-  draftKingsPlayers
+const availableWideReceivers = (
+  numberOfTeams: number,
+  playerSalaries: string
+) =>
+  draftKingsPlayers(playerSalaries)
     .filter((player) => player.position === 'WR')
     .slice(0, numberOfTeams * 4)
     .map((player) => ({
       ...player,
       onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
     })) as PassCatcher[];
-const availableTightEnds = (numberOfTeams: number) =>
-  draftKingsPlayers
+const availableTightEnds = (numberOfTeams: number, playerSalaries: string) =>
+  draftKingsPlayers(playerSalaries)
     .filter((player) => player.position === 'TE')
     .slice(0, numberOfTeams)
     .map((player) => ({
       ...player,
       onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
     })) as PassCatcher[];
-const availableDefenses = draftKingsPlayers.filter(
-  (player) => player.position === 'DST'
-) as Player[];
+const availableDefenses = (playerSalaries: string) =>
+  draftKingsPlayers(playerSalaries).filter(
+    (player) => player.position === Position.DST
+  ) as Player[];
 
-export const getAvailablePlayers = (numberOfTeams: number) => {
-  const qbs = availableQuarterbacks(numberOfTeams);
-  const rbs = availableRunningBacks(numberOfTeams);
-  const wrs = availableWideReceivers(numberOfTeams);
-  const tes = availableTightEnds(numberOfTeams);
-  const dsts = availableDefenses;
+export const getAvailablePlayers = (
+  numberOfTeams: number,
+  playerSalaries: string
+) => {
+  const qbs = availableQuarterbacks(numberOfTeams, playerSalaries);
+  const rbs = availableRunningBacks(numberOfTeams, playerSalaries);
+  const wrs = availableWideReceivers(numberOfTeams, playerSalaries);
+  const tes = availableTightEnds(numberOfTeams, playerSalaries);
+  const dsts = availableDefenses(playerSalaries);
 
   return { qbs, rbs, wrs, tes, dsts };
 };

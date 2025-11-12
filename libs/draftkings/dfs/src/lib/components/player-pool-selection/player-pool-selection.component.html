@@ -45,7 +45,7 @@
         class="max-h-[385px] overflow-scroll rounded"
         formControlName="rbPoolCtrl"
       >
-        @for (rb of availableRunningBacks; track rb.id) {
+        @for (rb of availableRunningBacks(); track rb.id) {
         <mat-list-option [selected]="rb.isSelectedForPlayerPool" [value]="rb">
           <span class="rb-text-color mr-3">RB</span>
           <span class="font-bold">{{ rb.name }}</span>
@@ -78,7 +78,7 @@
         class="max-h-[385px] overflow-scroll rounded"
         formControlName="wrPoolCtrl"
       >
-        @for (wr of availableWideReceivers; track wr.id) {
+        @for (wr of availableWideReceivers(); track wr.id) {
         <mat-list-option [selected]="wr.isSelectedForPlayerPool" [value]="wr">
           <span class="wr-text-color mr-3">WR</span>
           <span class="font-bold">{{ wr.name }}</span>
@@ -113,7 +113,7 @@
         class="max-h-[385px] overflow-scroll rounded"
         formControlName="tePoolCtrl"
       >
-        @for (te of availableTightEnds; track te.id) {
+        @for (te of availableTightEnds(); track te.id) {
         <mat-list-option [selected]="te.isSelectedForPlayerPool" [value]="te">
           <span class="te-text-color mr-3">TE</span>
           <span class="font-bold">{{ te.name }}</span>
@@ -148,7 +148,7 @@
         class="max-h-[385px] overflow-scroll rounded"
         formControlName="dstPoolCtrl"
       >
-        @for (dst of availableDsts; track dst.id) {
+        @for (dst of availableDsts(); track dst.id) {
         <mat-list-option [selected]="dst.isSelectedForPlayerPool" [value]="dst">
           <span class="dst-text-color mr-3">DST</span>
           <span class="font-bold">{{ dst.name }}</span>

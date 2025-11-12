@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SelectSlateComponent } from '../select-slate/select-slate.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Slate } from '../../enums';
+import { SlatesStore } from '../../store';
 
 @Component({
   selector: 'dfs-slate-setup-page',
@@ -13,6 +14,7 @@ import { Slate } from '../../enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SlateSetupPageComponent {
+  private readonly slatesStore = inject(SlatesStore);
   selectedFile: File | null = null;
   fileContent: string | ArrayBuffer | null = null;
   slateEnum = Slate;
@@ -27,20 +29,16 @@ export class SlateSetupPageComponent {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.fileContent = reader.result;
-        console.log('slate', slate);
-        console.log('typeOfFileContent', typeOfFileContent);
 
         if (typeOfFileContent === 'salaries') {
           if (
             this.fileContent?.toString().includes('Salary') &&
             !this.fileContent?.toString().includes('Contest ID')
           ) {
-            // This is a salaries file
-            console.log('This is a salaries file');
-            console.log('fileContent', this.fileContent);
-            // TODO: Use service from NgRx Signal Store to save file content to Firebase Firestore
+            console.log('salaries fileContent', this.fileContent);
+
+            this.setSalaries(slate, String(this.fileContent));
           } else {
-            // This is an entries file
             console.error(
               `This does not appear to be a DKSalaries file. Please check the file name and try again.`
             );
@@ -49,22 +47,19 @@ export class SlateSetupPageComponent {
 
         if (typeOfFileContent === 'entries') {
           if (this.fileContent?.toString().includes('Contest ID')) {
-            // This is an entries file
-            console.log('This is an entries file');
-            console.log('fileContent', this.fileContent);
+            console.log('entries fileContent', this.fileContent);
+
+            this.setEntries(slate, String(this.fileContent));
+
             // TODO: Use service from NgRx Signal Store to save file content to Firebase Firestore
           } else {
-            // This is not an entries file
             console.error(
               `This does not appear to be a DKEntries file. Please check the file name and try again.`
             );
           }
         }
-
-        // Now you have the file content, you can store it locally
-        // this.storeFileLocally(this.selectedFile!.name, this.fileContent);
       };
-      reader.readAsText(this.selectedFile); // Or reader.readAsDataURL(this.selectedFile) for images
+      reader.readAsText(this.selectedFile);
     }
   }
 
@@ -73,6 +68,34 @@ export class SlateSetupPageComponent {
     // TODO: Fetch DKSalaries and DKEntries for the Main Slate
     // TODO: Fetch DKSalaries and DKEntries for the Early Only Slate
     // TODO: Fetch DKSalaries and DKEntries for the Sun-Mon Slate
+  }
+
+  setSalaries(slate: Slate, fileContent: string): void {
+    if (!fileContent?.length) return;
+
+    if (slate === Slate.MAIN) {
+      this.slatesStore.setMainSlateSalaries(fileContent);
+    } else if (slate === Slate.EARLY_ONLY) {
+      this.slatesStore.setEarlyOnlySlateSalaries(fileContent);
+    } else if (slate === Slate.SUN_TO_MON) {
+      this.slatesStore.setSunToMonSlateSalaries(fileContent);
+    } else {
+      console.error('Unknown slate selected');
+    }
+  }
+
+  setEntries(slate: Slate, fileContent: string): void {
+    if (!fileContent?.length) return;
+
+    if (slate === Slate.MAIN) {
+      this.slatesStore.setMainSlateEntries(fileContent);
+    } else if (slate === Slate.EARLY_ONLY) {
+      this.slatesStore.setEarlyOnlySlateEntries(fileContent);
+    } else if (slate === Slate.SUN_TO_MON) {
+      this.slatesStore.setSunMonSlateEntries(fileContent);
+    } else {
+      console.error('Unknown slate selected');
+    }
   }
 
   help(): void {

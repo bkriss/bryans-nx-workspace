@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   OnInit,
   Signal,
   signal,
@@ -18,21 +19,8 @@ import {
   SimpleLineup,
   SimplePlayer,
 } from '../../models';
-// import {
-//   selectedQuarterbacks,
-//   selectedRunningBacks,
-//   selectedWideReceivers,
-//   selectedTightEnds,
-//   selectedDSTs,
-// } from '../../utils/early-only/selected-players.util';
-import {
-  selectedDSTs,
-  selectedQuarterbacks,
-  selectedRunningBacks,
-  selectedTightEnds,
-  selectedWideReceivers,
-} from '../../utils/main-slate/selected-players.util';
 import { LineupsComponent } from '../lineups/lineups.component';
+import { PlayerPoolsStore } from '../../store';
 
 @Component({
   imports: [CommonModule, LineupsComponent],
@@ -41,22 +29,26 @@ import { LineupsComponent } from '../lineups/lineups.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LineupBuildersPageComponent implements OnInit {
+  private readonly playerPoolsStore = inject(PlayerPoolsStore);
+
   lineups: WritableSignal<Lineup[]> = signal([]);
   numberOfInvalidLineups: Signal<number> = computed(() =>
     this.validateLineups(this.lineups())
   );
 
-  // TODO: Get qbPool, rbPool, wrPool, tePool, and dstPool from NgRx Signal Store
-  qbPool: Quarterback[] = [...selectedQuarterbacks];
-  rbPool: RunningBack[] = [...selectedRunningBacks];
-  wrPool: PassCatcher[] = [...selectedWideReceivers];
-  tePool: PassCatcher[] = [...selectedTightEnds];
-  dstPool: Player[] = [...selectedDSTs];
+  // Get player pools from NgRx Signal Store
+  readonly qbPool: Signal<Quarterback[]> = this.playerPoolsStore.quarterbacks;
+  readonly rbPool: Signal<RunningBack[]> = this.playerPoolsStore.runningBacks;
+  readonly wrPool: Signal<PassCatcher[]> = this.playerPoolsStore.wideReceivers;
+  readonly tePool: Signal<PassCatcher[]> = this.playerPoolsStore.tightEnds;
+  readonly dstPool: Signal<Player[]> = this.playerPoolsStore.defenses;
   currentQb: WritableSignal<Quarterback> = signal({} as Quarterback);
 
   ngOnInit(): void {
-    this.generateQbPassCatcherStacks();
-    this.generateLineups();
+    if (this.playerPoolsStore.allPoolsAreSet()) {
+      this.generateQbPassCatcherStacks();
+      this.generateLineups();
+    }
   }
 
   randomlySortTopWideReceivers(
@@ -76,7 +68,7 @@ export class LineupBuildersPageComponent implements OnInit {
     restrictedPassCatcherTeams: string[],
     fillingFlexPosition = false
   ): PassCatcher[] {
-    const eligibleWideReceivers = this.wrPool.filter((wr) => {
+    const eligibleWideReceivers = this.wrPool().filter((wr) => {
       const currentNumberOfLineupsWithThisWr = this.lineups().filter(
         (lineup) =>
           lineup.wr1?.id === wr.id ||
@@ -112,7 +104,7 @@ export class LineupBuildersPageComponent implements OnInit {
   findEligibleTightEndsForLineup(
     restrictedPassCatcherTeams: string[]
   ): PassCatcher[] {
-    return this.tePool
+    return this.tePool()
       .filter((te) => {
         const currentNumberOfLineupsWithThisTe = this.lineups().filter(
           (lineup) => lineup.te?.id === te.id || lineup.flex?.id === te.id
@@ -179,7 +171,7 @@ export class LineupBuildersPageComponent implements OnInit {
       restrictedDsts.push(flex.teamAbbrev);
     }
 
-    const eligibleDsts = this.dstPool.filter((dst) => {
+    const eligibleDsts = this.dstPool().filter((dst) => {
       const currentNumberOfLineupsWithThisDst = this.lineups().filter(
         (lineup) => lineup.dst?.id === dst.id
       ).length;
@@ -221,9 +213,7 @@ export class LineupBuildersPageComponent implements OnInit {
     const tesSortedBySalary = [...eligibleTightEnds].sort(
       (a, b) => a.salary - b.salary
     );
-    // const medianWrIndex = Math.floor(wrsSortedBySalary.length / 2);
 
-    // const medianCostOfWr = wrsSortedBySalary[medianWrIndex].salary;
     const costOfCheapestTe = tesSortedBySalary[0].salary;
     let numberOfMissingWideReceiversAfterAddingThisPlayer = 0;
 
@@ -373,19 +363,19 @@ export class LineupBuildersPageComponent implements OnInit {
       restrictedPassCatcherTeams.push(qb.opposingTeamAbbrev);
     }
 
-    const eligibleWideReceivers = this.wrPool.filter(
+    const eligibleWideReceivers = this.wrPool().filter(
       (wr) =>
         !restrictedPassCatcherTeams.includes(wr.teamAbbrev) &&
         !wr.onlyUseIfPartOfStackOrPlayingWithOrAgainstQb
     );
-    const eligibleTightEnds = this.tePool.filter(
+    const eligibleTightEnds = this.tePool().filter(
       (te) =>
         !restrictedPassCatcherTeams.includes(te.teamAbbrev) &&
         !te.onlyUseIfPartOfStackOrPlayingWithOrAgainstQb
     );
 
     // TODO: This should be eligible DSTs up to this point of lineup building process, not the entire pool
-    const dstsSortedBySalary = [...this.dstPool].sort(
+    const dstsSortedBySalary = [...this.dstPool()].sort(
       (a, b) => a.salary - b.salary
     );
     const wrsSortedBySalary = [...eligibleWideReceivers].sort(
@@ -878,7 +868,7 @@ export class LineupBuildersPageComponent implements OnInit {
 
     // Put most expensive DSTs first so we use as much of remaining salary as possible
     const dst: Player | null =
-      [...this.dstPool]
+      [...this.dstPool()]
         .sort((a, b) => b.salary - a.salary)
         .find(
           (dst) =>
@@ -897,11 +887,11 @@ export class LineupBuildersPageComponent implements OnInit {
     const rbCombosWithDuplicates: RunningBack[][] = [];
     let numberOfDuplicateRbGroups = 0;
 
-    const qbPlaysOnSameTeamAsOneOfTheRbs = this.rbPool.some(
+    const qbPlaysOnSameTeamAsOneOfTheRbs = this.rbPool().some(
       (rb) => rb.teamAbbrev === this.currentQb().teamAbbrev
     );
 
-    let rbPool: RunningBack[] = this.rbPool.filter(
+    let rbPool: RunningBack[] = this.rbPool().filter(
       (rb) =>
         !rb.allowOnlyAsFlex && rb.teamAbbrev !== this.currentQb().teamAbbrev
     );
@@ -929,12 +919,12 @@ export class LineupBuildersPageComponent implements OnInit {
   }
 
   generateQbPassCatcherStacks(): void {
-    this.qbPool = this.qbPool.map((qb) => {
+    const updatedQbs = this.qbPool().map((qb) => {
       const teamsInMatchup = qb.gameInfo.split('@');
-      const wrsInThisGame = this.wrPool.filter((wr) =>
+      const wrsInThisGame = this.wrPool().filter((wr) =>
         teamsInMatchup.includes(wr.teamAbbrev)
       );
-      const tesInThisGame = this.tePool.filter((te) =>
+      const tesInThisGame = this.tePool().filter((te) =>
         teamsInMatchup.includes(te.teamAbbrev)
       );
       const passCatcherPool: PassCatcher[] = [
@@ -1019,8 +1009,11 @@ export class LineupBuildersPageComponent implements OnInit {
       };
     });
 
+    // Update the quarterbacks in the store with the new pass catcher stacks
+    this.playerPoolsStore.setQuarterbacks(updatedQbs);
+
     // Make sure currentQb has updated passCatcherStacks
-    this.currentQb.set(this.qbPool[0]);
+    this.currentQb.set(this.qbPool()[0]);
   }
 
   selectedNewQuarterback(quarterback: Quarterback) {
