@@ -1,0 +1,22 @@
+@if (numberOfInvalidLineups() > 0) {
+<div
+  class="bg-red-600 flex items-center justify-center py-1 text-gray-100 text-sm"
+>
+  {{ numberOfInvalidLineups() }}/{{ lineups().length }} invalid
+</div>
+}
+
+<div class="p-4">
+  <dfs-lineups
+    [currentQb]="currentQb"
+    [lineups]="lineups"
+    [qbPool]="qbPool()"
+    [rbPool]="rbPool()"
+    [wrPool]="wrPool()"
+    [tePool]="tePool()"
+    [dstPool]="dstPool()"
+    (saveLineups)="saveLineups()"
+    (selectedNewQuarterback)="selectedNewQuarterback($event)"
+    (updateLineup)="updateLineup($event)"
+  ></dfs-lineups>
+</div>

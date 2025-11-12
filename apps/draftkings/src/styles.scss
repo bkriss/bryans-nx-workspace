@@ -1,0 +1,68 @@
+@use 'tailwindcss';
+@use './scss-partials/material-overrides';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --qb-red: #fc2b6d;
+  --rb-green: #20ceb7;
+  --wr-blue: #59a6ff;
+  --te-orange: #feae58;
+  --flex-purple: #c96cff;
+  --dst-brown: #bf5f40;
+  --border-color: #414b5f;
+  --background-color: #1e2832;
+}
+
+/* You can add global styles to this file, and also import other style files */
+body {
+  margin: 0;
+  background-color: var(--background-color);
+  color: #fff;
+  font-weight: 400;
+  font-size: 14px;
+  font-family: 'Helvetica Neue', 'Segoe UI', helvetica, verdana, sans-serif;
+  line-height: 1.35715;
+}
+
+.qb-text-color {
+  color: var(--qb-red);
+}
+
+.rb-text-color {
+  color: var(--rb-green);
+}
+
+.wr-text-color {
+  color: var(--wr-blue);
+}
+
+.te-text-color {
+  color: var(--te-orange);
+}
+
+.dst-text-color {
+  color: var(--dst-brown);
+}
+
+.link {
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.note {
+  border-radius: 8px;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px;
+  padding: 16px 40px;
+  background-color: var(--wr-blue);
+  color: #101414;
+}

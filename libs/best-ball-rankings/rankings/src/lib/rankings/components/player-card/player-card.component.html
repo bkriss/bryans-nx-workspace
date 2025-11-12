@@ -1,0 +1,58 @@
+<div class="card">
+  <div class="card-header">
+    <div class="grid grid-flow-col gap-2 items-end">
+      <h4>{{ player?.name }}</h4>
+      <div>
+        <span class="{{ player?.position }}">{{ player?.position }}</span>
+        &bull;
+        {{ player?.teamAbbreviation }}
+      </div>
+    </div>
+    <div>
+      <dx-button stylingMode="text" icon="edit"> </dx-button>
+      <dx-button
+        (click)="closeCard.emit(player)"
+        stylingMode="text"
+        icon="close"
+      >
+      </dx-button>
+    </div>
+  </div>
+  <div class="card-content">
+    <div class="grid grid-flow-col gap-4 justify-start mb-4">
+      <div class="grid justify-items-center">
+        <span class="font-bold">Age</span>
+        <!-- TODO: Add age? -->
+        <span>- -</span>
+      </div>
+      <div class="grid justify-items-center">
+        <span class="font-bold">My Rank</span>
+        <span>{{ player?.rank }}</span>
+      </div>
+      <div class="grid justify-items-center">
+        <span class="font-bold">Mike Clay</span>
+        <span>{{ player?.rank }}</span>
+      </div>
+      <div class="grid justify-items-center">
+        <span class="font-bold">ETR</span>
+        <span>{{ player?.rank }}</span>
+      </div>
+      <div class="grid justify-items-center">
+        <span class="font-bold">Underdog</span>
+        <span>{{ player?.rank }}</span>
+      </div>
+    </div>
+
+    <h6 class="">
+      Reasons For Optimism
+      <fa-icon class="ml-1 thumbs-up" [icon]="faThumbsUp"></fa-icon>
+    </h6>
+    <p class="py-1">{{ player?.reasonsForOptimism || '- -' }}</p>
+
+    <h6 class="">
+      Reasons For Concern
+      <fa-icon class="ml-1 text-red-500" [icon]="faThumbsDown"></fa-icon>
+    </h6>
+    <p class="py-1">{{ player?.reasonsForConcern || '- -' }}</p>
+  </div>
+</div>

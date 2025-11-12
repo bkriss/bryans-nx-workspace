@@ -1,0 +1,12 @@
+.mat-mdc-list-base {
+  border: 1px solid var(--border-color);
+  padding: 0;
+}
+
+.mat-stepper-horizontal {
+  background-color: var(--background-color);
+}
+
+.mdc-list-item:nth-child(even) {
+  background-color: rgb(42, 56, 70);
+}

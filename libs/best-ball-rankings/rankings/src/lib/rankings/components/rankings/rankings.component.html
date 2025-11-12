@@ -1,0 +1,60 @@
+<h1>
+  <fa-icon class="text-3xl" [icon]="faFootball"></fa-icon>
+  Best Ball Rankings
+</h1>
+
+@if (selectedPlayers().length) {
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    @for (selectedPlayer of selectedPlayers(); track selectedPlayer) {
+      <div>
+        <lib-player-card
+          (closeCard)="closeSelectedCard($event)"
+          [player]="selectedPlayer"
+        ></lib-player-card>
+      </div>
+    }
+  </div>
+}
+
+<div class="grid grid-flow-col items-end justify-space-between mb-4">
+  <span class="text-md italic">Click on two players below to compare</span>
+
+  <dx-button
+    class="justify-self-end"
+    icon="plus"
+    (onClick)="openAddPlayerModal()"
+    stylingMode="contained"
+    text="Add Player"
+    type="default"
+    >
+  </dx-button>
+</div>
+
+<!-- <ng-container *ngIf="isLoading()">Loading...</ng-container> -->
+
+@if (isLoading()) {
+  <!-- <div class="flex justify-center items-center h-96">
+  <dx-load-indicator></dx-load-indicator>
+</div> -->
+<div>Loading...</div>
+} @else if (errorMessage()) {
+  <div>Error: {{ errorMessage() }}</div>
+} @else {
+  <shared-bbr-list
+    [items]="players()"
+    (reorderItems)="reorderPlayers($event)"
+    (selectionChanged)="onSelectionChanged($event)"
+  ></shared-bbr-list>
+}
+
+<!-- <h1>Testing New For Loop</h1>
+@for (let player of players(); track player.id) {
+  <div>{{ player.name }}</div>
+  }  -->
+
+  <lib-save-player-modal
+    [isPopupVisible]="isPopupVisible"
+    (closePlayerModal)="closePlayerModal()"
+    [currentNumberOfPlayers]="players().length"
+    [teams]="teams"
+  ></lib-save-player-modal>

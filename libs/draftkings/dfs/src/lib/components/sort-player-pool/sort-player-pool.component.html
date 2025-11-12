@@ -1,0 +1,232 @@
+@if (quarterbacks.length || runningBacks.length || dsts.length){
+<h2 class="flex items-center text-xl mt-6 py-2">
+  <mat-icon class="mr-1">swap_vert</mat-icon>
+  Sort Players &amp; Set Preferences Below:
+</h2>
+} @if (quarterbacks.length > 0 ){
+<div
+  cdkDropList
+  class="sorted-player-list"
+  (cdkDropListDropped)="dropQuarterback($event)"
+>
+  @for (qb of quarterbacks; let i = $index; track qb.id) {
+  <div
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center sorted-player"
+    cdkDrag
+  >
+    <span class="qb-rank sort-order text-xl">
+      {{ i + 1 }}
+    </span>
+    <div class="ml-1">
+      <div class="text-lg font-bold">{{ qb.name }}</div>
+      <span class="text-slate-300 text-sm inline-flex">
+        {{ qb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
+
+        <span class="px-1">&bull;</span>
+        <span>{{ qb.gameInfo }}</span>
+      </span>
+    </div>
+
+    <mat-form-field class="w-[90px] self-end">
+      <mat-label>Grade</mat-label>
+      <input
+        min="0"
+        max="10"
+        step="0.1"
+        matInput
+        [value]="quarterbacks[i].gradeOutOfTen"
+        (input)="quarterbacks[i].gradeOutOfTen = $any($event.target).value"
+        type="number"
+      />
+    </mat-form-field>
+
+    <mat-form-field class="w-[90px] self-end">
+      <mat-label>Lineups</mat-label>
+      <input
+        matInput
+        [value]="quarterbacks[i].numberOfLineupsWithThisPlayer"
+        (input)="
+          quarterbacks[i].numberOfLineupsWithThisPlayer = $any(
+            $event.target
+          ).value
+        "
+        type="number"
+      />
+    </mat-form-field>
+
+    <div>
+      <mat-label class="block mb-1 text-center text-gray-300">
+        Teammate Pass Catchers
+      </mat-label>
+      <div>
+        <mat-form-field class="w-[95px] mb-0">
+          <mat-label>Min</mat-label>
+          <mat-select
+            [(value)]="quarterbacks[i].minNumberOfTeammatePasscatchers"
+          >
+            <mat-option [value]="1">1</mat-option>
+            <mat-option [value]="2">2</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="ml-2 w-[95px] mb-0">
+          <mat-label>Max</mat-label>
+          <mat-select
+            [(value)]="quarterbacks[i].maxNumberOfTeammatePasscatchers"
+          >
+            <mat-option [value]="1">1</mat-option>
+            <mat-option [value]="2">2</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="grid h-[56px] self-end items-center">
+      <mat-slide-toggle
+        name="requirePassCatcherFromOpposingTeam"
+        [checked]="quarterbacks[i].requirePassCatcherFromOpposingTeam"
+        (change)="
+          quarterbacks[i].requirePassCatcherFromOpposingTeam =
+            !quarterbacks[i].requirePassCatcherFromOpposingTeam
+        "
+      >
+        Require Opp. Pass Catcher
+      </mat-slide-toggle>
+    </div>
+  </div>
+  }
+</div>
+} @else if (runningBacks.length > 0 ){
+<div
+  cdkDropList
+  class="sorted-player-list"
+  (cdkDropListDropped)="dropRunningBack($event)"
+>
+  @for (rb of runningBacks; let i = $index; track rb.id) {
+  <div
+    class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center sorted-player"
+    cdkDrag
+  >
+    <span class="rb-rank sort-order text-xl shadow-md shadow-gray-800">
+      {{ i + 1 }}
+    </span>
+    <div class="ml-1">
+      <div class="text-lg font-bold">{{ rb.name }}</div>
+      <span class="text-slate-300 text-sm inline-flex">
+        {{ rb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
+
+        <span class="px-1">&bull;</span>
+        <span>{{ rb.gameInfo }}</span>
+      </span>
+    </div>
+
+    <mat-form-field class="w-[90px] self-end">
+      <mat-label>Grade</mat-label>
+      <input
+        min="0"
+        max="10"
+        step="0.1"
+        matInput
+        [value]="runningBacks[i].gradeOutOfTen"
+        (input)="runningBacks[i].gradeOutOfTen = $any($event.target).value"
+        type="number"
+      />
+    </mat-form-field>
+
+    <mat-slide-toggle
+      name="allowRBFromOpposingTeam"
+      [checked]="runningBacks[i].allowRBFromOpposingTeam"
+      (change)="
+        runningBacks[i].allowRBFromOpposingTeam =
+          !runningBacks[i].allowRBFromOpposingTeam
+      "
+    >
+      Allow RB From Opponent
+    </mat-slide-toggle>
+
+    <mat-slide-toggle
+      name="useAsAlternate"
+      [checked]="runningBacks[i].useAsAlternate"
+      (change)="
+        runningBacks[i].useAsAlternate = !runningBacks[i].useAsAlternate
+      "
+    >
+      Use As Alternate
+    </mat-slide-toggle>
+  </div>
+  }
+</div>
+} @else if (dsts.length > 0 ){
+<div
+  cdkDropList
+  class="sorted-player-list"
+  (cdkDropListDropped)="dropDst($event)"
+>
+  @for (dst of dsts; let i = $index; track dst.id) {
+  <div
+    class="grid grid-cols-[auto_1fr_auto_auto] gap-4 items-center sorted-player"
+    cdkDrag
+  >
+    <span class="dst-rank sort-order text-xl">
+      {{ i + 1 }}
+    </span>
+    <div class="ml-1">
+      <div class="text-lg font-bold">{{ dst.name }}</div>
+      <span class="text-slate-300 text-sm inline-flex">
+        {{ dst.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
+
+        <span class="px-1">&bull;</span>
+        <span>{{ dst.gameInfo }}</span>
+      </span>
+    </div>
+
+    <mat-form-field class="w-[90px] self-end">
+      <mat-label>Grade</mat-label>
+      <input
+        min="0"
+        max="10"
+        step="0.1"
+        matInput
+        [value]="dsts[i].gradeOutOfTen"
+        (input)="dsts[i].gradeOutOfTen = $any($event.target).value"
+        type="number"
+      />
+    </mat-form-field>
+
+    <div>
+      <mat-label class="block mb-1 text-center text-gray-300">
+        General Usage
+      </mat-label>
+
+      <div>
+        <mat-form-field class="w-[90px] mb-0">
+          <mat-label>Min</mat-label>
+          <input
+            min="0"
+            max="70"
+            matInput
+            [value]="dsts[i].minOwnershipPercentage"
+            (input)="dsts[i].minOwnershipPercentage = $any($event.target).value"
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+
+        <mat-form-field class="ml-2 w-[90px] mb-0">
+          <mat-label>Max</mat-label>
+          <input
+            min="0"
+            max="90"
+            matInput
+            [value]="dsts[i].maxOwnershipPercentage"
+            (input)="dsts[i].maxOwnershipPercentage = $any($event.target).value"
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+} @else { No Players Selected }

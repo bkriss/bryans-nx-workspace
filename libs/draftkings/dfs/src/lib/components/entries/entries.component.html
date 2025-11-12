@@ -1,0 +1,118 @@
+<div class="p-4">
+  <div class="grid justify-between gap-1 grid-flow-col mb-4">
+    <h1 class="text-2xl self-end">DraftKings Entries</h1>
+    <div>
+      <button class="" matFab extended (click)="downloadCsv()">
+        <mat-icon>download</mat-icon>
+        Download CSV
+      </button>
+    </div>
+  </div>
+
+  <table mat-table [dataSource]="entries()" class="mat-elevation-z8">
+    <!-- Entry ID -->
+    <ng-container matColumnDef="entryID">
+      <th mat-header-cell *matHeaderCellDef>Entry ID</th>
+      <td mat-cell *matCellDef="let element">{{ element['Entry ID'] }}</td>
+    </ng-container>
+
+    <!-- Contest Name -->
+    <ng-container matColumnDef="contestName">
+      <th mat-header-cell *matHeaderCellDef>Contest Name</th>
+      <td mat-cell *matCellDef="let element">{{ element['Contest Name'] }}</td>
+    </ng-container>
+
+    <!-- Contest ID -->
+    <ng-container matColumnDef="contestID">
+      <th mat-header-cell *matHeaderCellDef>Contest ID</th>
+      <td mat-cell *matCellDef="let element">{{ element['Contest ID'] }}</td>
+    </ng-container>
+
+    <!-- Entry Fee-->
+    <ng-container matColumnDef="entryFee">
+      <th mat-header-cell *matHeaderCellDef>Entry Fee</th>
+      <td mat-cell *matCellDef="let element">{{ element['Entry Fee'] }}</td>
+    </ng-container>
+
+    <!-- Top Prize-->
+    <ng-container matColumnDef="topPrize">
+      <th mat-header-cell *matHeaderCellDef>Top Prize</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element['topPrize'] | currency : 'USD' : 'symbol' : '1.0-0' }}
+      </td>
+    </ng-container>
+
+    <!-- Contest Size-->
+    <ng-container matColumnDef="contestSize">
+      <th mat-header-cell *matHeaderCellDef>Size</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element['contestSize'] | number : '' : 'en-US' }}
+      </td>
+    </ng-container>
+
+    <!-- QB -->
+    <ng-container matColumnDef="QB">
+      <th mat-header-cell *matHeaderCellDef>QB</th>
+      <td mat-cell *matCellDef="let element">{{ element['QB_NAME'] }}</td>
+    </ng-container>
+
+    <!-- RB1 -->
+    <ng-container matColumnDef="RB1">
+      <th mat-header-cell *matHeaderCellDef>RB</th>
+      <td mat-cell *matCellDef="let element">{{ element['RB1_NAME'] }}</td>
+    </ng-container>
+
+    <!-- RB2 -->
+    <ng-container matColumnDef="RB2">
+      <th mat-header-cell *matHeaderCellDef>RB</th>
+      <td mat-cell *matCellDef="let element">{{ element['RB2_NAME'] }}</td>
+    </ng-container>
+
+    <!-- WR1 -->
+    <ng-container matColumnDef="WR1">
+      <th mat-header-cell *matHeaderCellDef>WR</th>
+      <td mat-cell *matCellDef="let element">{{ element['WR1_NAME'] }}</td>
+    </ng-container>
+
+    <!-- WR2 -->
+    <ng-container matColumnDef="WR2">
+      <th mat-header-cell *matHeaderCellDef>WR</th>
+      <td mat-cell *matCellDef="let element">{{ element['WR2_NAME'] }}</td>
+    </ng-container>
+
+    <!-- WR3 -->
+    <ng-container matColumnDef="WR3">
+      <th mat-header-cell *matHeaderCellDef>WR</th>
+      <td mat-cell *matCellDef="let element">{{ element['WR3_NAME'] }}</td>
+    </ng-container>
+
+    <!-- TE -->
+    <ng-container matColumnDef="TE">
+      <th mat-header-cell *matHeaderCellDef>TE</th>
+      <td mat-cell *matCellDef="let element">{{ element['TE_NAME'] }}</td>
+    </ng-container>
+
+    <!-- FLEX -->
+    <ng-container matColumnDef="FLEX">
+      <th mat-header-cell *matHeaderCellDef>FLEX</th>
+      <td mat-cell *matCellDef="let element">{{ element['FLEX_NAME'] }}</td>
+    </ng-container>
+
+    <!-- DST -->
+    <ng-container matColumnDef="DST">
+      <th mat-header-cell *matHeaderCellDef>DST</th>
+      <td mat-cell *matCellDef="let element">{{ element['DST_NAME'] }}</td>
+    </ng-container>
+
+    <!-- Lineup Grade -->
+    <ng-container matColumnDef="lineupGrade">
+      <th mat-header-cell *matHeaderCellDef>Grade</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element['lineupGrade'] | number : '1.0-1' }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>

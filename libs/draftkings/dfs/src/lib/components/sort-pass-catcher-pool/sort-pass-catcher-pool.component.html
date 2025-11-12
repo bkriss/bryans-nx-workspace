@@ -1,0 +1,195 @@
+@if (passCatchers.length) {
+<h2 class="flex items-center text-xl mt-6 py-2">
+  <mat-icon class="mr-1">swap_vert</mat-icon>
+  Sort Players &amp; Set Preferences Below:
+</h2>
+<div
+  cdkDropList
+  class="sorted-player-list"
+  (cdkDropListDropped)="dropPassCatcher($event)"
+>
+  @for (player of passCatchers; let i = $index; track player.id) {
+  <div
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
+    cdkDrag
+  >
+    <span
+      class="sort-order text-xl"
+      [class.wr-rank]="position === 'WR'"
+      [class.te-rank]="position === 'TE'"
+    >
+      {{ i + 1 }}
+    </span>
+    <div class="ml-1">
+      <div class="text-lg font-bold">{{ player.name }}</div>
+      <span class="text-slate-300 text-sm inline-flex">
+        {{ player.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
+
+        <span class="px-1">&bull;</span>
+        <span class="gray-text">{{ player.gameInfo }}</span>
+      </span>
+    </div>
+
+    <mat-form-field class="w-[90px] self-end">
+      <mat-label>Grade</mat-label>
+      <input
+        min="0"
+        max="10"
+        step="0.1"
+        matInput
+        [value]="passCatchers[i].gradeOutOfTen"
+        (input)="passCatchers[i].gradeOutOfTen = $any($event.target).value"
+        type="number"
+      />
+    </mat-form-field>
+
+    <div>
+      <mat-label class="block mb-1 text-center text-gray-300">
+        General Usage
+      </mat-label>
+
+      <div>
+        <mat-form-field class="w-[90px] mb-0">
+          <mat-label>Min</mat-label>
+          <input
+            min="0"
+            max="70"
+            matInput
+            [value]="passCatchers[i].minOwnershipPercentage"
+            (input)="
+              passCatchers[i].minOwnershipPercentage = $any($event.target).value
+            "
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+
+        <mat-form-field class="ml-2 w-[90px] mb-0">
+          <mat-label>Max</mat-label>
+          <input
+            min="0"
+            max="90"
+            matInput
+            [value]="passCatchers[i].maxOwnershipPercentage"
+            (input)="
+              passCatchers[i].maxOwnershipPercentage = $any($event.target).value
+            "
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div>
+      <mat-label class="block mb-1 text-center text-gray-300">
+        Usage With QB
+      </mat-label>
+
+      <div>
+        <mat-form-field class="w-[95px] mb-0">
+          <mat-label>Min</mat-label>
+          <input
+            min="0"
+            max="70"
+            matInput
+            [value]="passCatchers[i].minOwnershipWhenPairedWithQb"
+            (input)="
+              passCatchers[i].minOwnershipWhenPairedWithQb = $any(
+                $event.target
+              ).value
+            "
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+
+        <mat-form-field class="ml-2 w-[95px] mb-0">
+          <mat-label>Max</mat-label>
+          <input
+            min="0"
+            max="90"
+            matInput
+            [value]="passCatchers[i].maxOwnershipWhenPairedWithQb"
+            (input)="
+              passCatchers[i].maxOwnershipWhenPairedWithQb = $any(
+                $event.target
+              ).value
+            "
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div>
+      <mat-label class="block mb-1 text-center text-gray-300">
+        Usage Against QB
+      </mat-label>
+
+      <div>
+        <mat-form-field class="w-[95px] mb-0">
+          <mat-label>Min</mat-label>
+          <input
+            min="0"
+            max="50"
+            matInput
+            [value]="passCatchers[i].minOwnershipWhenPairedWithOpposingQb"
+            (input)="
+              passCatchers[i].minOwnershipWhenPairedWithOpposingQb = $any(
+                $event.target
+              ).value
+            "
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+
+        <mat-form-field class="ml-2 w-[95px] mb-0">
+          <mat-label>Max</mat-label>
+          <input
+            min="0"
+            max="70"
+            matInput
+            [value]="passCatchers[i].maxOwnershipWhenPairedWithOpposingQb"
+            (input)="
+              passCatchers[i].maxOwnershipWhenPairedWithOpposingQb = $any(
+                $event.target
+              ).value
+            "
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="gap-2 grid self-end">
+      <mat-slide-toggle
+        name="onlyUseIfPartOfStackOrPlayingWithOrAgainstQb"
+        [checked]="passCatchers[i].onlyUseIfPartOfStackOrPlayingWithOrAgainstQb"
+        (change)="
+          passCatchers[i].onlyUseIfPartOfStackOrPlayingWithOrAgainstQb =
+            !passCatchers[i].onlyUseIfPartOfStackOrPlayingWithOrAgainstQb
+        "
+      >
+        With/Against QB Only
+      </mat-slide-toggle>
+
+      <mat-slide-toggle
+        name="onlyUseInLargerFieldContests"
+        [checked]="passCatchers[i].onlyUseInLargerFieldContests"
+        (change)="
+          passCatchers[i].onlyUseInLargerFieldContests =
+            !passCatchers[i].onlyUseInLargerFieldContests
+        "
+      >
+        Large Field Only
+      </mat-slide-toggle>
+    </div>
+  </div>
+  }
+</div>
+
+}

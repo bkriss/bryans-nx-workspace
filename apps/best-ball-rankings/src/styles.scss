@@ -1,0 +1,11 @@
+/* You can add global styles to this file, and also import other style files */
+@use 'tailwindcss';
+@use 'styles/_dx-overrides';
+
+:root {
+  --qb-red: #fc2b6d;
+  --rb-green: #20ceb7;
+  --wr-blue: #59a6ff;
+  --te-orange: #feae58;
+  --border-color: #414b5f;
+}

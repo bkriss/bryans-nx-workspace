@@ -20,7 +20,7 @@
             [formGroup]="profileForm"
             class="grid content-center pt-[20px]"
             (ngSubmit)="savePlayer()"
-          >
+            >
             <mat-form-field>
               <mat-label>Name</mat-label>
               <input formControlName="name" matInput />
@@ -37,9 +37,11 @@
             <mat-form-field>
               <mat-label>Team</mat-label>
               <mat-select formControlName="teamId">
-                <mat-option *ngFor="let team of teams" [value]="team.teamId">
-                  {{ team.teamLongName }}
-                </mat-option>
+                @for (team of teams; track team) {
+                  <mat-option [value]="team.teamId">
+                    {{ team.teamLongName }}
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
             <mat-form-field>
@@ -64,43 +66,43 @@
       <!-- TODO: Convert to component -->
       <h1>Overall Rankings</h1>
       <mat-accordion class="example-headers-align">
-        <mat-expansion-panel *ngFor="let player of players()">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <span class="rank">{{ player.positionRank }}</span>
-              {{ player.name }}
-            </mat-panel-title>
-            <mat-panel-description>
-              <div>
-                <span class="mx-[5px]">
-                  {{ player.position }}
-                </span>
-                -
-                <span class="mx-[5px]">{{ player.teamLongName }}</span>
-              </div>
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-
-          <!-- <mat-form-field>
+        @for (player of players(); track player) {
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <span class="rank">{{ player.positionRank }}</span>
+                {{ player.name }}
+              </mat-panel-title>
+              <mat-panel-description>
+                <div>
+                  <span class="mx-[5px]">
+                    {{ player.position }}
+                  </span>
+                  -
+                  <span class="mx-[5px]">{{ player.teamLongName }}</span>
+                </div>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <!-- <mat-form-field>
             <mat-label>First name</mat-label>
             <input matInput />
           </mat-form-field> -->
-
           <!-- <mat-form-field>
-            <mat-label>Age</mat-label>
-            <input matInput type="number" min="1" />
-          </mat-form-field> -->
-          <mat-action-row>
-            <button mat-button (click)="savePlayer(true)">Save</button>
-          </mat-action-row>
-        </mat-expansion-panel>
-      </mat-accordion>
-    </mat-tab>
-    <mat-tab label="QB"> </mat-tab>
-    <mat-tab label="RB"> Content 3 </mat-tab>
-    <mat-tab label="WR"> Content 4 </mat-tab>
-    <mat-tab label="TE"> Content 5 </mat-tab>
-  </mat-tab-group>
+          <mat-label>Age</mat-label>
+          <input matInput type="number" min="1" />
+        </mat-form-field> -->
+        <mat-action-row>
+          <button mat-button (click)="savePlayer(true)">Save</button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+</mat-tab>
+<mat-tab label="QB"> </mat-tab>
+<mat-tab label="RB"> Content 3 </mat-tab>
+<mat-tab label="WR"> Content 4 </mat-tab>
+<mat-tab label="TE"> Content 5 </mat-tab>
+</mat-tab-group>
 </div>
 
 <router-outlet></router-outlet>

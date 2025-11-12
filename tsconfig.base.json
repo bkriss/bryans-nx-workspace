@@ -14,7 +14,21 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@bryans-nx-workspace/bbr/shared": [
+        "libs/best-ball-rankings/shared/src/index.ts"
+      ],
+      "@bryans-nx-workspace/best-ball": [
+        "libs/draftkings/best-ball/src/index.ts"
+      ],
+      "@bryans-nx-workspace/dfs": ["libs/draftkings/dfs/src/index.ts"],
+      "@bryans-nx-workspace/draftkings-shared": [
+        "libs/draftkings/shared/src/index.ts"
+      ],
+      "@bryans-nx-workspace/rankings": [
+        "libs/best-ball-rankings/rankings/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

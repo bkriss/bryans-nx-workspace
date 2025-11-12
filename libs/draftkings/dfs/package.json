@@ -1,0 +1,15 @@
+{
+  "name": "@bryans-nx-workspace/dfs",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^20.0.0",
+    "@angular/core": "^20.0.0",
+    "@angular/material": "20.2.9",
+    "@angular/forms": "20.3.9",
+    "@angular/router": "20.3.9",
+    "@angular/cdk": "20.2.9",
+    "@ngrx/signals": "^20.1.0",
+    "@nx/angular": "22.0.3"
+  },
+  "sideEffects": false
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@bryans-nx-workspace/best-ball",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^20.0.0",
+    "@angular/core": "^20.0.0",
+    "@angular/router": "20.3.9",
+    "@nx/angular": "22.0.3"
+  },
+  "sideEffects": false
+}

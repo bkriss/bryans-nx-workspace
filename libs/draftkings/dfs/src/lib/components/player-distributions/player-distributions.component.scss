@@ -1,0 +1,26 @@
+.position-header {
+  display: inline-block;
+  border-bottom: 2px solid;
+  line-height: normal;
+  padding-bottom: 5px;
+
+  &.qb-header {
+    border-color: var(--qb-red);
+  }
+
+  &.rb-header {
+    border-color: var(--rb-green);
+  }
+
+  &.wr-header {
+    border-color: var(--wr-blue);
+  }
+
+  &.te-header {
+    border-color: var(--te-orange);
+  }
+
+  &.dst-header {
+    border-color: var(--dst-brown);
+  }
+}

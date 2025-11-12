@@ -1,0 +1,19 @@
+<dk-shared-header></dk-shared-header>
+
+<nav mat-tab-nav-bar [tabPanel]="tabPanel">
+  @for (link of links; track link.path) {
+  <a
+    class="nav-link"
+    [active]="activeRoute === link.path"
+    (click)="activeRoute = link.path"
+    mat-tab-link
+    [routerLink]="link.path"
+  >
+    <mat-icon class="mr-1">{{ link.iconName }}</mat-icon> {{ link.label }}
+  </a>
+  }
+</nav>
+
+<mat-tab-nav-panel #tabPanel>
+  <router-outlet></router-outlet>
+</mat-tab-nav-panel>

@@ -8,16 +8,12 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:application",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/dynasty-rookie-rankings",
         "index": "apps/dynasty-rookie-rankings/src/index.html",
         "browser": "apps/dynasty-rookie-rankings/src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "apps/dynasty-rookie-rankings/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -66,7 +62,8 @@
           "buildTarget": "dynasty-rookie-rankings:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "continuous": true
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -79,11 +76,10 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/dynasty-rookie-rankings/jest.config.ts"
+        "jestConfig": "apps/dynasty-rookie-rankings/jest.config.ts",
+        "tsConfig": "apps/dynasty-rookie-rankings/tsconfig.spec.json"
       }
     },
     "serve-static": {

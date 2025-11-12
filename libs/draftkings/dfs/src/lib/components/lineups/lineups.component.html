@@ -1,0 +1,73 @@
+<div class="grid gap-1 grid-flow-col justify-between">
+  <div class="self-start">
+    <dfs-select-slate></dfs-select-slate>
+
+    <mat-form-field class="ml-2">
+      <mat-label>Current Quarterback</mat-label>
+      <mat-select
+        (selectionChange)="selectedNewQuarterback.emit($event.value)"
+        [ngModel]="currentQb()"
+      >
+        @for (qb of qbPool; track qb.id) {
+        <mat-option [value]="qb">
+          {{ qb.name }}
+        </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div>
+    <button class="mb-4 mr-2" matFab extended (click)="validateLineups()">
+      <mat-icon>verified</mat-icon>
+      Validate Lineups
+    </button>
+
+    <button class="mb-4 mr-2" matFab extended (click)="saveLineups.emit()">
+      <mat-icon>save</mat-icon>
+      Save Lineups
+    </button>
+
+    <dfs-player-overlap-imbalance-button
+      class="inline-block self-end"
+      [lineups]="lineups()"
+      [rbPool]="rbPool"
+      [wrPool]="wrPool"
+      [tePool]="tePool"
+      [dstPool]="dstPool"
+    ></dfs-player-overlap-imbalance-button>
+  </div>
+</div>
+
+<mat-accordion class="block mb-4">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title class="text-lg">
+        <mat-icon class="mr-2">format_list_numbered_rtl</mat-icon>
+        Player Distributions
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <dfs-player-distributions
+      [currentQb]="currentQb()"
+      [lineups]="lineups"
+      [rbPool]="rbPool"
+      [wrPool]="wrPool"
+      [tePool]="tePool"
+      [dstPool]="dstPool"
+    ></dfs-player-distributions>
+  </mat-expansion-panel>
+</mat-accordion>
+
+<div class="lineup-builders-container">
+  @for (lineup of lineups(); track lineup.lineupId) {
+  <dfs-lineup-builder
+    [qbPool]="qbPool"
+    [runningBackPool]="rbPool"
+    [wideReceiverPool]="wrPool"
+    [tightEndPool]="tePool"
+    [dstPool]="dstPool"
+    [lineup]="lineup"
+    (updateLineup)="updateLineup.emit($event)"
+  ></dfs-lineup-builder>
+  }
+</div>

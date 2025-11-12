@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>WR Player Overlap Review</h2>
+<mat-dialog-content>
+  <mat-accordion>
+    @for (playerWithNotableOverlap of data.playerOverlapReview; track
+    playerWithNotableOverlap.playerId) {
+
+    <mat-expansion-panel
+      (opened)="panelOpenState.set(true)"
+      (closed)="panelOpenState.set(false)"
+    >
+      <mat-expansion-panel-header>
+        <mat-panel-title> {{ playerWithNotableOverlap.name }} </mat-panel-title>
+        <!-- <mat-panel-description>
+        Currently I am {{panelOpenState() ? 'open' : 'closed'}}
+      </mat-panel-description> -->
+      </mat-expansion-panel-header>
+
+      <h3 class="font-bold underline">Running Backs:</h3>
+      <ul class="mb-4">
+        @for (rbs of playerWithNotableOverlap.rbsInLineupsWithThisPlayer; track
+        rbs.playerId) {
+        <li>
+          {{ rbs.name }} &rarr;
+          {{ rbs.numberOfLineupsWithThisPlayer }}
+          ({{
+            rbs.percentageOfLineupsWithThisPlayer * 100 | number : '1.0-0'
+          }}%)
+        </li>
+        }
+      </ul>
+
+      <h3 class="font-bold underline">Wide Receivers:</h3>
+      <ul class="mb-4">
+        @for (wrs of playerWithNotableOverlap.wrsInLineupsWithThisPlayer; track
+        wrs.playerId) {
+        <li>
+          {{ wrs.name }} &rarr;
+          {{ wrs.numberOfLineupsWithThisPlayer }}
+          ({{
+            wrs.percentageOfLineupsWithThisPlayer * 100 | number : '1.0-0'
+          }}%)
+        </li>
+        }
+      </ul>
+
+      <h3 class="font-bold underline">Tight Ends:</h3>
+      <ul class="mb-4">
+        @for (tes of playerWithNotableOverlap.tesInLineupsWithThisPlayer; track
+        tes.playerId) {
+        <li>
+          {{ tes.name }} &rarr;
+          {{ tes.numberOfLineupsWithThisPlayer }}
+          ({{
+            tes.percentageOfLineupsWithThisPlayer * 100 | number : '1.0-0'
+          }}%)
+        </li>
+        }
+      </ul>
+    </mat-expansion-panel>
+    }
+  </mat-accordion>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button matButton (click)="close()">Close</button>
+  <!--<button matButton [mat-dialog-close]="animal()" cdkFocusInitial>Ok</button> -->
+</mat-dialog-actions>

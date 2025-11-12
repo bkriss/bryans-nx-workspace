@@ -1,0 +1,60 @@
+<mat-list-item role="listitem">
+  <div
+    class="grid grid-cols-[auto_1fr_25px_40px_auto] gap-3 items-center justify-start"
+  >
+    <span class="position text-sm {{ className }}">{{ position }}</span>
+    @if (player) {
+    <!-- <span class="text-sm">{{ player.name }}</span> -->
+    <span class="text-sm text-ellipsis overflow-hidden">
+      {{ player.nameAbbrev }}
+    </span>
+    <span class="text-xs">{{ player.teamAbbrev }}</span>
+    <span class="text-xs">
+      {{ player.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
+    </span>
+    <button
+      aria-label="Remove player button"
+      class="justify-end self-end"
+      (click)="removePlayer.emit(player)"
+      matIconButton
+    >
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+
+    } @else {
+    <button matButton [matMenuTriggerFor]="menu">Select {{ position }}</button>
+    <mat-menu #menu="matMenu">
+      @for (p of availablePlayers; track p.id) {
+      <button
+        *ngIf="
+          lineup.qb?.id !== p.id &&
+          lineup.rb1?.id !== p.id &&
+          lineup.rb2?.id !== p.id &&
+          lineup.wr1?.id !== p.id &&
+          lineup.wr2?.id !== p.id &&
+          lineup.wr3?.id !== p.id &&
+          lineup.te?.id !== p.id &&
+          lineup.flex?.id !== p.id &&
+          lineup.dst?.id !== p.id
+        "
+        mat-menu-item
+        (click)="selectPlayer.emit(p)"
+      >
+        <span class="text-base">{{ p.name }}</span>
+
+        @if (p.position === 'DST') { &bull;
+        <span class="text-xs">{{ p.gameInfo }}</span>
+        } &bull;
+        <span [class.text-red-500]="lineup.remainingSalary < p.salary">
+          {{ p.salary | currency : 'USD' : 'symbol' : '1.0-0' }}</span
+        >
+        &bull;
+        <!-- TODO: Make player ownership % dynamic -->
+        <!-- <span>(20%)</span> -->
+        {{ p.gradeOutOfTen }}
+      </button>
+      }
+    </mat-menu>
+    }
+  </div>
+</mat-list-item>

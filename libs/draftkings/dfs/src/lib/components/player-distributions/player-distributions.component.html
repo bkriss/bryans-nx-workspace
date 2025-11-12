@@ -1,0 +1,147 @@
+<!-- TODO: Convert each distribution container into new component -->
+
+<div class="grid grid-cols-4 gap-4">
+  <!-- Running Backs -->
+  <div class="rb-distribution">
+    <h3 class="mb-1 font-bold position-header rb-header">
+      Running Back Distribution
+    </h3>
+    <ol>
+      @for (player of runningBackDistribution(); track player.playerId) {
+      <li>
+        <span class="text-sm">
+          <span
+            class="player-name"
+            [class.text-yellow-300]="player.teamAbbrev === currentQb.teamAbbrev"
+            [class.text-fuchsia-400]="
+              player.teamAbbrev === currentQb.opposingTeamAbbrev
+            "
+          >
+            {{ player.name }}
+          </span>
+          <span class="mx-1">&rarr;</span>
+        </span>
+        <span class="count">{{ player.count }}</span>
+        @if (player.percentageDifference.length > 0) {
+        <span class="text-slate-400 ml-1">&#8942;</span>
+        <span
+          class="percentage-difference"
+          [class.text-orange-400]="player.overLimit"
+          [class.text-teal-300]="player.underMinimumRequirement"
+        >
+          {{ player.percentageDifference }}
+        </span>
+        }
+      </li>
+      }
+    </ol>
+  </div>
+
+  <!-- Wide Receivers -->
+  <div class="wr-distribution">
+    <h3 class="mb-1 font-bold position-header wr-header">
+      Wide Receiver Distribution
+    </h3>
+    <ol>
+      @for (player of wideReceiverDistribution(); track player.playerId) {
+      <li>
+        <span class="text-sm">
+          <span
+            class="player-name"
+            [class.text-yellow-300]="player.teamAbbrev === currentQb.teamAbbrev"
+            [class.text-fuchsia-400]="
+              player.teamAbbrev === currentQb.opposingTeamAbbrev
+            "
+          >
+            {{ player.name }}
+          </span>
+          <span class="mx-1">&rarr;</span>
+        </span>
+        <span class="count">
+          {{ player.count }}
+        </span>
+        @if (player.percentageDifference.length > 0) {
+        <span class="text-slate-400 ml-1">&#8942;</span>
+        <span
+          class="percentage-difference"
+          [class.text-orange-400]="player.overLimit"
+          [class.text-teal-300]="player.underMinimumRequirement"
+        >
+          {{ player.percentageDifference }}
+        </span>
+        }
+      </li>
+      }
+    </ol>
+  </div>
+
+  <!-- Tight Ends -->
+  <div class="te-distribution">
+    <h3 class="mb-1 font-bold position-header te-header">
+      Tight End Distribution
+    </h3>
+    <ol>
+      @for (player of tightEndDistribution(); track player.playerId) {
+      <li>
+        <span class="text-sm">
+          <span
+            class="player-name"
+            [class.text-yellow-300]="player.teamAbbrev === currentQb.teamAbbrev"
+            [class.text-fuchsia-400]="
+              player.teamAbbrev === currentQb.opposingTeamAbbrev
+            "
+          >
+            {{ player.name }}
+          </span>
+          <span class="mx-1">&rarr;</span>
+        </span>
+        <span class="count">{{ player.count }}</span>
+        @if (player.percentageDifference.length > 0) {
+        <span class="text-slate-400 ml-1">&#8942;</span>
+        <span
+          class="percentage-difference"
+          [class.text-orange-400]="player.overLimit"
+          [class.text-teal-300]="player.underMinimumRequirement"
+        >
+          {{ player.percentageDifference }}
+        </span>
+        }
+      </li>
+      }
+    </ol>
+  </div>
+
+  <!-- DSTs -->
+  <div class="dst-distribution">
+    <h3 class="mb-1 font-bold position-header dst-header">DST Distribution</h3>
+    <ol>
+      @for (player of dstDistribution(); track player.playerId) {
+      <li>
+        <span class="text-sm">
+          <span
+            class="player-name"
+            [class.text-yellow-300]="player.teamAbbrev === currentQb.teamAbbrev"
+            [class.text-fuchsia-400]="
+              player.teamAbbrev === currentQb.opposingTeamAbbrev
+            "
+          >
+            {{ player.name }}
+          </span>
+          <span class="mx-1">&rarr;</span>
+        </span>
+        <span class="count">{{ player.count }}</span>
+        @if (player.percentageDifference.length > 0) {
+        <span class="text-slate-400 ml-1">&#8942;</span>
+        <span
+          class="percentage-difference"
+          [class.text-orange-400]="player.overLimit"
+          [class.text-teal-300]="player.underMinimumRequirement"
+        >
+          {{ player.percentageDifference }}
+        </span>
+        }
+      </li>
+      }
+    </ol>
+  </div>
+</div>

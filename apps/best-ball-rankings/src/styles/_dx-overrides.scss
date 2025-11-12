@@ -1,0 +1,8 @@
+.dx-item.dx-list-item:nth-child(even) {
+  background-color: rgb(42, 56, 70);
+}
+
+.dx-item.dx-list-item.dx-state-focused {
+  background-color: rgb(129 140 248) !important;
+  color: white !important;
+}

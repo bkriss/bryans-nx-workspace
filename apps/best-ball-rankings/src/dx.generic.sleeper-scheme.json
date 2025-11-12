@@ -1,0 +1,79 @@
+{
+    "items": [
+        {
+            "key": "$base-accent",
+            "value": "rgba(88, 167, 255, 1)"
+        },
+        {
+            "key": "$base-bg",
+            "value": "rgba(30, 40, 50, 1)"
+        },
+        {
+            "key": "$base-border-color",
+            "value": "rgba(65, 75, 95, 1)"
+        },
+        {
+            "key": "$base-text-color",
+            "value": "rgba(255, 255, 255, 1)"
+        }
+    ],
+    "baseTheme": "generic.dark",
+    "outputColorScheme": "sleeper-scheme",
+    "makeSwatch": false,
+    "version": "24.2.7",
+    "widgets": [
+        "DataGrid",
+        "Accordion",
+        "Box",
+        "ContextMenu",
+        "Drawer",
+        "Menu",
+        "MultiView",
+        "ResponsiveBox",
+        "Splitter",
+        "TabPanel",
+        "Tabs",
+        "TileView",
+        "Toolbar",
+        "TreeView",
+        "Autocomplete",
+        "Calendar",
+        "CheckBox",
+        "ColorBox",
+        "DateBox",
+        "DateRangeBox",
+        "DropDownBox",
+        "Form",
+        "HtmlEditor",
+        "Lookup",
+        "NumberBox",
+        "RadioGroup",
+        "RangeSlider",
+        "SelectBox",
+        "Slider",
+        "Switch",
+        "TagBox",
+        "TextBox",
+        "Validation",
+        "ActionSheet",
+        "Button",
+        "ButtonGroup",
+        "DropDownButton",
+        "SpeedDialAction",
+        "FilterBuilder",
+        "LoadIndicator",
+        "LoadPanel",
+        "Popover",
+        "Popup",
+        "ProgressBar",
+        "ScrollView",
+        "Sortable",
+        "Toast",
+        "Tooltip",
+        "FileManager",
+        "FileUploader",
+        "Gallery",
+        "List"
+    ],
+    "removeExternalResources": false
+}
