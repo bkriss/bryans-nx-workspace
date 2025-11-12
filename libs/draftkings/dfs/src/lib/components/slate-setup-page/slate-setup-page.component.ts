@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SelectSlateComponent } from '../select-slate/select-slate.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { SelectSlateComponent } from '../select-slate/select-slate.component';
 import { Slate } from '../../enums';
 import { SlatesStore } from '../../store';
 
