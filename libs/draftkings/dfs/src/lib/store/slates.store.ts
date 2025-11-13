@@ -1,20 +1,34 @@
-// import { computed } from '@angular/core';
+import { computed, inject } from '@angular/core';
+
 import {
   patchState,
   signalStore,
-  // withComputed,
+  withComputed,
   withMethods,
   withState,
 } from '@ngrx/signals';
 
 import { Slate } from '../enums';
+import { SlateData, SlatesService } from './slates.service';
+import { catchError, finalize, of, tap } from 'rxjs';
+import { PassCatcher, Player, Quarterback, RunningBack } from '../models';
+import { getAvailablePlayers } from '../utils';
 
 /**
- * State interface for player pools
+ * State interface for contest slates
  */
 export interface SlatesState {
+  availableQuarterbacks: Quarterback[];
+  availableRunningBacks: RunningBack[];
+  availableWideReceivers: PassCatcher[];
+  availableTightEnds: PassCatcher[];
+  availableDefenses: Player[];
   currentSlate: Slate;
   entries: Record<Slate, string>;
+  error: string | null;
+  id: string; // Firestore document ID is required since SlatesData has to be stored in a collection
+  isLoading: boolean;
+  isSaving: boolean;
   salaries: Record<Slate, string>;
 }
 
@@ -22,24 +36,131 @@ export interface SlatesState {
  * Initial state for slates
  */
 const initialState: SlatesState = {
+  availableQuarterbacks: [],
+  availableRunningBacks: [],
+  availableWideReceivers: [],
+  availableTightEnds: [],
+  availableDefenses: [],
   currentSlate: Slate.MAIN,
   entries: {
-    [Slate.MAIN]: '',
     [Slate.EARLY_ONLY]: '',
+    [Slate.MAIN]: '',
     [Slate.SUN_TO_MON]: '',
+    [Slate.THUR_TO_MON]: '',
   },
+  error: null,
+  id: '',
+  isLoading: false,
+  isSaving: false,
   salaries: {
-    [Slate.MAIN]: '',
     [Slate.EARLY_ONLY]: '',
+    [Slate.MAIN]: '',
     [Slate.SUN_TO_MON]: '',
+    [Slate.THUR_TO_MON]: '',
   },
 };
 
 export const SlatesStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
+  withComputed((store) => ({
+    entriesForCurrentSlate: computed(
+      () => store.entries()[store.currentSlate()]
+    ),
+    salariesForCurrentSlate: computed(
+      () => store.salaries()[store.currentSlate()]
+    ),
+  })),
+  withMethods((store, slatesService = inject(SlatesService)) => ({
+    async loadSlates() {
+      patchState(store, { isLoading: true, error: null });
+      slatesService
+        .getSlateData()
+        .pipe(
+          tap({
+            next: (slateData) => {
+              const { entries, id, currentSlate, salaries } = slateData[0];
 
-  withMethods((store) => ({
+              const salariesForCurrentSlate = salaries[currentSlate];
+
+              const { qbs, rbs, wrs, tes, dsts } = getAvailablePlayers(
+                30,
+                salariesForCurrentSlate
+              );
+
+              patchState(store, {
+                availableQuarterbacks: qbs,
+                availableRunningBacks: rbs,
+                availableWideReceivers: wrs,
+                availableTightEnds: tes,
+                availableDefenses: dsts,
+                id,
+                currentSlate,
+                entries,
+                isLoading: false,
+                salaries,
+              });
+            },
+            error: (err) => {
+              console.error('Failed to load slate data:', err);
+              patchState(store, {
+                error: 'Failed to load slate data.',
+                isLoading: false,
+              });
+            },
+          })
+        )
+        .subscribe();
+    },
+
+    async updateSlateData(updates: Partial<SlateData>) {
+      patchState(store, { isSaving: true, error: null });
+      const slateData: SlateData = {} as SlateData;
+
+      if (updates.salaries) {
+        slateData['salaries'] = {
+          ...store.salaries(),
+          ...updates.salaries,
+        };
+      }
+
+      if (updates.entries) {
+        slateData['entries'] = {
+          ...store.entries(),
+          ...updates.entries,
+        };
+      }
+
+      if (updates.currentSlate) {
+        slateData['currentSlate'] = updates.currentSlate;
+      }
+
+      slatesService
+        .updateSlate(store.id(), slateData)
+        .pipe(
+          tap(() => {
+            patchState(store, () => ({
+              ...slateData,
+              isSaving: false,
+            }));
+          }),
+          catchError((err) => {
+            const errorMessage = updates.currentSlate
+              ? 'Failed to update current slate.'
+              : 'Failed to upload file.';
+
+            console.error(errorMessage, err);
+            patchState(store, {
+              error: errorMessage,
+              isSaving: false,
+            });
+            return of(null);
+          }),
+          finalize(() => patchState(store, { isSaving: false }))
+        )
+        .subscribe();
+    },
+
     /**
      * Sets the main slate salaries
      * @param salaries - DKSalaries.csv content for Main Slate as a string

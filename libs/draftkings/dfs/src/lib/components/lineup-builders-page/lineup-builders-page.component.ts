@@ -37,11 +37,11 @@ export class LineupBuildersPageComponent implements OnInit {
   );
 
   // Get player pools from NgRx Signal Store
-  readonly qbPool: Signal<Quarterback[]> = this.playerPoolsStore.quarterbacks;
-  readonly rbPool: Signal<RunningBack[]> = this.playerPoolsStore.runningBacks;
-  readonly wrPool: Signal<PassCatcher[]> = this.playerPoolsStore.wideReceivers;
-  readonly tePool: Signal<PassCatcher[]> = this.playerPoolsStore.tightEnds;
-  readonly dstPool: Signal<Player[]> = this.playerPoolsStore.defenses;
+  readonly qbPool = this.playerPoolsStore.selectedQuarterbacks;
+  readonly rbPool = this.playerPoolsStore.selectedRunningBacks;
+  readonly wrPool = this.playerPoolsStore.selectedWideReceivers;
+  readonly tePool = this.playerPoolsStore.selectedTightEnds;
+  readonly dstPool = this.playerPoolsStore.selectedDefenses;
   currentQb: WritableSignal<Quarterback> = signal({} as Quarterback);
 
   ngOnInit(): void {

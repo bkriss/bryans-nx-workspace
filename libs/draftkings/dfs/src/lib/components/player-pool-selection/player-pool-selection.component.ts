@@ -2,9 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnDestroy,
   OnInit,
-  signal,
-  WritableSignal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -19,8 +18,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatListModule } from '@angular/material/list';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
+import { Subscription } from 'rxjs';
 
-import { getAvailablePlayers, defaultPlayerRankings } from '../../utils';
+import { defaultPlayerRankings } from '../../utils';
 import { PassCatcher, Player, Quarterback, RunningBack } from '../../models';
 import { Router } from '@angular/router';
 import { SortPlayerPoolComponent } from '../sort-player-pool/sort-player-pool.component';
@@ -45,81 +45,117 @@ import { PlayerPoolsStore, SlatesStore } from '../../store';
   styleUrl: './player-pool-selection.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlayerPoolSelectionComponent implements OnInit {
+export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly _formBuilder = inject(FormBuilder);
   private readonly playerPoolsStore = inject(PlayerPoolsStore);
   private readonly slatesStore = inject(SlatesStore);
 
-  availableQuarterbacks: WritableSignal<Quarterback[]> = signal([]);
-  availableRunningBacks: WritableSignal<RunningBack[]> = signal([]);
-  availableWideReceivers: WritableSignal<PassCatcher[]> = signal([]);
-  availableTightEnds: WritableSignal<PassCatcher[]> = signal([]);
-  availableDsts: WritableSignal<Player[]> = signal([]);
+  // TODO: Remove subscriptions once there is a better way to use signals in forms
+  private qbChangesSubscription: Subscription = new Subscription();
+  private rbChangesSubscription: Subscription = new Subscription();
+  private wrChangesSubscription: Subscription = new Subscription();
+  private teChangesSubscription: Subscription = new Subscription();
+  private dstChangesSubscription: Subscription = new Subscription();
+
+  availableQuarterbacks = this.slatesStore.availableQuarterbacks;
+  availableRunningBacks = this.slatesStore.availableRunningBacks;
+  availableWideReceivers = this.slatesStore.availableWideReceivers;
+  availableTightEnds = this.slatesStore.availableTightEnds;
+  availableDsts = this.slatesStore.availableDefenses;
+  isLoading = this.slatesStore.isLoading;
   position = Position;
+  selectedQuarterbacks = this.playerPoolsStore.selectedQuarterbacks;
+  selectedRunningBacks = this.playerPoolsStore.selectedRunningBacks;
+  selectedWideReceivers = this.playerPoolsStore.selectedWideReceivers;
+  selectedTightEnds = this.playerPoolsStore.selectedTightEnds;
+  selectedDefenses = this.playerPoolsStore.selectedDefenses;
 
   protected playerPool = [];
 
   qbSelectionFormGroup = this._formBuilder.group({
     qbPoolCtrl: [
-      this.playerPoolsStore.quarterbacks() as Quarterback[],
+      this.selectedQuarterbacks() as Quarterback[],
       // [Validators.minLength(4), Validators.maxLength(5)],
       [Validators.minLength(0), Validators.maxLength(6)],
     ],
   });
   rbSelectionFormGroup = this._formBuilder.group({
     rbPoolCtrl: [
-      this.playerPoolsStore.runningBacks() as RunningBack[],
+      this.selectedRunningBacks() as RunningBack[],
       // [Validators.minLength(7), Validators.maxLength(9)],
       [Validators.minLength(0), Validators.maxLength(9)],
     ],
   });
   wrSelectionFormGroup = this._formBuilder.group({
     wrPoolCtrl: [
-      this.playerPoolsStore.wideReceivers() as PassCatcher[],
+      this.selectedWideReceivers() as PassCatcher[],
       // [Validators.minLength(30), Validators.maxLength(40)],
       [Validators.minLength(0), Validators.maxLength(40)],
     ],
   });
   teSelectionFormGroup = this._formBuilder.group({
     tePoolCtrl: [
-      this.playerPoolsStore.tightEnds() as PassCatcher[],
+      this.selectedTightEnds() as PassCatcher[],
       // [Validators.minLength(4), Validators.maxLength(10)],
       [Validators.minLength(0), Validators.maxLength(10)],
     ],
   });
   dstSelectionFormGroup = this._formBuilder.group({
     dstPoolCtrl: [
-      this.playerPoolsStore.defenses() as Player[],
+      this.selectedDefenses() as Player[],
       // [Validators.minLength(5), Validators.maxLength(10)],
       [Validators.minLength(0), Validators.maxLength(10)],
     ],
   });
 
   ngOnInit(): void {
-    const salaries = this.findAppropriateSalariesFiles();
-    const { qbs, rbs, wrs, tes, dsts } = getAvailablePlayers(30, salaries);
-    this.availableQuarterbacks.set(qbs);
-    this.availableRunningBacks.set(rbs);
-    this.availableWideReceivers.set(wrs);
-    this.availableTightEnds.set(tes);
-    this.availableDsts.set(dsts);
-
+    this.slatesStore.loadSlates();
+    this.updateSignalsWhenFormValuesChange();
     this.getDefaultPlayerRankings();
   }
 
-  findAppropriateSalariesFiles(): string {
-    const currentSlate = this.slatesStore.currentSlate();
+  // TODO: Remove ngOnDestroy once there is a better way to use signals in forms
+  ngOnDestroy() {
+    this.qbChangesSubscription.unsubscribe();
+    this.rbChangesSubscription.unsubscribe();
+    this.wrChangesSubscription.unsubscribe();
+    this.teChangesSubscription.unsubscribe();
+    this.dstChangesSubscription.unsubscribe();
+  }
 
-    if (currentSlate === Slate.MAIN) {
-      return this.slatesStore.salaries()[Slate.MAIN];
-    } else if (currentSlate === Slate.EARLY_ONLY) {
-      return this.slatesStore.salaries()[Slate.EARLY_ONLY];
-    } else if (currentSlate === Slate.SUN_TO_MON) {
-      return this.slatesStore.salaries()[Slate.SUN_TO_MON];
-    } else {
-      return '';
-    }
+  // TODO: Remove updateSignalsWhenFormValuesChange once there is a better way to use signals in forms
+  updateSignalsWhenFormValuesChange() {
+    this.qbChangesSubscription =
+      this.qbSelectionFormGroup.controls.qbPoolCtrl.valueChanges.subscribe(
+        (selectedQbs) => {
+          this.playerPoolsStore.setQuarterbacks(selectedQbs || []);
+        }
+      );
+    this.rbChangesSubscription =
+      this.rbSelectionFormGroup.controls.rbPoolCtrl.valueChanges.subscribe(
+        (selectedRBs) => {
+          this.playerPoolsStore.setRunningBacks(selectedRBs || []);
+        }
+      );
+    this.wrChangesSubscription =
+      this.wrSelectionFormGroup.controls.wrPoolCtrl.valueChanges.subscribe(
+        (selectedWRs) => {
+          this.playerPoolsStore.setWideReceivers(selectedWRs || []);
+        }
+      );
+    this.teChangesSubscription =
+      this.teSelectionFormGroup.controls.tePoolCtrl.valueChanges.subscribe(
+        (selectedTEs) => {
+          this.playerPoolsStore.setTightEnds(selectedTEs || []);
+        }
+      );
+    this.dstChangesSubscription =
+      this.dstSelectionFormGroup.controls.dstPoolCtrl.valueChanges.subscribe(
+        (selectedDSTs) => {
+          this.playerPoolsStore.setDefenses(selectedDSTs || []);
+        }
+      );
   }
 
   getDefaultPlayerRankings() {
@@ -158,131 +194,126 @@ export class PlayerPoolSelectionComponent implements OnInit {
   }
 
   saveQbSelections() {
-    const selectedQbs =
-      this.qbSelectionFormGroup.controls.qbPoolCtrl.value || [];
+    console.log('saveQbSelections');
+    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current quarterback selections
 
-    // TODO: Refactor this to use a service from NgRx Signal Store to save Quarterback selections to Firebase Firestore
-    this.playerPoolsStore.setQuarterbacks(selectedQbs);
+    // const selectedQbs =
+    //   this.qbSelectionFormGroup.controls.qbPoolCtrl.value || [];
 
-    const availableQuarterbacks = this.availableQuarterbacks().map((qb) => {
-      const playerIsSelected = selectedQbs.some(
-        (selectedQb) => selectedQb.id === qb.id
-      );
-      return {
-        ...qb,
-        isSelectedForPlayerPool: playerIsSelected,
-      };
-    });
+    // this.playerPoolsStore.setQuarterbacks(selectedQbs);
 
-    // TODO: Use service from NgRx Signal Store to save Quarterback selections to Firebase Firestore
-    console.log('availableQuarterbacks', availableQuarterbacks);
+    // const availableQuarterbacks = this.availableQuarterbacks().map((qb) => {
+    //   const playerIsSelected = selectedQbs.some(
+    //     (selectedQb) => selectedQb.id === qb.id
+    //   );
+    //   return {
+    //     ...qb,
+    //     isSelectedForPlayerPool: playerIsSelected,
+    //   };
+    // });
+
+    // console.log('availableQuarterbacks', availableQuarterbacks);
   }
 
   saveRBSelections() {
-    const selectedRBs =
-      this.rbSelectionFormGroup.controls.rbPoolCtrl.value || [];
+    console.log('saveRBSelections');
+    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current running back selections
 
+    // const selectedRBs =
+    //   this.rbSelectionFormGroup.controls.rbPoolCtrl.value || [];
     // TODO: Refactor this to use a service from NgRx Signal Store to save Running Back selections to Firebase Firestore
-    this.playerPoolsStore.setRunningBacks(selectedRBs);
-
-    const availableRunningBacks = this.availableRunningBacks().map((rb) => {
-      const playerIsSelected = selectedRBs.some(
-        (selectedRB) => selectedRB.id === rb.id
-      );
-      return {
-        ...rb,
-        isSelectedForPlayerPool: playerIsSelected,
-      };
-    });
-
+    // this.playerPoolsStore.setRunningBacks(selectedRBs);
+    // const availableRunningBacks = this.availableRunningBacks().map((rb) => {
+    //   const playerIsSelected = selectedRBs.some(
+    //     (selectedRB) => selectedRB.id === rb.id
+    //   );
+    //   return {
+    //     ...rb,
+    //     isSelectedForPlayerPool: playerIsSelected,
+    //   };
+    // });
     // TODO: Use service from NgRx Signal Store to save Running Back selections to Firebase Firestore
-    console.log('saving availableRunningBacks', availableRunningBacks);
+    // console.log('saving availableRunningBacks', availableRunningBacks);
   }
 
   saveWRSelections() {
-    const selectedWRs =
-      this.wrSelectionFormGroup.controls.wrPoolCtrl.value || [];
+    console.log('saveWRSelections');
+    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current wide receiver selections
 
-    // TODO: Refactor this to use a service from NgRx Signal Store to save Wide Receiver selections to Firebase Firestore
-    this.playerPoolsStore.setWideReceivers(selectedWRs);
-
-    const availableWideReceivers = this.availableWideReceivers().map((wr) => {
-      const playerIsSelected = selectedWRs.some(
-        (selectedWR) => selectedWR.id === wr.id
-      );
-      return {
-        ...wr,
-        isSelectedForPlayerPool: playerIsSelected,
-      };
-    });
-
-    // TODO: Use service from NgRx Signal Store to save Wide Receiver selections to Firebase Firestore
-    console.log('saving availableWideReceivers', availableWideReceivers);
+    // const selectedWRs =
+    //   this.wrSelectionFormGroup.controls.wrPoolCtrl.value || [];
+    // this.playerPoolsStore.setWideReceivers(selectedWRs);
+    // const availableWideReceivers = this.availableWideReceivers().map((wr) => {
+    //   const playerIsSelected = selectedWRs.some(
+    //     (selectedWR) => selectedWR.id === wr.id
+    //   );
+    //   return {
+    //     ...wr,
+    //     isSelectedForPlayerPool: playerIsSelected,
+    //   };
+    // });
+    // console.log('saving availableWideReceivers', availableWideReceivers);
   }
 
   saveTightEndSelections() {
-    const selectedTEs =
-      this.teSelectionFormGroup.controls.tePoolCtrl.value || [];
+    console.log('saveTESelections');
+    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current tight end selections
 
-    // TODO: Refactor this to use a service from NgRx Signal Store to save Tight End selections to Firebase Firestore
-    this.playerPoolsStore.setTightEnds(selectedTEs);
-
-    const availableTightEnds = this.availableTightEnds().map((te) => {
-      const playerIsSelected = selectedTEs.some(
-        (selectedTE) => selectedTE.id === te.id
-      );
-      return {
-        ...te,
-        isSelectedForPlayerPool: playerIsSelected,
-      };
-    });
-
-    // TODO: Use service from NgRx Signal Store to save Tight End selections to Firebase Firestore
-    console.log('saving availableTightEnds', availableTightEnds);
+    // const selectedTEs =
+    //   this.teSelectionFormGroup.controls.tePoolCtrl.value || [];
+    // this.playerPoolsStore.setTightEnds(selectedTEs);
+    // const availableTightEnds = this.availableTightEnds().map((te) => {
+    //   const playerIsSelected = selectedTEs.some(
+    //     (selectedTE) => selectedTE.id === te.id
+    //   );
+    //   return {
+    //     ...te,
+    //     isSelectedForPlayerPool: playerIsSelected,
+    //   };
+    // });
+    // console.log('saving availableTightEnds', availableTightEnds);
   }
 
   saveDSTSelections() {
-    const selectedDSTs =
-      this.dstSelectionFormGroup.controls.dstPoolCtrl.value || [];
+    console.log('saveDSTSelections');
+    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current defense selections
 
-    // TODO: Refactor this to use a service from NgRx Signal Store to save Defense selections to Firebase Firestore
-    this.playerPoolsStore.setDefenses(selectedDSTs);
-
-    const availableDsts = this.availableDsts().map((dst) => {
-      const playerIsSelected = selectedDSTs.some(
-        (selectedDST) => selectedDST.id === dst.id
-      );
-      return {
-        ...dst,
-        isSelectedForPlayerPool: playerIsSelected,
-      };
-    });
-
-    // TODO: Use service from NgRx Signal Store to save DST selections to Firebase Firestore
-    console.log('saving availableDsts', availableDsts);
+    // const selectedDSTs =
+    //   this.dstSelectionFormGroup.controls.dstPoolCtrl.value || [];
+    // this.playerPoolsStore.setDefenses(selectedDSTs);
+    // const availableDsts = this.availableDsts().map((dst) => {
+    //   const playerIsSelected = selectedDSTs.some(
+    //     (selectedDST) => selectedDST.id === dst.id
+    //   );
+    //   return {
+    //     ...dst,
+    //     isSelectedForPlayerPool: playerIsSelected,
+    //   };
+    // });
+    // console.log('saving availableDsts', availableDsts);
   }
 
   generateLineupBuilders() {
     this.router.navigate(['/dfs/lineup-builders']);
   }
 
-  updateQuarterbacks(newQuarterbacks: Quarterback[]) {
-    this.qbSelectionFormGroup.controls.qbPoolCtrl.setValue(newQuarterbacks);
-  }
+  // updateQuarterbacks(newQuarterbacks: Quarterback[]) {
+  //   this.qbSelectionFormGroup.controls.qbPoolCtrl.setValue(newQuarterbacks);
+  // }
 
-  updateRunningBacks(newRunningBacks: RunningBack[]) {
-    this.rbSelectionFormGroup.controls.rbPoolCtrl.setValue(newRunningBacks);
-  }
+  // updateRunningBacks(newRunningBacks: RunningBack[]) {
+  //   this.rbSelectionFormGroup.controls.rbPoolCtrl.setValue(newRunningBacks);
+  // }
 
-  updateWideReceivers(newWideReceivers: PassCatcher[]) {
-    this.wrSelectionFormGroup.controls.wrPoolCtrl.setValue(newWideReceivers);
-  }
+  // updateWideReceivers(newWideReceivers: PassCatcher[]) {
+  //   this.wrSelectionFormGroup.controls.wrPoolCtrl.setValue(newWideReceivers);
+  // }
 
-  updateTightEnds(newTightEnds: PassCatcher[]) {
-    this.teSelectionFormGroup.controls.tePoolCtrl.setValue(newTightEnds);
-  }
+  // updateTightEnds(newTightEnds: PassCatcher[]) {
+  //   this.teSelectionFormGroup.controls.tePoolCtrl.setValue(newTightEnds);
+  // }
 
-  updateDsts(newDsts: Player[]) {
-    this.dstSelectionFormGroup.controls.dstPoolCtrl.setValue(newDsts);
-  }
+  // updateDsts(newDsts: Player[]) {
+  //   this.dstSelectionFormGroup.controls.dstPoolCtrl.setValue(newDsts);
+  // }
 }

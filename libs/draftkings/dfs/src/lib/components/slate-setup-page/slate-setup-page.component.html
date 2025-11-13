@@ -31,6 +31,33 @@
         below.
       </p>
 
+      @if (isLoading() ) {
+      <p>Loading upload statuses...</p>
+      } @else {
+
+      <ul class="list-disc mb-4 ml-4">
+        <li class="py-1">
+          DKSalaries:
+
+          <span
+            [class.text-green-500]="salaries()[slateEnum.MAIN]"
+            [class.text-red-500]="!salaries()[slateEnum.MAIN]"
+          >
+            {{ salaries()[slateEnum.MAIN] ? 'Uploaded' : 'Not Uploaded' }}
+          </span>
+        </li>
+        <li class="py-1">
+          DKEntries:
+          <span
+            [class.text-green-500]="entries()[slateEnum.MAIN]"
+            [class.text-red-500]="!entries()[slateEnum.MAIN]"
+          >
+            {{ entries()[slateEnum.MAIN] ? 'Uploaded' : 'Not Uploaded' }}
+          </span>
+        </li>
+      </ul>
+      }
+
       <div class="grid gap-2 grid-flow-col justify-center">
         <!-- Salary CSV upload for Main Slate -->
         <input
@@ -40,7 +67,11 @@
           (change)="onFileSelected($event, slateEnum.MAIN, 'salaries')"
           #mainSalariesInput
         />
-        <button (click)="mainSalariesInput.click()" matButton>
+        <button
+          (click)="mainSalariesInput.click()"
+          [disabled]="isLoading() || isSaving()"
+          matButton
+        >
           <mat-icon>upload_file</mat-icon>
           Upload DKSalaries
         </button>
@@ -53,21 +84,54 @@
           (change)="onFileSelected($event, slateEnum.MAIN, 'entries')"
           #mainEntriesInput
         />
-        <button matButton (click)="mainEntriesInput.click()">
+        <button
+          matButton
+          (click)="mainEntriesInput.click()"
+          [disabled]="isLoading() || isSaving()"
+        >
           <mat-icon>upload_file</mat-icon>
           Upload DKEntries
         </button>
       </div>
+
+      <div class="grid gap-2 grid-flow-col justify-center"></div>
     </div>
 
     <!-- EARLY ONLY -->
     <div class="slate-card">
-      <h3 class="text-lg mb-2 slate-title">Early Only Slate</h3>
+      <h3 class="text-lg mb-2 slate-title">Early Only</h3>
       <p class="mb-4">
         If you entered contests in the
         <span class="italic">early only</span> slate, you can upload your CSV
         files below.
       </p>
+
+      @if (isLoading() ) {
+      <p>Loading upload statuses...</p>
+      } @else {
+
+      <ul class="list-disc mb-4 ml-4">
+        <li class="py-1">
+          DKSalaries:
+
+          <span
+            [class.text-green-500]="salaries()[slateEnum.EARLY_ONLY]"
+            [class.text-red-500]="!salaries()[slateEnum.EARLY_ONLY]"
+          >
+            {{ salaries()[slateEnum.EARLY_ONLY] ? 'Uploaded' : 'Not Uploaded' }}
+          </span>
+        </li>
+        <li class="py-1">
+          DKEntries:
+          <span
+            [class.text-green-500]="entries()[slateEnum.EARLY_ONLY]"
+            [class.text-red-500]="!entries()[slateEnum.EARLY_ONLY]"
+          >
+            {{ entries()[slateEnum.EARLY_ONLY] ? 'Uploaded' : 'Not Uploaded' }}
+          </span>
+        </li>
+      </ul>
+      }
 
       <div class="grid gap-2 grid-flow-col justify-center">
         <!-- Salary CSV upload for Early Only Slate -->
@@ -78,7 +142,11 @@
           (change)="onFileSelected($event, slateEnum.EARLY_ONLY, 'salaries')"
           #earlyOnlySalariesInput
         />
-        <button (click)="earlyOnlySalariesInput.click()" matButton>
+        <button
+          (click)="earlyOnlySalariesInput.click()"
+          [disabled]="isLoading() || isSaving()"
+          matButton
+        >
           <mat-icon>upload_file</mat-icon>
           Upload DKSalaries
         </button>
@@ -91,7 +159,11 @@
           (change)="onFileSelected($event, slateEnum.EARLY_ONLY, 'entries')"
           #earlyOnlyEntriesInput
         />
-        <button matButton (click)="earlyOnlyEntriesInput.click()">
+        <button
+          matButton
+          (click)="earlyOnlyEntriesInput.click()"
+          [disabled]="isLoading() || isSaving()"
+        >
           <mat-icon>upload_file</mat-icon>
           Upload DKEntries
         </button>
@@ -100,12 +172,39 @@
 
     <!-- SUN TO MON -->
     <div class="slate-card">
-      <h3 class="text-lg mb-2 slate-title">Sunday To Monday Slate</h3>
+      <h3 class="text-lg mb-2 slate-title">Sunday To Monday</h3>
       <p class="mb-4">
         If you entered contests in the
         <span class="italic">Sun-Mon</span> slate, you can upload your CSV files
         below.
       </p>
+
+      @if (isLoading() ) {
+      <p>Loading upload statuses...</p>
+      } @else {
+
+      <ul class="list-disc mb-4 ml-4">
+        <li class="py-1">
+          DKSalaries:
+
+          <span
+            [class.text-green-500]="salaries()[slateEnum.SUN_TO_MON]"
+            [class.text-red-500]="!salaries()[slateEnum.SUN_TO_MON]"
+          >
+            {{ salaries()[slateEnum.SUN_TO_MON] ? 'Uploaded' : 'Not Uploaded' }}
+          </span>
+        </li>
+        <li class="py-1">
+          DKEntries:
+          <span
+            [class.text-green-500]="entries()[slateEnum.SUN_TO_MON]"
+            [class.text-red-500]="!entries()[slateEnum.SUN_TO_MON]"
+          >
+            {{ entries()[slateEnum.SUN_TO_MON] ? 'Uploaded' : 'Not Uploaded' }}
+          </span>
+        </li>
+      </ul>
+      }
 
       <div class="grid gap-2 grid-flow-col justify-center">
         <!-- Salary CSV upload for Sun-Mon Slate -->
@@ -116,7 +215,11 @@
           (change)="onFileSelected($event, slateEnum.SUN_TO_MON, 'salaries')"
           #sunMonSalariesInput
         />
-        <button (click)="sunMonSalariesInput.click()" matButton>
+        <button
+          (click)="sunMonSalariesInput.click()"
+          [disabled]="isLoading() || isSaving()"
+          matButton
+        >
           <mat-icon>upload_file</mat-icon>
           Upload DKSalaries
         </button>
@@ -129,7 +232,11 @@
           (change)="onFileSelected($event, slateEnum.SUN_TO_MON, 'entries')"
           #sunMonEntriesInput
         />
-        <button matButton (click)="sunMonEntriesInput.click()">
+        <button
+          matButton
+          (click)="sunMonEntriesInput.click()"
+          [disabled]="isLoading() || isSaving()"
+        >
           <mat-icon>upload_file</mat-icon>
           Upload DKEntries
         </button>

@@ -25,6 +25,7 @@ const renderLastName = (fullName: string): string => {
   return lastName;
 };
 
+// TODO: Refactor this so that it doesn't need to be called so many times.
 export const draftKingsPlayers = (playerSalaries: string) =>
   csvToJson(playerSalaries).map((rawPlayer: RawPlayer) => {
     const firstName = rawPlayer.Name.split(' ')[0];

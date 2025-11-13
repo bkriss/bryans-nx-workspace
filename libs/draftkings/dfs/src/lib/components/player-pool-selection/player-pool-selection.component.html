@@ -7,6 +7,9 @@
     <form [formGroup]="qbSelectionFormGroup">
       <ng-template matStepLabel>Select 4-5 QBs</ng-template>
 
+      @if (isLoading()) {
+      <div>Loading available players...</div>
+      } @else {
       <mat-selection-list
         #qbs
         class="max-h-[385px] overflow-scroll rounded"
@@ -27,8 +30,7 @@
 
       <dfs-sort-player-pool
         class="block mt-4"
-        [quarterbacks]="qbSelectionFormGroup.controls.qbPoolCtrl.value || []"
-        (updateQuarterbacks)="updateQuarterbacks($event)"
+        [quarterbacks]="selectedQuarterbacks()"
       ></dfs-sort-player-pool>
 
       <div class="mt-1">
@@ -36,6 +38,7 @@
           Next
         </button>
       </div>
+      }
     </form>
   </mat-step>
   <mat-step [stepControl]="rbSelectionFormGroup" label="Select 7-9 RBs">
@@ -60,8 +63,7 @@
 
       <dfs-sort-player-pool
         class="block mt-4"
-        [runningBacks]="rbSelectionFormGroup.controls.rbPoolCtrl.value || []"
-        (updateRunningBacks)="updateRunningBacks($event)"
+        [runningBacks]="selectedRunningBacks()"
       ></dfs-sort-player-pool>
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
@@ -93,9 +95,8 @@
 
       <dfs-sort-pass-catcher-pool
         class="block mt-4"
-        [passCatchers]="wrSelectionFormGroup.controls.wrPoolCtrl.value || []"
+        [passCatchers]="selectedWideReceivers()"
         [position]="position.WR"
-        (updatePassCatchers)="updateWideReceivers($event)"
       ></dfs-sort-pass-catcher-pool>
 
       <div class="mt-1">
@@ -128,9 +129,8 @@
 
       <dfs-sort-pass-catcher-pool
         class="block mt-4"
-        [passCatchers]="teSelectionFormGroup.controls.tePoolCtrl.value || []"
+        [passCatchers]="selectedTightEnds()"
         [position]="position.TE"
-        (updatePassCatchers)="updateTightEnds($event)"
       ></dfs-sort-pass-catcher-pool>
 
       <div class="mt-1">
@@ -163,8 +163,7 @@
 
       <dfs-sort-player-pool
         class="block mt-4"
-        [dsts]="dstSelectionFormGroup.controls.dstPoolCtrl.value || []"
-        (updateDsts)="updateDsts($event)"
+        [dsts]="selectedDefenses()"
       ></dfs-sort-player-pool>
 
       <div class="mt-1">

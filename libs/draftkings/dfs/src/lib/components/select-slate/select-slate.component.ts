@@ -1,9 +1,15 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  Signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { Slate } from '../../enums';
+import { SlatesStore } from '../../store';
 
 @Component({
   selector: 'dfs-select-slate',
@@ -13,7 +19,11 @@ import { Slate } from '../../enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SelectSlateComponent {
-  currentSlate: Slate = Slate.MAIN;
+  private readonly slatesStore = inject(SlatesStore);
+  isLoading = this.slatesStore.isLoading;
+  isSaving = this.slatesStore.isSaving;
+
+  currentSlate: Signal<Slate> = this.slatesStore.currentSlate;
   slatePool = [
     {
       name: 'Main Slate',
@@ -30,7 +40,8 @@ export class SelectSlateComponent {
   ];
 
   selectedNewSlate(slate: Slate) {
-    // TODO: Save selected slate to NgRx Signal Store
-    console.log('Selected new slate:', slate);
+    this.slatesStore.updateSlateData({
+      currentSlate: slate,
+    });
   }
 }

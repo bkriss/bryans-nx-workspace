@@ -1,9 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
+  inject,
   Input,
-  Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -20,6 +19,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PassCatcher } from '../../models';
 import { calculateGrade } from '../../utils';
 import { Position } from '../../enums';
+import { PlayerPoolsStore } from '../../store';
 
 @Component({
   selector: 'dfs-sort-pass-catcher-pool',
@@ -40,7 +40,7 @@ import { Position } from '../../enums';
 export class SortPassCatcherPoolComponentComponent {
   @Input() passCatchers: PassCatcher[] = [];
   @Input() position: Position = Position.WR;
-  @Output() updatePassCatchers = new EventEmitter<PassCatcher[]>();
+  private readonly playerPoolsStore = inject(PlayerPoolsStore);
 
   dropPassCatcher(event: CdkDragDrop<PassCatcher[]>) {
     moveItemInArray(this.passCatchers, event.previousIndex, event.currentIndex);
@@ -81,6 +81,10 @@ export class SortPassCatcherPoolComponentComponent {
     });
 
     console.log('Updated Pass Catchers:', passCatchers);
-    this.updatePassCatchers.emit(passCatchers);
+    if (this.position === Position.WR) {
+      this.playerPoolsStore.setWideReceivers(passCatchers);
+    } else {
+      this.playerPoolsStore.setTightEnds(passCatchers);
+    }
   }
 }

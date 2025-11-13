@@ -1,9 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
+  inject,
   Input,
-  Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -19,6 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Player, Quarterback, RunningBack } from '../../models';
 import { calculateGrade } from '../../utils';
+import { PlayerPoolsStore } from '../../store';
 
 @Component({
   selector: 'dfs-sort-player-pool',
@@ -40,9 +40,7 @@ export class SortPlayerPoolComponent {
   @Input() quarterbacks: Quarterback[] = [];
   @Input() runningBacks: RunningBack[] = [];
   @Input() dsts: Player[] = [];
-  @Output() updateQuarterbacks = new EventEmitter<Quarterback[]>();
-  @Output() updateRunningBacks = new EventEmitter<RunningBack[]>();
-  @Output() updateDsts = new EventEmitter<Player[]>();
+  private readonly playerPoolsStore = inject(PlayerPoolsStore);
 
   dropQuarterback(event: CdkDragDrop<Quarterback[]>) {
     moveItemInArray(this.quarterbacks, event.previousIndex, event.currentIndex);
@@ -56,8 +54,8 @@ export class SortPlayerPoolComponent {
       };
     });
 
-    console.log('Updated Quarterbacks:', quarterbacks);
-    this.updateQuarterbacks.emit(quarterbacks);
+    console.log('Updated Quarterbacks: ', quarterbacks);
+    this.playerPoolsStore.setQuarterbacks(quarterbacks);
   }
 
   dropRunningBack(event: CdkDragDrop<RunningBack[]>) {
@@ -77,8 +75,8 @@ export class SortPlayerPoolComponent {
       };
     });
 
-    console.log('Updated Running Backs:', runningBacks);
-    this.updateRunningBacks.emit(runningBacks);
+    console.log('Updated Running Backs: ', runningBacks);
+    this.playerPoolsStore.setRunningBacks(runningBacks);
   }
 
   dropDst(event: CdkDragDrop<Player[]>) {
@@ -103,7 +101,7 @@ export class SortPlayerPoolComponent {
       };
     });
 
-    console.log('Updated DSTs 1:', dsts);
-    this.updateDsts.emit(dsts);
+    console.log('Updated DSTs: ', dsts);
+    this.playerPoolsStore.setDefenses(dsts);
   }
 }

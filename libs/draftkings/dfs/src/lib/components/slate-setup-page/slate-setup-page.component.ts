@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,11 +18,21 @@ import { SlatesStore } from '../../store';
   styleUrl: './slate-setup-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SlateSetupPageComponent {
+export class SlateSetupPageComponent implements OnInit {
   private readonly slatesStore = inject(SlatesStore);
+  isLoading = this.slatesStore.isLoading;
+  currentSlate = this.slatesStore.currentSlate;
+  salaries = this.slatesStore.salaries;
+  entries = this.slatesStore.entries;
+  id = this.slatesStore.id;
+  isSaving = this.slatesStore.isSaving;
   selectedFile: File | null = null;
   fileContent: string | ArrayBuffer | null = null;
   slateEnum = Slate;
+
+  ngOnInit(): void {
+    this.slatesStore.loadSlates();
+  }
 
   onFileSelected(
     event: any,
@@ -37,7 +52,11 @@ export class SlateSetupPageComponent {
           ) {
             console.log('salaries fileContent', this.fileContent);
 
-            this.setSalaries(slate, String(this.fileContent));
+            this.slatesStore.updateSlateData({
+              salaries: {
+                [slate]: String(this.fileContent),
+              } as Record<Slate, string>,
+            });
           } else {
             console.error(
               `This does not appear to be a DKSalaries file. Please check the file name and try again.`
@@ -49,9 +68,11 @@ export class SlateSetupPageComponent {
           if (this.fileContent?.toString().includes('Contest ID')) {
             console.log('entries fileContent', this.fileContent);
 
-            this.setEntries(slate, String(this.fileContent));
-
-            // TODO: Use service from NgRx Signal Store to save file content to Firebase Firestore
+            this.slatesStore.updateSlateData({
+              entries: {
+                [slate]: String(this.fileContent),
+              } as Record<Slate, string>,
+            });
           } else {
             console.error(
               `This does not appear to be a DKEntries file. Please check the file name and try again.`
