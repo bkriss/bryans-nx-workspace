@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   inject,
   OnDestroy,
   OnInit,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -51,7 +53,7 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   private readonly playerPoolsStore = inject(PlayerPoolsStore);
   private readonly slatesStore = inject(SlatesStore);
 
-  // TODO: Remove subscriptions once there is a better way to use signals in forms
+  // TODO: Remove subscriptions and refactor once Signal Forms is stable
   private qbChangesSubscription: Subscription = new Subscription();
   private rbChangesSubscription: Subscription = new Subscription();
   private wrChangesSubscription: Subscription = new Subscription();
@@ -65,13 +67,12 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   availableDsts = this.slatesStore.availableDefenses;
   isLoading = this.slatesStore.isLoading;
   position = Position;
+  playerPoolsLoaded = signal(false);
   selectedQuarterbacks = this.playerPoolsStore.selectedQuarterbacks;
   selectedRunningBacks = this.playerPoolsStore.selectedRunningBacks;
   selectedWideReceivers = this.playerPoolsStore.selectedWideReceivers;
   selectedTightEnds = this.playerPoolsStore.selectedTightEnds;
   selectedDefenses = this.playerPoolsStore.selectedDefenses;
-
-  protected playerPool = [];
 
   qbSelectionFormGroup = this._formBuilder.group({
     qbPoolCtrl: [
@@ -109,13 +110,54 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
     ],
   });
 
+  constructor() {
+    // Effect to load player pools after slates are successfully loaded
+    effect(() => {
+      const isLoading = this.slatesStore.isLoading();
+      const currentSlate = this.slatesStore.currentSlate();
+
+      // When loading completes and we have a valid slate, load player pools
+      if (!isLoading && currentSlate && !this.playerPoolsLoaded()) {
+        this.playerPoolsLoaded.set(true);
+        this.playerPoolsStore.loadPlayerPoolsFromFirestore();
+      }
+    });
+
+    // Effect to update form controls when player pools are loaded from Firestore
+    // TODO: Potentially remove and/or refactor once Signal Forms is stable
+    effect(() => {
+      const qbs = this.selectedQuarterbacks();
+      const rbs = this.selectedRunningBacks();
+      const wrs = this.selectedWideReceivers();
+      const tes = this.selectedTightEnds();
+      const dsts = this.selectedDefenses();
+
+      // Update form controls with loaded data (without emitting events to avoid circular updates)
+      this.qbSelectionFormGroup.controls.qbPoolCtrl.setValue(qbs, {
+        emitEvent: false,
+      });
+      this.rbSelectionFormGroup.controls.rbPoolCtrl.setValue(rbs, {
+        emitEvent: false,
+      });
+      this.wrSelectionFormGroup.controls.wrPoolCtrl.setValue(wrs, {
+        emitEvent: false,
+      });
+      this.teSelectionFormGroup.controls.tePoolCtrl.setValue(tes, {
+        emitEvent: false,
+      });
+      this.dstSelectionFormGroup.controls.dstPoolCtrl.setValue(dsts, {
+        emitEvent: false,
+      });
+    });
+  }
+
   ngOnInit(): void {
     this.slatesStore.loadSlates();
     this.updateSignalsWhenFormValuesChange();
     this.getDefaultPlayerRankings();
   }
 
-  // TODO: Remove ngOnDestroy once there is a better way to use signals in forms
+  // TODO: Remove ngOnDestroy and refactor once Signal Forms is stable
   ngOnDestroy() {
     this.qbChangesSubscription.unsubscribe();
     this.rbChangesSubscription.unsubscribe();
@@ -124,7 +166,7 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
     this.dstChangesSubscription.unsubscribe();
   }
 
-  // TODO: Remove updateSignalsWhenFormValuesChange once there is a better way to use signals in forms
+  // TODO: Remove updateSignalsWhenFormValuesChange and refactor once Signal Forms is stable
   updateSignalsWhenFormValuesChange() {
     this.qbChangesSubscription =
       this.qbSelectionFormGroup.controls.qbPoolCtrl.valueChanges.subscribe(
@@ -195,102 +237,27 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
 
   saveQbSelections() {
     console.log('saveQbSelections');
-    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current quarterback selections
-
-    // const selectedQbs =
-    //   this.qbSelectionFormGroup.controls.qbPoolCtrl.value || [];
-
-    // this.playerPoolsStore.setQuarterbacks(selectedQbs);
-
-    // const availableQuarterbacks = this.availableQuarterbacks().map((qb) => {
-    //   const playerIsSelected = selectedQbs.some(
-    //     (selectedQb) => selectedQb.id === qb.id
-    //   );
-    //   return {
-    //     ...qb,
-    //     isSelectedForPlayerPool: playerIsSelected,
-    //   };
-    // });
-
-    // console.log('availableQuarterbacks', availableQuarterbacks);
+    this.playerPoolsStore.savePlayerPoolsToFirestore();
   }
 
   saveRBSelections() {
     console.log('saveRBSelections');
-    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current running back selections
-
-    // const selectedRBs =
-    //   this.rbSelectionFormGroup.controls.rbPoolCtrl.value || [];
-    // TODO: Refactor this to use a service from NgRx Signal Store to save Running Back selections to Firebase Firestore
-    // this.playerPoolsStore.setRunningBacks(selectedRBs);
-    // const availableRunningBacks = this.availableRunningBacks().map((rb) => {
-    //   const playerIsSelected = selectedRBs.some(
-    //     (selectedRB) => selectedRB.id === rb.id
-    //   );
-    //   return {
-    //     ...rb,
-    //     isSelectedForPlayerPool: playerIsSelected,
-    //   };
-    // });
-    // TODO: Use service from NgRx Signal Store to save Running Back selections to Firebase Firestore
-    // console.log('saving availableRunningBacks', availableRunningBacks);
+    this.playerPoolsStore.savePlayerPoolsToFirestore();
   }
 
   saveWRSelections() {
     console.log('saveWRSelections');
-    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current wide receiver selections
-
-    // const selectedWRs =
-    //   this.wrSelectionFormGroup.controls.wrPoolCtrl.value || [];
-    // this.playerPoolsStore.setWideReceivers(selectedWRs);
-    // const availableWideReceivers = this.availableWideReceivers().map((wr) => {
-    //   const playerIsSelected = selectedWRs.some(
-    //     (selectedWR) => selectedWR.id === wr.id
-    //   );
-    //   return {
-    //     ...wr,
-    //     isSelectedForPlayerPool: playerIsSelected,
-    //   };
-    // });
-    // console.log('saving availableWideReceivers', availableWideReceivers);
+    this.playerPoolsStore.savePlayerPoolsToFirestore();
   }
 
   saveTightEndSelections() {
     console.log('saveTESelections');
-    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current tight end selections
-
-    // const selectedTEs =
-    //   this.teSelectionFormGroup.controls.tePoolCtrl.value || [];
-    // this.playerPoolsStore.setTightEnds(selectedTEs);
-    // const availableTightEnds = this.availableTightEnds().map((te) => {
-    //   const playerIsSelected = selectedTEs.some(
-    //     (selectedTE) => selectedTE.id === te.id
-    //   );
-    //   return {
-    //     ...te,
-    //     isSelectedForPlayerPool: playerIsSelected,
-    //   };
-    // });
-    // console.log('saving availableTightEnds', availableTightEnds);
+    this.playerPoolsStore.savePlayerPoolsToFirestore();
   }
 
   saveDSTSelections() {
     console.log('saveDSTSelections');
-    // TODO: Call function in NgRx Signal Store to patch the selected player pool for the current slate in Firestore with the current defense selections
-
-    // const selectedDSTs =
-    //   this.dstSelectionFormGroup.controls.dstPoolCtrl.value || [];
-    // this.playerPoolsStore.setDefenses(selectedDSTs);
-    // const availableDsts = this.availableDsts().map((dst) => {
-    //   const playerIsSelected = selectedDSTs.some(
-    //     (selectedDST) => selectedDST.id === dst.id
-    //   );
-    //   return {
-    //     ...dst,
-    //     isSelectedForPlayerPool: playerIsSelected,
-    //   };
-    // });
-    // console.log('saving availableDsts', availableDsts);
+    this.playerPoolsStore.savePlayerPoolsToFirestore();
   }
 
   generateLineupBuilders() {

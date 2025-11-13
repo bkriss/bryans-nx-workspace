@@ -1,4 +1,4 @@
-import { computed } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import {
   patchState,
   signalStore,
@@ -6,12 +6,16 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
+import { tap, catchError, of } from 'rxjs';
+
 import {
   PassCatcher,
   Player,
   Quarterback,
   RunningBack,
 } from '../models/player.model';
+import { PlayerPoolsService } from './player-pools.service';
+import { SlatesStore } from './slates.store';
 
 /**
  * State interface for player pools
@@ -236,5 +240,87 @@ export const PlayerPoolsStore = signalStore(
     //       break;
     //   }
     // },
-  }))
+  })),
+
+  withMethods(
+    (
+      store,
+      playerPoolsService = inject(PlayerPoolsService),
+      slatesStore = inject(SlatesStore)
+    ) => ({
+      /**
+       * Loads player pools from Firestore based on the current slate
+       * Uses the currentSlate from SlatesStore to determine which collection to fetch from
+       */
+      loadPlayerPoolsFromFirestore(): void {
+        const currentSlate = slatesStore.currentSlate();
+
+        playerPoolsService
+          .getPlayerPools(currentSlate)
+          .pipe(
+            tap((playerPools) => {
+              if (playerPools) {
+                patchState(store, {
+                  selectedQuarterbacks: playerPools.quarterbacks || [],
+                  selectedRunningBacks: playerPools.runningBacks || [],
+                  selectedWideReceivers: playerPools.wideReceivers || [],
+                  selectedTightEnds: playerPools.tightEnds || [],
+                  selectedDefenses: playerPools.defenses || [],
+                });
+                console.log(
+                  `Successfully loaded player pools from Firestore for ${currentSlate} slate`
+                );
+              } else {
+                console.log(
+                  `No player pools found in Firestore for ${currentSlate} slate`
+                );
+                // Clear the store if no data exists
+                patchState(store, initialState);
+              }
+            }),
+            catchError((error) => {
+              console.error(
+                `Failed to load player pools for ${currentSlate} slate:`,
+                error
+              );
+              return of(null);
+            })
+          )
+          .subscribe();
+      },
+
+      /**
+       * Saves the current player pools to Firestore based on the current slate
+       * Uses the currentSlate from SlatesStore to determine which collection to update
+       */
+      savePlayerPoolsToFirestore(): void {
+        const currentSlate = slatesStore.currentSlate();
+        const playerPools = {
+          quarterbacks: store.selectedQuarterbacks(),
+          runningBacks: store.selectedRunningBacks(),
+          wideReceivers: store.selectedWideReceivers(),
+          tightEnds: store.selectedTightEnds(),
+          defenses: store.selectedDefenses(),
+        };
+
+        playerPoolsService
+          .savePlayerPools(currentSlate, playerPools)
+          .pipe(
+            tap(() => {
+              console.log(
+                `Successfully saved player pools to Firestore for ${currentSlate} slate`
+              );
+            }),
+            catchError((error) => {
+              console.error(
+                `Failed to save player pools for ${currentSlate} slate:`,
+                error
+              );
+              return of(null);
+            })
+          )
+          .subscribe();
+      },
+    })
+  )
 );
