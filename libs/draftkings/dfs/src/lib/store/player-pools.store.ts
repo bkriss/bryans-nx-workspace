@@ -16,6 +16,7 @@ import {
 } from '../models/player.model';
 import { PlayerPoolsService } from './player-pools.service';
 import { SlatesStore } from './slates.store';
+import { PlayerProjectionsService } from './player-projections.service';
 
 /**
  * State interface for player pools
@@ -246,7 +247,8 @@ export const PlayerPoolsStore = signalStore(
     (
       store,
       playerPoolsService = inject(PlayerPoolsService),
-      slatesStore = inject(SlatesStore)
+      slatesStore = inject(SlatesStore),
+      playerProjectionsService = inject(PlayerProjectionsService)
     ) => ({
       /**
        * Loads player pools from Firestore based on the current slate

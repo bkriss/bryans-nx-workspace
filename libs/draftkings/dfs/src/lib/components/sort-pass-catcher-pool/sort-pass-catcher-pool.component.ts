@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   inject,
   Input,
+  Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -20,6 +22,7 @@ import { PassCatcher } from '../../models';
 import { calculateGrade } from '../../utils';
 import { Position } from '../../enums';
 import { PlayerPoolsStore } from '../../store';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'dfs-sort-pass-catcher-pool',
@@ -27,6 +30,7 @@ import { PlayerPoolsStore } from '../../store';
     CdkDropList,
     CdkDrag,
     CommonModule,
+    MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -40,6 +44,7 @@ import { PlayerPoolsStore } from '../../store';
 export class SortPassCatcherPoolComponentComponent {
   @Input() passCatchers: PassCatcher[] = [];
   @Input() position: Position = Position.WR;
+  @Output() selectPlayersBasedOnProjections = new EventEmitter<Position>();
   private readonly playerPoolsStore = inject(PlayerPoolsStore);
 
   dropPassCatcher(event: CdkDragDrop<PassCatcher[]>) {
@@ -86,5 +91,13 @@ export class SortPassCatcherPoolComponentComponent {
     } else {
       this.playerPoolsStore.setTightEnds(passCatchers);
     }
+  }
+
+  makeSuggestedSelections() {
+    this.selectPlayersBasedOnProjections.emit(this.position);
+  }
+
+  savePassCatcherSelections(): void {
+    this.playerPoolsStore.savePlayerPoolsToFirestore();
   }
 }

@@ -30,7 +30,11 @@
 
       <dfs-sort-player-pool
         class="block mt-4"
+        [position]="position.QB"
         [quarterbacks]="selectedQuarterbacks()"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-player-pool>
 
       <div class="mt-1">
@@ -63,7 +67,11 @@
 
       <dfs-sort-player-pool
         class="block mt-4"
+        [position]="position.RB"
         [runningBacks]="selectedRunningBacks()"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-player-pool>
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
@@ -97,6 +105,9 @@
         class="block mt-4"
         [passCatchers]="selectedWideReceivers()"
         [position]="position.WR"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-pass-catcher-pool>
 
       <div class="mt-1">
@@ -131,6 +142,9 @@
         class="block mt-4"
         [passCatchers]="selectedTightEnds()"
         [position]="position.TE"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-pass-catcher-pool>
 
       <div class="mt-1">
@@ -164,6 +178,10 @@
       <dfs-sort-player-pool
         class="block mt-4"
         [dsts]="selectedDefenses()"
+        [position]="position.DST"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-player-pool>
 
       <div class="mt-1">

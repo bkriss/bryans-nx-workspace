@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   inject,
   Input,
+  Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -19,6 +21,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Player, Quarterback, RunningBack } from '../../models';
 import { calculateGrade } from '../../utils';
 import { PlayerPoolsStore } from '../../store';
+import { MatButtonModule } from '@angular/material/button';
+import { Position } from '../../enums';
 
 @Component({
   selector: 'dfs-sort-player-pool',
@@ -26,6 +30,7 @@ import { PlayerPoolsStore } from '../../store';
     CdkDropList,
     CdkDrag,
     CommonModule,
+    MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -37,9 +42,11 @@ import { PlayerPoolsStore } from '../../store';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SortPlayerPoolComponent {
+  @Input() position: Position = Position.WR;
   @Input() quarterbacks: Quarterback[] = [];
   @Input() runningBacks: RunningBack[] = [];
   @Input() dsts: Player[] = [];
+  @Output() selectPlayersBasedOnProjections = new EventEmitter<Position>();
   private readonly playerPoolsStore = inject(PlayerPoolsStore);
 
   dropQuarterback(event: CdkDragDrop<Quarterback[]>) {
@@ -103,5 +110,13 @@ export class SortPlayerPoolComponent {
 
     console.log('Updated DSTs: ', dsts);
     this.playerPoolsStore.setDefenses(dsts);
+  }
+
+  makeSuggestedSelections() {
+    this.selectPlayersBasedOnProjections.emit(this.position);
+  }
+
+  savePlayerSelections(): void {
+    this.playerPoolsStore.savePlayerPoolsToFirestore();
   }
 }

@@ -1,7 +1,5 @@
 import { TableFriendlyDraftKingsEntry } from '../models';
 import { csvToJson } from './csv-to-json.util';
-// import { entries } from './early-only/entries';
-import { entries } from './main-slate/entries';
 
 interface RawEntry {
   'Contest ID': string;
@@ -356,51 +354,52 @@ export const contestSizes = [
   ...sunToMonContestSizes,
 ];
 
-export const draftKingsEntries = csvToJson(entries)
-  .map((rawEntry: RawEntry): TableFriendlyDraftKingsEntry => {
-    const contest = contestSizes.find(
-      (contest) => contest.name === rawEntry['Contest Name']
-    );
-    const contestSize = contest?.entries || 0;
-    const topPrize = contest?.topPrize || 0;
-
-    if (!contestSize || !topPrize) {
-      console.warn(
-        'Could not find contest size or top prize for entry:',
-        rawEntry['Contest Name']
+export const renderDraftKingsEntriesAsJson = (entries: string) =>
+  csvToJson(entries)
+    .map((rawEntry: RawEntry): TableFriendlyDraftKingsEntry => {
+      const contest = contestSizes.find(
+        (contest) => contest.name === rawEntry['Contest Name']
       );
-    }
+      const contestSize = contest?.entries || 0;
+      const topPrize = contest?.topPrize || 0;
 
-    const entry: TableFriendlyDraftKingsEntry = {
-      'Entry ID': rawEntry['Entry ID'],
-      'Contest Name': rawEntry['Contest Name'],
-      'Contest ID': rawEntry['Contest ID'],
-      'Entry Fee': rawEntry['Entry Fee'],
-      entryFeeAsNumber: Number(rawEntry['Entry Fee'].replace('$', '')),
-      QB: '',
-      RB1: '',
-      RB2: '',
-      WR1: '',
-      WR2: '',
-      WR3: '',
-      TE: '',
-      FLEX: '',
-      DST: '',
-      QB_NAME: '',
-      RB1_NAME: '',
-      RB2_NAME: '',
-      WR1_NAME: '',
-      WR2_NAME: '',
-      WR3_NAME: '',
-      TE_NAME: '',
-      FLEX_NAME: '',
-      DST_NAME: '',
-      contestSize,
-      contestScore: contestSize ? (topPrize * 5) / contestSize : 0,
-      topPrize,
-    };
+      if (!contestSize || !topPrize) {
+        console.warn(
+          'Could not find contest size or top prize for entry:',
+          rawEntry['Contest Name']
+        );
+      }
 
-    return entry;
-  })
-  .filter((entry) => entry['Entry ID']?.length > 0)
-  .sort((a, b) => b.contestScore - a.contestScore);
+      const entry: TableFriendlyDraftKingsEntry = {
+        'Entry ID': rawEntry['Entry ID'],
+        'Contest Name': rawEntry['Contest Name'],
+        'Contest ID': rawEntry['Contest ID'],
+        'Entry Fee': rawEntry['Entry Fee'],
+        entryFeeAsNumber: Number(rawEntry['Entry Fee'].replace('$', '')),
+        QB: '',
+        RB1: '',
+        RB2: '',
+        WR1: '',
+        WR2: '',
+        WR3: '',
+        TE: '',
+        FLEX: '',
+        DST: '',
+        QB_NAME: '',
+        RB1_NAME: '',
+        RB2_NAME: '',
+        WR1_NAME: '',
+        WR2_NAME: '',
+        WR3_NAME: '',
+        TE_NAME: '',
+        FLEX_NAME: '',
+        DST_NAME: '',
+        contestSize,
+        contestScore: contestSize ? (topPrize * 5) / contestSize : 0,
+        topPrize,
+      };
+
+      return entry;
+    })
+    .filter((entry) => entry['Entry ID']?.length > 0)
+    .sort((a, b) => b.contestScore - a.contestScore);

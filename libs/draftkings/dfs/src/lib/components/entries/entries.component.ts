@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   Input,
   OnInit,
   Signal,
@@ -13,7 +14,7 @@ import { MatTableModule } from '@angular/material/table';
 import {
   convertJsonToCsv,
   downloadCsvFile,
-  draftKingsEntries,
+  renderDraftKingsEntriesAsJson,
 } from '../../utils';
 import {
   DraftKingsEntry,
@@ -23,11 +24,14 @@ import {
 } from '../../models';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+
+// TODO: Get lineups from NgRx Signal Store and delete these imports/files
 import {
   lineupsForQb1,
   lineupsForQb2,
   lineupsForQb3,
   lineupsForQb4,
+  lineupsForQb5,
 } from '../../utils/main-slate/lineups';
 // import {
 //   lineupsForQb1,
@@ -36,31 +40,34 @@ import {
 //   lineupsForQb4,
 // } from '../../utils/early-only/lineups';
 import { Slate } from '../../enums';
+import { PlayerPoolsStore, SlatesStore } from '../../store';
 
 @Component({
-  selector: 'dfs-entries',
   imports: [CommonModule, MatButtonModule, MatIconModule, MatTableModule],
   templateUrl: './entries.component.html',
   styleUrl: './entries.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntriesComponent implements OnInit {
-  @Input() numberOfQbs = 4; // TODO: Get this from NgRx Signal Store
+  private readonly playerPoolsStore = inject(PlayerPoolsStore);
+  private readonly slatesStore = inject(SlatesStore);
   currentSlate = Slate.SUN_TO_MON; // TODO: Get this from NgRx Signal Store
-  draftKingsEntries = draftKingsEntries;
+  draftKingsEntries = this.slatesStore.entriesForCurrentSlate;
   lineupsForQb1: WritableSignal<SimpleLineup[]> = signal([]);
   lineupsForQb2: WritableSignal<SimpleLineup[]> = signal([]);
   lineupsForQb3: WritableSignal<SimpleLineup[]> = signal([]);
   lineupsForQb4: WritableSignal<SimpleLineup[]> = signal([]);
+  lineupsForQb5: WritableSignal<SimpleLineup[]> = signal([]);
   lineupsForAllQbs: Signal<SimpleLineup[]> = computed(() => {
     return [
       ...this.lineupsForQb1(),
       ...this.lineupsForQb2(),
       ...this.lineupsForQb3(),
       ...this.lineupsForQb4(),
+      ...this.lineupsForQb5(),
     ].sort((a, b) => b.lineupGrade - a.lineupGrade);
   });
-
+  numberOfQbs = this.playerPoolsStore.selectedQuarterbacks().length;
   numberOfLineupsMatchNumberOfEntries = computed(() => {
     return this.lineupsForAllQbs().length === this.entries().length;
   });
@@ -89,6 +96,7 @@ export class EntriesComponent implements OnInit {
     this.fetchLineupsForQb2();
     this.fetchLineupsForQb3();
     this.fetchLineupsForQb4();
+    this.fetchLineupsForQb5();
   }
 
   renderEntryPosition(player: Player): string {
@@ -169,9 +177,9 @@ export class EntriesComponent implements OnInit {
       })
       .sort((a, b) => b.lineupGrade - a.lineupGrade);
 
-    const entriesSortedBySize = [...draftKingsEntries].sort(
-      (a, b) => b.contestSize - a.contestSize
-    );
+    const entriesSortedBySize = [
+      ...renderDraftKingsEntriesAsJson(this.draftKingsEntries()),
+    ].sort((a, b) => b.contestSize - a.contestSize);
     const largerFieldEntries = entriesSortedBySize.slice(
       0,
       lineupsForLargeFieldContests.length
@@ -226,6 +234,14 @@ export class EntriesComponent implements OnInit {
 
     // TODO: Fetch lineupsForQb4 from NgRx Signal Store Service
     this.lineupsForQb4.set([...lineupsForQb4]);
+  }
+
+  fetchLineupsForQb5(): void {
+    if (this.numberOfQbs < 5) return;
+    console.log('fetchLineupsForQb5');
+
+    // TODO: Fetch lineupsForQb5 from NgRx Signal Store Service
+    this.lineupsForQb5.set([...lineupsForQb5]);
   }
 
   downloadCsv(): void {
