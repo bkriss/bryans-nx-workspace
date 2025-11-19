@@ -25,7 +25,7 @@
 >
   @for (player of passCatchers; let i = $index; track player.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span
@@ -206,6 +206,17 @@
       >
         Large Field Only
       </mat-slide-toggle>
+    </div>
+
+    <div class="grid h-[56px] self-end items-center delete-icon-button">
+      <button
+        aria-label="remove player button"
+        class="text-red-600"
+        (click)="removePlayerFromPool(player, position)"
+        matIconButton
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
     </div>
   </div>
   }

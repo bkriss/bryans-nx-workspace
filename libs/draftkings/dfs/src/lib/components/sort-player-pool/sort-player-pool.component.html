@@ -17,7 +17,6 @@
     </button>
   </div>
 </div>
-
 } @if (quarterbacks.length > 0 ){
 <div
   cdkDropList
@@ -26,7 +25,7 @@
 >
   @for (qb of quarterbacks; let i = $index; track qb.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span class="qb-rank sort-order text-xl">
@@ -112,6 +111,17 @@
         Require Opp. Pass Catcher
       </mat-slide-toggle>
     </div>
+
+    <div class="grid h-[56px] self-end items-center delete-icon-button">
+      <button
+        aria-label="remove player button"
+        class="text-red-600"
+        (click)="removePlayerFromPool(qb, position)"
+        matIconButton
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
   </div>
   }
 </div>
@@ -123,7 +133,7 @@
 >
   @for (rb of runningBacks; let i = $index; track rb.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span class="rb-rank sort-order text-xl shadow-md shadow-gray-800">
@@ -176,6 +186,17 @@
     >
       Use As Alternate
     </mat-slide-toggle>
+
+    <div class="grid h-[56px] self-end items-center delete-icon-button">
+      <button
+        aria-label="remove player button"
+        class="text-red-600"
+        (click)="removePlayerFromPool(rb, position)"
+        matIconButton
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
   </div>
   }
 </div>
@@ -187,7 +208,7 @@
 >
   @for (dst of dsts; let i = $index; track dst.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span class="dst-rank sort-order text-xl">
@@ -252,6 +273,16 @@
           <span class="pl-1" matTextSuffix>&#37;</span>
         </mat-form-field>
       </div>
+    </div>
+    <div class="grid h-[56px] self-end items-center delete-icon-button">
+      <button
+        aria-label="remove player button"
+        class="text-red-600"
+        (click)="removePlayerFromPool(dst, position)"
+        matIconButton
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
     </div>
   </div>
   }

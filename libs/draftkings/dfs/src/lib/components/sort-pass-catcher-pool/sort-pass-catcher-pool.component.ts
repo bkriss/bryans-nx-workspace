@@ -18,7 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { PassCatcher } from '../../models';
+import { PassCatcher, Player } from '../../models';
 import { calculateGrade } from '../../utils';
 import { Position } from '../../enums';
 import { PlayerPoolsStore } from '../../store';
@@ -99,5 +99,28 @@ export class SortPassCatcherPoolComponentComponent {
 
   savePassCatcherSelections(): void {
     this.playerPoolsStore.savePlayerPoolsToFirestore();
+  }
+
+  removePlayerFromPool(player: Player, position: Position): void {
+    switch (position) {
+      case Position.QB:
+        this.playerPoolsStore.removeQuarterback(player.id);
+        break;
+      case Position.RB:
+        this.playerPoolsStore.removeRunningBack(player.id);
+        break;
+      case Position.WR:
+        this.playerPoolsStore.removeWideReceiver(player.id);
+        break;
+      case Position.TE:
+        this.playerPoolsStore.removeTightEnd(player.id);
+        break;
+      case Position.DST:
+        this.playerPoolsStore.removeDefense(player.id);
+        break;
+      default:
+        console.warn('Unknown position: ', position);
+        break;
+    }
   }
 }

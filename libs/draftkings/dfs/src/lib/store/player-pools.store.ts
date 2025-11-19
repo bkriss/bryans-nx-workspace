@@ -96,6 +96,34 @@ export const PlayerPoolsStore = signalStore(
   })),
 
   withMethods((store) => ({
+    removeQuarterback(id: string): void {
+      const updatedQbs = store
+        .selectedQuarterbacks()
+        .filter((qb) => qb.id !== id);
+      patchState(store, { selectedQuarterbacks: updatedQbs });
+    },
+    removeRunningBack(id: string): void {
+      const updatedRbs = store
+        .selectedRunningBacks()
+        .filter((rb) => rb.id !== id);
+      patchState(store, { selectedRunningBacks: updatedRbs });
+    },
+    removeWideReceiver(id: string): void {
+      const updatedWrs = store
+        .selectedWideReceivers()
+        .filter((wr) => wr.id !== id);
+      patchState(store, { selectedWideReceivers: updatedWrs });
+    },
+    removeTightEnd(id: string): void {
+      const updatedTes = store.selectedTightEnds().filter((te) => te.id !== id);
+      patchState(store, { selectedTightEnds: updatedTes });
+    },
+    removeDefense(id: string): void {
+      const updatedDsts = store
+        .selectedDefenses()
+        .filter((dst) => dst.id !== id);
+      patchState(store, { selectedDefenses: updatedDsts });
+    },
     /**
      * Sets the quarterback pool
      * @param quarterbacks - Array of quarterbacks to set in the pool

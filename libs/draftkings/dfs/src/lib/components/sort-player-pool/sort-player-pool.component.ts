@@ -119,4 +119,27 @@ export class SortPlayerPoolComponent {
   savePlayerSelections(): void {
     this.playerPoolsStore.savePlayerPoolsToFirestore();
   }
+
+  removePlayerFromPool(player: Player, position: Position): void {
+    switch (position) {
+      case Position.QB:
+        this.playerPoolsStore.removeQuarterback(player.id);
+        break;
+      case Position.RB:
+        this.playerPoolsStore.removeRunningBack(player.id);
+        break;
+      case Position.WR:
+        this.playerPoolsStore.removeWideReceiver(player.id);
+        break;
+      case Position.TE:
+        this.playerPoolsStore.removeTightEnd(player.id);
+        break;
+      case Position.DST:
+        this.playerPoolsStore.removeDefense(player.id);
+        break;
+      default:
+        console.warn('Unknown position: ', position);
+        break;
+    }
+  }
 }
