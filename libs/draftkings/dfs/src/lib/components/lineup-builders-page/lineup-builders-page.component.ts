@@ -2,8 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
-  OnInit,
   Signal,
   signal,
   WritableSignal,
@@ -20,7 +20,8 @@ import {
   SimplePlayer,
 } from '../../models';
 import { LineupsComponent } from '../lineups/lineups.component';
-import { PlayerPoolsStore } from '../../store';
+import { PlayerPoolsStore, SlatesStore } from '../../store';
+import { Position } from '../../enums';
 
 @Component({
   imports: [CommonModule, LineupsComponent],
@@ -28,27 +29,205 @@ import { PlayerPoolsStore } from '../../store';
   styleUrl: './lineup-builders-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LineupBuildersPageComponent implements OnInit {
+export class LineupBuildersPageComponent {
   private readonly playerPoolsStore = inject(PlayerPoolsStore);
-
-  lineups: WritableSignal<Lineup[]> = signal([]);
-  numberOfInvalidLineups: Signal<number> = computed(() =>
-    this.validateLineups(this.lineups())
-  );
-
-  // Get player pools from NgRx Signal Store
+  private readonly slatesStore = inject(SlatesStore);
+  readonly loadingPlayerPools = this.playerPoolsStore.isLoading;
+  readonly loadingSlates = this.slatesStore.isLoading;
   readonly qbPool = this.playerPoolsStore.selectedQuarterbacks;
   readonly rbPool = this.playerPoolsStore.selectedRunningBacks;
   readonly wrPool = this.playerPoolsStore.selectedWideReceivers;
   readonly tePool = this.playerPoolsStore.selectedTightEnds;
   readonly dstPool = this.playerPoolsStore.selectedDefenses;
-  currentQb: WritableSignal<Quarterback> = signal({} as Quarterback);
 
-  ngOnInit(): void {
-    if (this.playerPoolsStore.allPoolsAreSet()) {
-      this.generateQbPassCatcherStacks();
-      this.generateLineups();
+  beganLineupGeneration: WritableSignal<boolean> = signal(false);
+  currentQb: WritableSignal<Quarterback> = signal({} as Quarterback);
+  isLoading = computed(() => this.loadingSlates() || this.loadingPlayerPools());
+  lineups: WritableSignal<Lineup[]> = signal([]);
+  loadedPlayers: WritableSignal<boolean> = signal(false);
+  loadedSlates: WritableSignal<boolean> = signal(false);
+  numberOfInvalidLineups: Signal<number> = computed(() =>
+    this.validateLineups(this.lineups())
+  );
+
+  constructor() {
+    effect(() => {
+      if (!this.loadedSlates() && !this.loadingSlates()) {
+        this.loadedSlates.set(true);
+        this.slatesStore.loadSlates();
+      }
+    });
+
+    effect(() => {
+      const salariesForCurrentSlate =
+        this.slatesStore.salariesForCurrentSlate();
+
+      if (
+        !this.loadingSlates() &&
+        salariesForCurrentSlate &&
+        !this.loadedPlayers()
+      ) {
+        this.loadedPlayers.set(true);
+        this.playerPoolsStore.loadPlayerPoolsFromFirestore();
+      }
+    });
+
+    effect(() => {
+      if (
+        this.playerPoolsStore.allPoolsAreSet() &&
+        !this.beganLineupGeneration()
+      ) {
+        this.beganLineupGeneration.set(true);
+        this.setOwnershipForPassCatchersWithOrAgainstQb();
+        this.generateQbPassCatcherStacks();
+        this.generateLineups();
+      }
+    });
+  }
+
+  calculateOwnershipPercentagesForGivenPassCatcher(
+    passCatcher: PassCatcher,
+    relevantQbPassCatcherData: {
+      qbTeamAbbrev: string;
+      qbOpposingTeamAbbrev: string;
+      numberOfTeammatePassCatchersPerLineup: number;
+      requirePassCatcherFromOpposingTeam: boolean;
+      opponentPassCatchers: PassCatcher[];
+      teammatePassCatchers: PassCatcher[];
     }
+  ): PassCatcher {
+    // TODO: Consider refactoring this function so that it is more readable and easier to understand
+    const defaultOpponentPassCatcherDistributions = [
+      [0], // no pass catchers to choose from
+      [100], // one pass catcher to choose from
+      [70, 30], // two pass catchers to choose from
+      [65, 27, 8], // three pass catchers to choose from
+      [60, 27, 8, 5], // four pass catchers to choose from
+      [57, 27, 8, 5, 3], // five pass catchers to choose from
+    ];
+    const defaultTeammatePassCatcherDistributionsWhenMaxIsOne = [
+      [0],
+      [100],
+      [70, 30],
+      [65, 27, 8],
+      [60, 27, 8, 5],
+      [57, 27, 8, 5, 3],
+    ];
+    const defaultTeammatePassCatcherDistributionsWhenMaxIsTwo = [
+      [0],
+      [100],
+      [100, 100],
+      [90, 85, 25],
+      [85, 80, 25, 10],
+      [82, 78, 25, 10, 5],
+    ];
+
+    // Teammate pass catchers
+    const numberOfAvailableTeammatePassCatchers =
+      relevantQbPassCatcherData?.teammatePassCatchers?.length || 0;
+    const teammatePassCatcherIndex =
+      relevantQbPassCatcherData.teammatePassCatchers.findIndex(
+        (tpc) => tpc.id === passCatcher.id
+      );
+
+    const maxOwnershipWhenPairedWithQb: number =
+      relevantQbPassCatcherData.numberOfTeammatePassCatchersPerLineup === 1
+        ? defaultTeammatePassCatcherDistributionsWhenMaxIsOne[
+            numberOfAvailableTeammatePassCatchers
+          ][teammatePassCatcherIndex] || 0
+        : defaultTeammatePassCatcherDistributionsWhenMaxIsTwo[
+            numberOfAvailableTeammatePassCatchers
+          ][teammatePassCatcherIndex] || 0;
+    const minOwnershipWhenPairedWithQb =
+      maxOwnershipWhenPairedWithQb < 8 ? 0 : maxOwnershipWhenPairedWithQb - 8;
+
+    // Opposing team pass catchers
+    const numberOfAvailableOpposingPassCatchers =
+      relevantQbPassCatcherData?.opponentPassCatchers?.length || 0;
+    const opponentPassCatcherIndex =
+      relevantQbPassCatcherData.opponentPassCatchers.findIndex(
+        (opc) => opc.id === passCatcher.id
+      );
+    let maxOwnershipWhenPairedWithOpposingQb: number =
+      passCatcher.maxOwnershipPercentage;
+    let minOwnershipWhenPairedWithOpposingQb: number =
+      passCatcher.minOwnershipPercentage;
+
+    if (relevantQbPassCatcherData.requirePassCatcherFromOpposingTeam) {
+      maxOwnershipWhenPairedWithOpposingQb =
+        defaultOpponentPassCatcherDistributions[
+          numberOfAvailableOpposingPassCatchers
+        ][opponentPassCatcherIndex] || 0;
+      minOwnershipWhenPairedWithOpposingQb =
+        maxOwnershipWhenPairedWithOpposingQb < 8
+          ? 0
+          : maxOwnershipWhenPairedWithOpposingQb - 8;
+    }
+
+    return {
+      ...passCatcher,
+      maxOwnershipWhenPairedWithOpposingQb,
+      minOwnershipWhenPairedWithOpposingQb,
+      maxOwnershipWhenPairedWithQb,
+      minOwnershipWhenPairedWithQb,
+    };
+  }
+
+  setOwnershipForPassCatchersWithOrAgainstQb(): void {
+    const allPassCatchers = [...this.wrPool(), ...this.tePool()];
+    const qbPassCatcherData = this.qbPool().map((qb) => {
+      return {
+        qbTeamAbbrev: qb.teamAbbrev,
+        qbOpposingTeamAbbrev: qb.opposingTeamAbbrev,
+        numberOfTeammatePassCatchersPerLineup:
+          qb.maxNumberOfTeammatePasscatchers,
+        requirePassCatcherFromOpposingTeam:
+          qb.requirePassCatcherFromOpposingTeam,
+        opponentPassCatchers: allPassCatchers
+          .filter((pc) => pc.teamAbbrev === qb.opposingTeamAbbrev)
+          .sort((a, b) => b.gradeOutOfTen - a.gradeOutOfTen),
+        teammatePassCatchers: allPassCatchers
+          .filter((pc) => pc.teamAbbrev === qb.teamAbbrev)
+          .sort((a, b) => b.gradeOutOfTen - a.gradeOutOfTen),
+      };
+    });
+
+    const updatedWrPool = this.wrPool().map((wr) => {
+      const relevantQbPassCatcherData = qbPassCatcherData.find(
+        (data) =>
+          data.qbTeamAbbrev === wr.teamAbbrev ||
+          data.qbOpposingTeamAbbrev === wr.teamAbbrev
+      );
+
+      if (relevantQbPassCatcherData) {
+        return this.calculateOwnershipPercentagesForGivenPassCatcher(
+          wr,
+          relevantQbPassCatcherData
+        );
+      }
+
+      return wr;
+    });
+
+    const updatedTePool = this.tePool().map((te) => {
+      const relevantQbPassCatcherData = qbPassCatcherData.find(
+        (data) =>
+          data.qbTeamAbbrev === te.teamAbbrev ||
+          data.qbOpposingTeamAbbrev === te.teamAbbrev
+      );
+
+      if (relevantQbPassCatcherData) {
+        return this.calculateOwnershipPercentagesForGivenPassCatcher(
+          te,
+          relevantQbPassCatcherData
+        );
+      }
+
+      return te;
+    });
+
+    this.playerPoolsStore.setWideReceivers(updatedWrPool);
+    this.playerPoolsStore.setTightEnds(updatedTePool);
   }
 
   randomlySortTopWideReceivers(
@@ -241,12 +420,12 @@ export class LineupBuildersPageComponent implements OnInit {
     let costOfThisPlayerAndEstimatedCostOfRemainingPlayers =
       passCatcherToAdd.salary;
 
-    if (passCatcherToAdd.position === 'WR') {
+    if (passCatcherToAdd.position === Position.WR) {
       // If passCatcherToAdd is a WR, we don't need to account for it in the remaining players
       numberOfMissingWideReceiversAfterAddingThisPlayer -= 1;
     }
 
-    if (!te && passCatcherToAdd.position !== 'TE') {
+    if (!te && passCatcherToAdd.position !== Position.TE) {
       costOfThisPlayerAndEstimatedCostOfRemainingPlayers += costOfCheapestTe;
     }
 
@@ -311,19 +490,7 @@ export class LineupBuildersPageComponent implements OnInit {
     const finalRemainingSalary =
       remainingSalary - costOfThisPlayerAndEstimatedCostOfRemainingPlayers;
 
-    // console.log(
-    //   `hola-${currentLineup.lineupId.split('-')[1]}, ${passCatcherToAdd.name}`,
-    //   {
-    //     costOfThisPlayerAndEstimatedCostOfRemainingPlayers,
-    //     currentLineup,
-    //     finalRemainingSalary,
-    //     numberOfMissingWideReceiversAfterAddingThisPlayer,
-    //     // passCatcherToAdd: passCatcherToAdd.name,
-    //     remainingSalary,
-    //   }
-    // );
-
-    // Last position (FLEX) is
+    // Last position (FLEX)
     if (numberOfMissingWideReceiversAfterAddingThisPlayer === 0) {
       const biggestDifferenceInDstPrices =
         costOfMostExpensiveDst - costOfCheapestDst;
@@ -758,6 +925,7 @@ export class LineupBuildersPageComponent implements OnInit {
 
     const combinedScore =
       qbGrade + rbGrade + wrGrade + teGrade + flexGrade + dstGrade;
+
     return Number(((combinedScore / 90) * 100).toFixed(3));
   }
 
@@ -970,13 +1138,13 @@ export class LineupBuildersPageComponent implements OnInit {
           for (let i = 0; i < passCatcherCombosWithoutOpponent.length; i++) {
             const doesQbPasscatcherComboIncludeTightEnd =
               passCatcherCombosWithoutOpponent[i].find(
-                (pc) => pc.position === 'TE'
+                (pc) => pc.position === Position.TE
               );
 
             // Don't allow combos with multiple tight ends
             if (
               !doesQbPasscatcherComboIncludeTightEnd ||
-              passCatchersFromOpposingTeam[groupIndex].position === 'WR'
+              passCatchersFromOpposingTeam[groupIndex].position === Position.WR
             ) {
               passCatcherCombosIncludingOpponent.push([
                 ...passCatcherCombosWithoutOpponent[i],

@@ -2,9 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
-  Input,
-  OnInit,
   Signal,
   signal,
   WritableSignal,
@@ -48,11 +47,18 @@ import { PlayerPoolsStore, SlatesStore } from '../../store';
   styleUrl: './entries.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EntriesComponent implements OnInit {
+export class EntriesComponent {
   private readonly playerPoolsStore = inject(PlayerPoolsStore);
   private readonly slatesStore = inject(SlatesStore);
+  // TODO: Change to loadingEntries
+  // readonly loadingPlayerPools = this.playerPoolsStore.isLoading;
+  readonly loadingSlates = this.slatesStore.isLoading;
+
   currentSlate = Slate.SUN_TO_MON; // TODO: Get this from NgRx Signal Store
   draftKingsEntries = this.slatesStore.entriesForCurrentSlate;
+  // isLoading = computed(() => this.loadingSlates() || this.loadingEntries());
+  isLoading = computed(() => this.loadingSlates());
+
   lineupsForQb1: WritableSignal<SimpleLineup[]> = signal([]);
   lineupsForQb2: WritableSignal<SimpleLineup[]> = signal([]);
   lineupsForQb3: WritableSignal<SimpleLineup[]> = signal([]);
@@ -67,6 +73,8 @@ export class EntriesComponent implements OnInit {
       ...this.lineupsForQb5(),
     ].sort((a, b) => b.lineupGrade - a.lineupGrade);
   });
+  loadedLineups: WritableSignal<boolean> = signal(false);
+  loadedSlates: WritableSignal<boolean> = signal(false);
   numberOfQbs = this.playerPoolsStore.selectedQuarterbacks().length;
   numberOfLineupsMatchNumberOfEntries = computed(() => {
     return this.lineupsForAllQbs().length === this.entries().length;
@@ -91,12 +99,30 @@ export class EntriesComponent implements OnInit {
     return this.assignLineupsToContests(this.lineupsForAllQbs());
   });
 
-  ngOnInit(): void {
-    this.fetchLineupsForQb1();
-    this.fetchLineupsForQb2();
-    this.fetchLineupsForQb3();
-    this.fetchLineupsForQb4();
-    this.fetchLineupsForQb5();
+  constructor() {
+    effect(() => {
+      if (!this.loadedSlates() && !this.loadingSlates()) {
+        this.loadedSlates.set(true);
+        this.slatesStore.loadSlates();
+      }
+    });
+
+    effect(() => {
+      const entriesForCurrentSlate = this.slatesStore.entriesForCurrentSlate();
+
+      if (
+        !this.loadingSlates() &&
+        entriesForCurrentSlate &&
+        !this.loadedLineups()
+      ) {
+        this.loadedLineups.set(true);
+        this.fetchLineupsForQb1();
+        this.fetchLineupsForQb2();
+        this.fetchLineupsForQb3();
+        this.fetchLineupsForQb4();
+        this.fetchLineupsForQb5();
+      }
+    });
   }
 
   renderEntryPosition(player: Player): string {

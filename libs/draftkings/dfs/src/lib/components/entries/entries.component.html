@@ -2,13 +2,19 @@
   <div class="grid justify-between gap-1 grid-flow-col mb-4">
     <h1 class="text-2xl self-end">DraftKings Entries</h1>
     <div>
-      <button class="" matFab extended (click)="downloadCsv()">
+      <button
+        (click)="downloadCsv()"
+        [disabled]="!entries().length"
+        extended
+        matFab
+      >
         <mat-icon>download</mat-icon>
         Download CSV
       </button>
     </div>
   </div>
 
+  @if (isLoading()) { Loading... } @else {
   <table mat-table [dataSource]="entries()" class="mat-elevation-z8">
     <!-- Entry ID -->
     <ng-container matColumnDef="entryID">
@@ -115,4 +121,5 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
+  }
 </div>

@@ -251,19 +251,19 @@ export const playerScoringProjections = onCall(async (request) => {
 
     const quarterbacks = simplifiedData
       .filter((p) => p.position === 'QB')
-      .slice(0, 30);
+      .slice(0, 25);
     const runningBacks = simplifiedData
       .filter((p) => p.position === 'RB')
-      .slice(0, 40);
+      .slice(0, 25);
     const wideReceivers = simplifiedData
       .filter((p) => p.position === 'WR')
-      .slice(0, 75);
+      .slice(0, 65);
     const tightEnds = simplifiedData
       .filter((p) => p.position === 'TE')
       .slice(0, 30);
     const dsts = simplifiedData
       .filter((p) => p.position === 'DST')
-      .slice(0, 30);
+      .slice(0, 25);
 
     return { quarterbacks, runningBacks, wideReceivers, tightEnds, dsts };
   } catch (err: unknown) {

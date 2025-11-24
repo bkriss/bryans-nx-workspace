@@ -78,36 +78,31 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   qbSelectionFormGroup = this._formBuilder.group({
     qbPoolCtrl: [
       this.selectedQuarterbacks() as Quarterback[],
-      // [Validators.minLength(4), Validators.maxLength(5)],
-      [Validators.minLength(0), Validators.maxLength(20)],
+      [Validators.minLength(4), Validators.maxLength(5)],
     ],
   });
   rbSelectionFormGroup = this._formBuilder.group({
     rbPoolCtrl: [
       this.selectedRunningBacks() as RunningBack[],
-      // [Validators.minLength(7), Validators.maxLength(9)],
-      [Validators.minLength(0), Validators.maxLength(15)],
+      [Validators.minLength(6), Validators.maxLength(9)],
     ],
   });
   wrSelectionFormGroup = this._formBuilder.group({
     wrPoolCtrl: [
       this.selectedWideReceivers() as PassCatcher[],
-      // [Validators.minLength(30), Validators.maxLength(40)],
-      [Validators.minLength(0), Validators.maxLength(75)],
+      [Validators.minLength(30), Validators.maxLength(40)],
     ],
   });
   teSelectionFormGroup = this._formBuilder.group({
     tePoolCtrl: [
       this.selectedTightEnds() as PassCatcher[],
-      // [Validators.minLength(4), Validators.maxLength(10)],
-      [Validators.minLength(0), Validators.maxLength(25)],
+      [Validators.minLength(7), Validators.maxLength(15)],
     ],
   });
   dstSelectionFormGroup = this._formBuilder.group({
     dstPoolCtrl: [
       this.selectedDefenses() as Player[],
-      // [Validators.minLength(5), Validators.maxLength(10)],
-      [Validators.minLength(0), Validators.maxLength(15)],
+      [Validators.minLength(6), Validators.maxLength(10)],
     ],
   });
 
@@ -123,10 +118,6 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
         this.playerPoolsStore.loadPlayerPoolsFromFirestore();
       }
     });
-
-    // effect(() => {
-    //
-    // });
 
     // Effect to update form controls when player pools are loaded from Firestore
     // TODO: Potentially remove and/or refactor once Signal Forms is stable
@@ -171,6 +162,7 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
     this.dstChangesSubscription.unsubscribe();
   }
 
+  // TODO: Refactor app so projectedPointsPerDollar is added right away.
   selectPlayersBasedOnProjections(position: Position) {
     if (position === Position.QB) {
       const selectedPlayers = this.selectMostValuablePlayers(
@@ -183,14 +175,14 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
       const selectedPlayers = this.selectMostValuablePlayers(
         this.availableRunningBacks(),
         this.playerProjectionsStore.runningBacks(),
-        15
+        20
       );
       this.playerPoolsStore.setRunningBacks(selectedPlayers as RunningBack[]);
     } else if (position === Position.WR) {
       const selectedPlayers = this.selectMostValuablePlayers(
         this.availableWideReceivers(),
         this.playerProjectionsStore.wideReceivers(),
-        50
+        65
       );
       this.playerPoolsStore.setWideReceivers(selectedPlayers as PassCatcher[]);
     } else if (position === Position.TE) {
@@ -204,7 +196,7 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
       const selectedPlayers = this.selectMostValuablePlayers(
         this.availableDsts(),
         this.playerProjectionsStore.dsts(),
-        15
+        25
       );
       this.playerPoolsStore.setDefenses(selectedPlayers as Player[]);
     }

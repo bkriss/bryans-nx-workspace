@@ -89,6 +89,26 @@ export const earlyOnlyContestSizes = [
 
 export const mainSlateContestSizes = [
   {
+    name: 'NFL $400K Spy [$100K to 1st Single Entry]',
+    entries: 4444,
+    topPrize: 100000,
+  },
+  {
+    name: 'NFL $80K Octopus [$20K to 1st 8 Entry Max]',
+    entries: 1033,
+    topPrize: 20000,
+  },
+  {
+    name: 'NFL $30K Goal Line [3 Entry Max]',
+    entries: 454,
+    topPrize: 3000,
+  },
+  {
+    name: 'NFL $150K Spy [$25K to 1st Single Entry]',
+    entries: 1666,
+    topPrize: 25000,
+  },
+  {
     name: 'NFL $700K Play-Action [20 Entry Max]',
     entries: 277400,
     topPrize: 50000,

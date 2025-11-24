@@ -59,6 +59,7 @@ export class SortPassCatcherPoolComponentComponent {
 
       const maxOwnershipPercentage = generalMax >= 3 ? generalMax : 3;
       const minOwnershipPercentage = generalMin >= 0 ? generalMin : 0;
+
       return {
         ...player,
         gradeOutOfTen: Number(calculateGrade(i)),
@@ -86,6 +87,7 @@ export class SortPassCatcherPoolComponentComponent {
     });
 
     console.log('Updated Pass Catchers:', passCatchers);
+
     if (this.position === Position.WR) {
       this.playerPoolsStore.setWideReceivers(passCatchers);
     } else {

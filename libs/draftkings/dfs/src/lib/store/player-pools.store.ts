@@ -1,4 +1,5 @@
 import { computed, inject } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   patchState,
   signalStore,
@@ -16,12 +17,14 @@ import {
 } from '../models/player.model';
 import { PlayerPoolsService } from './player-pools.service';
 import { SlatesStore } from './slates.store';
-import { PlayerProjectionsService } from './player-projections.service';
+import { Position } from '../enums';
 
 /**
  * State interface for player pools
  */
 export interface PlayerPoolsState {
+  error: string | null;
+  isLoading: boolean;
   selectedQuarterbacks: Quarterback[];
   selectedRunningBacks: RunningBack[];
   selectedWideReceivers: PassCatcher[];
@@ -33,6 +36,8 @@ export interface PlayerPoolsState {
  * Initial state for player pools
  */
 const initialState: PlayerPoolsState = {
+  error: null,
+  isLoading: false,
   selectedQuarterbacks: [],
   selectedRunningBacks: [],
   selectedWideReceivers: [],
@@ -45,34 +50,6 @@ export const PlayerPoolsStore = signalStore(
   withState(initialState),
 
   withComputed((store) => ({
-    /**
-     * Total number of quarterbacks in the pool
-     */
-    qbCount: computed(() => store.selectedQuarterbacks().length),
-
-    /**
-     * Total number of running backs in the pool
-     */
-    rbCount: computed(() => store.selectedRunningBacks().length),
-
-    /**
-     * Total number of wide receivers in the pool
-     */
-    wrCount: computed(() => store.selectedWideReceivers().length),
-
-    /**
-     * Total number of tight ends in the pool
-     */
-    teCount: computed(() => store.selectedTightEnds().length),
-
-    /**
-     * Total number of defenses in the pool
-     */
-    dstCount: computed(() => store.selectedDefenses().length),
-
-    /**
-     * Indicates whether all required player pools have been populated
-     */
     allPoolsAreSet: computed(
       () =>
         store.selectedQuarterbacks().length > 0 &&
@@ -80,18 +57,6 @@ export const PlayerPoolsStore = signalStore(
         store.selectedWideReceivers().length > 0 &&
         store.selectedTightEnds().length > 0 &&
         store.selectedDefenses().length > 0
-    ),
-
-    /**
-     * Total number of players across all pools
-     */
-    totalPlayerCount: computed(
-      () =>
-        store.selectedQuarterbacks().length +
-        store.selectedRunningBacks().length +
-        store.selectedWideReceivers().length +
-        store.selectedTightEnds().length +
-        store.selectedDefenses().length
     ),
   })),
 
@@ -124,178 +89,158 @@ export const PlayerPoolsStore = signalStore(
         .filter((dst) => dst.id !== id);
       patchState(store, { selectedDefenses: updatedDsts });
     },
-    /**
-     * Sets the quarterback pool
-     * @param quarterbacks - Array of quarterbacks to set in the pool
-     */
     setQuarterbacks(quarterbacks: Quarterback[]): void {
       patchState(store, { selectedQuarterbacks: [...quarterbacks] });
     },
-
-    /**
-     * Sets the running back pool
-     * @param runningBacks - Array of running backs to set in the pool
-     */
     setRunningBacks(runningBacks: RunningBack[]): void {
       patchState(store, { selectedRunningBacks: [...runningBacks] });
     },
-
-    /**
-     * Sets the wide receiver pool
-     * @param wideReceivers - Array of wide receivers to set in the pool
-     */
     setWideReceivers(wideReceivers: PassCatcher[]): void {
       patchState(store, { selectedWideReceivers: [...wideReceivers] });
     },
-
-    /**
-     * Sets the tight end pool
-     * @param tightEnds - Array of tight ends to set in the pool
-     */
     setTightEnds(tightEnds: PassCatcher[]): void {
       patchState(store, { selectedTightEnds: [...tightEnds] });
     },
-
-    /**
-     * Sets the defense pool
-     * @param defenses - Array of defenses to set in the pool
-     */
     setDefenses(defenses: Player[]): void {
       patchState(store, { selectedDefenses: [...defenses] });
     },
-
-    /**
-     * Sets all player pools at once
-     * @param pools - Object containing all player pools
-     */
-    // setAllPools(pools: Partial<PlayerPoolsState>): void {
-    //   patchState(store, {
-    //     quarterbacks: pools.quarterbacks
-    //       ? [...pools.quarterbacks]
-    //       : store.quarterbacks(),
-    //     runningBacks: pools.runningBacks
-    //       ? [...pools.runningBacks]
-    //       : store.runningBacks(),
-    //     wideReceivers: pools.wideReceivers
-    //       ? [...pools.wideReceivers]
-    //       : store.wideReceivers(),
-    //     tightEnds: pools.tightEnds ? [...pools.tightEnds] : store.tightEnds(),
-    //     defenses: pools.defenses ? [...pools.defenses] : store.defenses(),
-    //   });
-    // },
-
-    /**
-     * Updates a specific quarterback in the pool
-     * @param updatedQb - The quarterback with updated properties
-     */
     // updateQuarterback(updatedQb: Quarterback): void {
     //   const updatedQbs = store
     //     .quarterbacks()
     //     .map((qb) => (qb.id === updatedQb.id ? updatedQb : qb));
     //   patchState(store, { quarterbacks: updatedQbs });
     // },
-
-    /**
-     * Updates a specific running back in the pool
-     * @param updatedRb - The running back with updated properties
-     */
     // updateRunningBack(updatedRb: RunningBack): void {
     //   const updatedRbs = store
     //     .runningBacks()
     //     .map((rb) => (rb.id === updatedRb.id ? updatedRb : rb));
     //   patchState(store, { runningBacks: updatedRbs });
     // },
-
-    /**
-     * Updates a specific wide receiver in the pool
-     * @param updatedWr - The wide receiver with updated properties
-     */
     // updateWideReceiver(updatedWr: PassCatcher): void {
     //   const updatedWrs = store
     //     .wideReceivers()
     //     .map((wr) => (wr.id === updatedWr.id ? updatedWr : wr));
     //   patchState(store, { wideReceivers: updatedWrs });
     // },
-
-    /**
-     * Updates a specific tight end in the pool
-     * @param updatedTe - The tight end with updated properties
-     */
     // updateTightEnd(updatedTe: PassCatcher): void {
     //   const updatedTes = store
     //     .tightEnds()
     //     .map((te) => (te.id === updatedTe.id ? updatedTe : te));
     //   patchState(store, { tightEnds: updatedTes });
     // },
-
-    /**
-     * Updates a specific defense in the pool
-     * @param updatedDst - The defense with updated properties
-     */
     // updateDefense(updatedDst: Player): void {
     //   const updatedDsts = store
     //     .defenses()
     //     .map((dst) => (dst.id === updatedDst.id ? updatedDst : dst));
     //   patchState(store, { defenses: updatedDsts });
     // },
-
-    /**
-     * Clears all player pools
-     */
     clearAllPools(): void {
       patchState(store, initialState);
     },
 
-    /**
-     * Clears a specific position pool
-     * @param position - The position to clear ('QB', 'RB', 'WR', 'TE', 'DST')
-     */
-    // clearPool(position: Position): void {
-    //   switch (position) {
-    //     case Position.QB:
-    //       patchState(store, { quarterbacks: [] });
-    //       break;
-    //     case Position.RB:
-    //       patchState(store, { runningBacks: [] });
-    //       break;
-    //     case Position.WR:
-    //       patchState(store, { wideReceivers: [] });
-    //       break;
-    //     case Position.TE:
-    //       patchState(store, { tightEnds: [] });
-    //       break;
-    //     case Position.DST:
-    //       patchState(store, { defenses: [] });
-    //       break;
-    //   }
-    // },
+    clearPool(position: Position): void {
+      switch (position) {
+        case Position.QB:
+          patchState(store, { selectedQuarterbacks: [] });
+          break;
+        case Position.RB:
+          patchState(store, { selectedRunningBacks: [] });
+          break;
+        case Position.WR:
+          patchState(store, { selectedWideReceivers: [] });
+          break;
+        case Position.TE:
+          patchState(store, { selectedTightEnds: [] });
+          break;
+        case Position.DST:
+          patchState(store, { selectedDefenses: [] });
+          break;
+      }
+    },
   })),
 
+  // TODO: Refactor so there is only one instance of withMethods
   withMethods(
     (
       store,
       playerPoolsService = inject(PlayerPoolsService),
       slatesStore = inject(SlatesStore),
-      playerProjectionsService = inject(PlayerProjectionsService)
+      _matSnackBar = inject(MatSnackBar)
     ) => ({
-      /**
-       * Loads player pools from Firestore based on the current slate
-       * Uses the currentSlate from SlatesStore to determine which collection to fetch from
-       */
       loadPlayerPoolsFromFirestore(): void {
+        patchState(store, { isLoading: true, error: null });
         const currentSlate = slatesStore.currentSlate();
 
         playerPoolsService
           .getPlayerPools(currentSlate)
           .pipe(
             tap((playerPools) => {
+              // console.log('Fetched player pools from Firestore:', playerPools);
               if (playerPools) {
                 patchState(store, {
-                  selectedQuarterbacks: playerPools.quarterbacks || [],
-                  selectedRunningBacks: playerPools.runningBacks || [],
-                  selectedWideReceivers: playerPools.wideReceivers || [],
-                  selectedTightEnds: playerPools.tightEnds || [],
-                  selectedDefenses: playerPools.defenses || [],
+                  error: null,
+                  isLoading: false,
+                  selectedQuarterbacks:
+                    playerPools.quarterbacks.map((qb) => ({
+                      ...qb,
+                      gradeOutOfTen: +qb.gradeOutOfTen,
+                      maxNumberOfTeammatePasscatchers:
+                        +qb.maxNumberOfTeammatePasscatchers,
+                      minNumberOfTeammatePasscatchers:
+                        +qb.minNumberOfTeammatePasscatchers,
+                    })) || [],
+                  selectedRunningBacks:
+                    playerPools.runningBacks.map((rb) => ({
+                      ...rb,
+                      gradeOutOfTen: +rb.gradeOutOfTen,
+                      maxOwnershipPercentage: +rb.maxOwnershipPercentage,
+                      minOwnershipPercentage: +rb.minOwnershipPercentage,
+                    })) || [],
+                  selectedWideReceivers:
+                    playerPools.wideReceivers.map((wr) => ({
+                      ...wr,
+                      gradeOutOfTen: +wr.gradeOutOfTen,
+                      maxOwnershipPercentage: +wr.maxOwnershipPercentage,
+                      maxOwnershipWhenPairedWithOpposingQb: +(
+                        wr.maxOwnershipWhenPairedWithOpposingQb || 0
+                      ),
+                      maxOwnershipWhenPairedWithQb: +(
+                        wr.maxOwnershipWhenPairedWithQb || 0
+                      ),
+                      minOwnershipPercentage: +wr.minOwnershipPercentage,
+                      minOwnershipWhenPairedWithOpposingQb: +(
+                        wr.minOwnershipWhenPairedWithOpposingQb || 0
+                      ),
+                      minOwnershipWhenPairedWithQb: +(
+                        wr.minOwnershipWhenPairedWithQb || 0
+                      ),
+                    })) || [],
+                  selectedTightEnds:
+                    playerPools.tightEnds.map((te) => ({
+                      ...te,
+                      gradeOutOfTen: +te.gradeOutOfTen,
+                      maxOwnershipPercentage: +te.maxOwnershipPercentage,
+                      maxOwnershipWhenPairedWithOpposingQb: +(
+                        te.maxOwnershipWhenPairedWithOpposingQb || 0
+                      ),
+                      maxOwnershipWhenPairedWithQb: +(
+                        te.maxOwnershipWhenPairedWithQb || 0
+                      ),
+                      minOwnershipPercentage: +te.minOwnershipPercentage,
+                      minOwnershipWhenPairedWithOpposingQb: +(
+                        te.minOwnershipWhenPairedWithOpposingQb || 0
+                      ),
+                      minOwnershipWhenPairedWithQb: +(
+                        te.minOwnershipWhenPairedWithQb || 0
+                      ),
+                    })) || [],
+                  selectedDefenses:
+                    playerPools.defenses.map((dst) => ({
+                      ...dst,
+                      gradeOutOfTen: +dst.gradeOutOfTen,
+                      maxOwnershipPercentage: +dst.maxOwnershipPercentage,
+                      minOwnershipPercentage: +dst.minOwnershipPercentage,
+                    })) || [],
                 });
                 console.log(
                   `Successfully loaded player pools from Firestore for ${currentSlate} slate`
@@ -313,16 +258,15 @@ export const PlayerPoolsStore = signalStore(
                 `Failed to load player pools for ${currentSlate} slate:`,
                 error
               );
+              patchState(store, {
+                error: 'Failed to load player pools.',
+                isLoading: false,
+              });
               return of(null);
             })
           )
           .subscribe();
       },
-
-      /**
-       * Saves the current player pools to Firestore based on the current slate
-       * Uses the currentSlate from SlatesStore to determine which collection to update
-       */
       savePlayerPoolsToFirestore(): void {
         const currentSlate = slatesStore.currentSlate();
         const playerPools = {
@@ -337,8 +281,11 @@ export const PlayerPoolsStore = signalStore(
           .savePlayerPools(currentSlate, playerPools)
           .pipe(
             tap(() => {
-              console.log(
-                `Successfully saved player pools to Firestore for ${currentSlate} slate`
+              _matSnackBar.open(
+                `Saved player pools for ${currentSlate
+                  .replace('_', ' ')
+                  .toLowerCase()} slate`,
+                'Close'
               );
             }),
             catchError((error) => {
@@ -346,6 +293,7 @@ export const PlayerPoolsStore = signalStore(
                 `Failed to save player pools for ${currentSlate} slate:`,
                 error
               );
+              _matSnackBar.open('Failed to save player pools', 'Close');
               return of(null);
             })
           )

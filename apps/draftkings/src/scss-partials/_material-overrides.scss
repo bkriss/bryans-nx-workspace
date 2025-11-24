@@ -52,7 +52,14 @@ mat-stepper {
 .delete-icon-button {
   @include mat.icon-overrides(
     (
-      color: #e7000b // var(color-red-600),
+      color: #e7000b // var(color-red-600),,
     )
   );
+}
+
+.mat-icon-2xl {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
 }
