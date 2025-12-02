@@ -8,8 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { Slate } from '../../enums';
-import { SlatesStore } from '../../store';
+import { Slate, SlatesStore } from '@bryans-nx-workspace/draftkings-shared';
 
 @Component({
   selector: 'dfs-select-slate',

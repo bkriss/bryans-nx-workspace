@@ -19,10 +19,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { PassCatcher, Player } from '../../models';
+import {
+  PassCatcher,
+  Player,
+  PlayerSelectionStore,
+  Position,
+} from '@bryans-nx-workspace/draftkings-shared';
 import { calculateGrade } from '../../utils';
-import { Position } from '../../enums';
-import { PlayerSelectionStore } from '../../store';
 
 @Component({
   selector: 'dfs-sort-pass-catcher-pool',

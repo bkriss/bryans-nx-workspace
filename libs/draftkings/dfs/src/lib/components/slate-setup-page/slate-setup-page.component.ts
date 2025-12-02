@@ -1,15 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Slate, SlatesStore } from '@bryans-nx-workspace/draftkings-shared';
 import { SelectSlateComponent } from '../select-slate/select-slate.component';
-import { Slate } from '../../enums';
-import { SlatesStore } from '../../store';
 
 @Component({
   selector: 'dfs-slate-setup-page',
@@ -18,7 +12,7 @@ import { SlatesStore } from '../../store';
   styleUrl: './slate-setup-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SlateSetupPageComponent implements OnInit {
+export class SlateSetupPageComponent {
   private readonly slatesStore = inject(SlatesStore);
   isLoading = this.slatesStore.isLoading;
   currentSlate = this.slatesStore.currentSlate;
@@ -29,10 +23,6 @@ export class SlateSetupPageComponent implements OnInit {
   selectedFile: File | null = null;
   fileContent: string | ArrayBuffer | null = null;
   slateEnum = Slate;
-
-  ngOnInit(): void {
-    this.slatesStore.loadSlates();
-  }
 
   onFileSelected(
     event: any,

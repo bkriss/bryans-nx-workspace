@@ -40,7 +40,7 @@ export class LineupsService {
    * Save lineups for the provided slate into the 'lineups' collection.
    * The document ID is the slate (e.g., MAIN).
    */
-  saveLineups(slate: Slate, lineups: Lineups): Observable<void> {
+  saveLineups(slate: Slate, lineups: Partial<Lineups>): Observable<void> {
     const docRef = doc(this.firestore, 'lineups', slate);
     return from(setDoc(docRef, lineups, { merge: true }));
   }

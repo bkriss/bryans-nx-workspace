@@ -23,13 +23,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { PassCatcher, Player, Quarterback, RunningBack } from '../../models';
+import {
+  PassCatcher,
+  Player,
+  Quarterback,
+  RunningBack,
+  Position,
+  PlayerSelectionStore,
+  SlatesStore,
+  PlayerProjectionsStore,
+  PlayerScoringProjection,
+} from '@bryans-nx-workspace/draftkings-shared';
 import { SortPlayerPoolComponent } from '../sort-player-pool/sort-player-pool.component';
 import { SortPassCatcherPoolComponentComponent } from '../sort-pass-catcher-pool/sort-pass-catcher-pool.component';
-import { Position } from '../../enums';
-import { PlayerSelectionStore, SlatesStore } from '../../store';
-import { PlayerProjectionsStore } from '../../store/player-projections.store';
-import { PlayerScoringProjection } from '../../store/player-projections.service';
 import { draftKingsPlayersWithScoringProjections } from '../../utils';
 
 @Component({
@@ -163,7 +169,6 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.slatesStore.loadSlates();
     this.updateSignalsWhenFormValuesChange();
     this.playerProjectionsStore.loadPlayerScoringProjections();
   }

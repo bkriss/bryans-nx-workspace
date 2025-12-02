@@ -7,20 +7,18 @@ import {
   Signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import {
   Lineup,
   PassCatcher,
   Player,
   PlayerDistribution,
+  Position,
   Quarterback,
   RunningBack,
-  // TightEnd,
-  // WideReceiver,
-} from '../../models';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { Position } from '../../enums';
+} from '@bryans-nx-workspace/draftkings-shared';
 
 @Component({
   selector: 'dfs-player-distributions',

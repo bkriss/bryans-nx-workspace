@@ -19,10 +19,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { Player, Quarterback, RunningBack } from '../../models';
+import {
+  Player,
+  Quarterback,
+  RunningBack,
+  PlayerSelectionStore,
+  Position,
+} from '@bryans-nx-workspace/draftkings-shared';
 import { calculateGrade } from '../../utils';
-import { PlayerSelectionStore } from '../../store';
-import { Position } from '../../enums';
 
 @Component({
   selector: 'dfs-sort-player-pool',

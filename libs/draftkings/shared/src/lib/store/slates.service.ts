@@ -1,4 +1,3 @@
-// TODO: Change filename to be specific to one store
 import { Injectable, inject } from '@angular/core';
 import {
   collection,

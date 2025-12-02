@@ -15,12 +15,12 @@ import {
   Quarterback,
   RunningBack,
 } from '../models/player.model';
-import { SlatesStore } from './slates.store';
 import { Position, Slate } from '../enums';
 import {
   PlayerPoolSelections,
   PlayerSelectionService,
 } from './player-selection.service';
+import { SlatesStore } from './slates.store';
 
 /**
  * State interface for player pools

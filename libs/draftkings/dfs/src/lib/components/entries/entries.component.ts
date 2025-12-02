@@ -13,18 +13,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import {
-  convertJsonToCsv,
-  downloadCsvFile,
-  renderDraftKingsEntriesAsJson,
-} from '../../utils';
-import {
   DraftKingsEntry,
   Player,
   SimpleLineup,
   TableFriendlyDraftKingsEntry,
-} from '../../models';
-import { Slate } from '../../enums';
-import { LineupsStore, SlatesStore } from '../../store';
+  Slate,
+  LineupsStore,
+  SlatesStore,
+} from '@bryans-nx-workspace/draftkings-shared';
+import {
+  convertJsonToCsv,
+  downloadCsvFile,
+  renderDraftKingsEntriesAsJson,
+} from '../../utils';
 
 @Component({
   imports: [CommonModule, MatButtonModule, MatIconModule, MatTableModule],
@@ -56,7 +57,6 @@ export class EntriesComponent {
     ].sort((a, b) => b.lineupGrade - a.lineupGrade);
   });
   loadedLineups: WritableSignal<boolean> = signal(false);
-  loadedSlates: WritableSignal<boolean> = signal(false);
   numberOfLineupsMatchNumberOfEntries = computed(() => {
     return this.lineupsForAllQbs().length === this.entries().length;
   });
@@ -81,13 +81,6 @@ export class EntriesComponent {
   });
 
   constructor() {
-    effect(() => {
-      if (!this.loadedSlates() && !this.loadingSlates()) {
-        this.loadedSlates.set(true);
-        this.slatesStore.loadSlates();
-      }
-    });
-
     effect(() => {
       const entriesForCurrentSlate = this.slatesStore.entriesForCurrentSlate();
 

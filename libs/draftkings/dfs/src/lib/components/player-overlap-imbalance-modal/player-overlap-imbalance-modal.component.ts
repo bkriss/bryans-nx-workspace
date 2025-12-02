@@ -14,7 +14,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { PlayerOverlapReview } from '../../models';
+import { PlayerOverlapReview } from '@bryans-nx-workspace/draftkings-shared';
 import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({

@@ -14,14 +14,16 @@ import {
   PassCatcher,
   PassCatcherStack,
   Player,
+  Position,
   Quarterback,
   RunningBack,
   SimpleLineup,
   SimplePlayer,
-} from '../../models';
+  LineupsStore,
+  PlayerSelectionStore,
+  SlatesStore,
+} from '@bryans-nx-workspace/draftkings-shared';
 import { LineupsComponent } from '../lineups/lineups.component';
-import { LineupsStore, PlayerSelectionStore, SlatesStore } from '../../store';
-import { Position } from '../../enums';
 
 @Component({
   imports: [CommonModule, LineupsComponent],
@@ -50,20 +52,12 @@ export class LineupBuildersPageComponent {
   );
   lineups: WritableSignal<Lineup[]> = signal([]);
   loadedPlayers: WritableSignal<boolean> = signal(false);
-  loadedSlates: WritableSignal<boolean> = signal(false);
   maxRemainingSalary = computed(() => (this.isSmallSlate() ? 600 : 300));
   numberOfInvalidLineups: Signal<number> = computed(() =>
     this.validateLineups(this.lineups())
   );
 
   constructor() {
-    effect(() => {
-      if (!this.loadedSlates() && !this.loadingSlates()) {
-        this.loadedSlates.set(true);
-        this.slatesStore.loadSlates();
-      }
-    });
-
     effect(() => {
       const salariesForCurrentSlate =
         this.slatesStore.salariesForCurrentSlate();
@@ -1333,30 +1327,39 @@ export class LineupBuildersPageComponent {
   }
 
   saveLineups() {
-    // TODO: Modify saveLineupsToFirestore to patch data and only save that particular QB's lineups.
-
     const { sortOrder } = this.currentQb();
 
+    const lineupsToSave: SimpleLineup[] = this.simplifyLineupData();
     if (sortOrder === 1) {
-      console.log('saving lineups for QB1', this.simplifyLineupData());
-      this.lineupsStore.setLineupsForQb1(this.simplifyLineupData());
-      this.lineupsStore.saveLineupsToFirestore();
+      console.log('saving lineups for QB1', lineupsToSave);
+      this.lineupsStore.setLineupsForQb1(lineupsToSave);
+      this.lineupsStore.saveLineupsToFirestore({
+        lineupsForQb1: lineupsToSave,
+      });
     } else if (sortOrder === 2) {
-      console.log('saving lineups for QB2', this.simplifyLineupData());
-      this.lineupsStore.setLineupsForQb2(this.simplifyLineupData());
-      this.lineupsStore.saveLineupsToFirestore();
+      console.log('saving lineups for QB2', lineupsToSave);
+      this.lineupsStore.setLineupsForQb2(lineupsToSave);
+      this.lineupsStore.saveLineupsToFirestore({
+        lineupsForQb2: lineupsToSave,
+      });
     } else if (sortOrder === 3) {
-      console.log('saving lineups for QB3', this.simplifyLineupData());
-      this.lineupsStore.setLineupsForQb3(this.simplifyLineupData());
-      this.lineupsStore.saveLineupsToFirestore();
+      console.log('saving lineups for QB3', lineupsToSave);
+      this.lineupsStore.setLineupsForQb3(lineupsToSave);
+      this.lineupsStore.saveLineupsToFirestore({
+        lineupsForQb3: lineupsToSave,
+      });
     } else if (sortOrder === 4) {
-      console.log('saving lineups for QB4', this.simplifyLineupData());
-      this.lineupsStore.setLineupsForQb4(this.simplifyLineupData());
-      this.lineupsStore.saveLineupsToFirestore();
+      console.log('saving lineups for QB4', lineupsToSave);
+      this.lineupsStore.setLineupsForQb4(lineupsToSave);
+      this.lineupsStore.saveLineupsToFirestore({
+        lineupsForQb4: lineupsToSave,
+      });
     } else if (sortOrder === 5) {
-      console.log('saving lineups for QB5', this.simplifyLineupData());
-      this.lineupsStore.setLineupsForQb5(this.simplifyLineupData());
-      this.lineupsStore.saveLineupsToFirestore();
+      console.log('saving lineups for QB5', lineupsToSave);
+      this.lineupsStore.setLineupsForQb5(lineupsToSave);
+      this.lineupsStore.saveLineupsToFirestore({
+        lineupsForQb5: lineupsToSave,
+      });
     } else {
       console.error(`Unknown sortOrder for quarterback: ${sortOrder}`);
     }

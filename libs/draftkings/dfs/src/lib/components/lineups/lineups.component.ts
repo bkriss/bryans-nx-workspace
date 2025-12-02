@@ -17,17 +17,17 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { PlayerOverlapImbalanceButtonComponent } from '../player-overlap-imbalance-button/player-overlap-imbalance-button.component';
-import { PlayerDistributionsComponent } from '../player-distributions/player-distributions.component';
-import { LineupBuilderComponent } from '../lineup-builder/lineup-builder.component';
-import { SelectSlateComponent } from '../select-slate/select-slate.component';
 import {
   Lineup,
   PassCatcher,
   Player,
   Quarterback,
   RunningBack,
-} from '../../models';
+} from '@bryans-nx-workspace/draftkings-shared';
+import { PlayerOverlapImbalanceButtonComponent } from '../player-overlap-imbalance-button/player-overlap-imbalance-button.component';
+import { PlayerDistributionsComponent } from '../player-distributions/player-distributions.component';
+import { LineupBuilderComponent } from '../lineup-builder/lineup-builder.component';
+import { SelectSlateComponent } from '../select-slate/select-slate.component';
 import { LineupValidationModalComponent } from '../lineup-validation-modal/lineup-validation-modal.component';
 
 @Component({

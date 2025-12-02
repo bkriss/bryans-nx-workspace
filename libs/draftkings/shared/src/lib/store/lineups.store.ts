@@ -1,4 +1,5 @@
 import { computed, inject } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   patchState,
   signalStore,
@@ -7,11 +8,11 @@ import {
   withState,
 } from '@ngrx/signals';
 import { catchError, finalize, of, tap } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { SimpleLineup } from '../models';
-import { Slate } from '../enums';
-import { Lineups, LineupsService } from './lineups.service';
 import { SlatesStore } from './slates.store';
+import { SimpleLineup } from '../models';
+import { Lineups, LineupsService } from './lineups.service';
+import { Slate } from '../enums';
+// import { SlatesStore } from '../';
 
 export interface LineupsState {
   error: string | null;
@@ -102,19 +103,20 @@ export const LineupsStore = signalStore(
           .subscribe();
       },
 
-      saveLineupsToFirestore(): void {
+      saveLineupsToFirestore(lineupsPartial: Partial<Lineups>): void {
+        // console.log('lineupsId to save:', lineupsId);
         const currentSlate: Slate = slatesStore.currentSlate();
-        const lineups: Lineups = {
-          lineupsForQb1: store.lineupsForQb1(),
-          lineupsForQb2: store.lineupsForQb2(),
-          lineupsForQb3: store.lineupsForQb3(),
-          lineupsForQb4: store.lineupsForQb4(),
-          lineupsForQb5: store.lineupsForQb5(),
-        };
+        // const lineups: Lineups = {
+        //   lineupsForQb1: store.lineupsForQb1(),
+        //   lineupsForQb2: store.lineupsForQb2(),
+        //   lineupsForQb3: store.lineupsForQb3(),
+        //   lineupsForQb4: store.lineupsForQb4(),
+        //   lineupsForQb5: store.lineupsForQb5(),
+        // };
 
         patchState(store, { isSaving: true, error: null });
         lineupsService
-          .saveLineups(currentSlate, lineups)
+          .saveLineups(currentSlate, lineupsPartial)
           .pipe(
             tap(() => {
               _matSnackBar.open(

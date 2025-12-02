@@ -1,4 +1,4 @@
-import { TableFriendlyDraftKingsEntry } from '../models';
+import { TableFriendlyDraftKingsEntry } from '@bryans-nx-workspace/draftkings-shared';
 import { csvToJson } from './csv-to-json.util';
 
 interface RawEntry {

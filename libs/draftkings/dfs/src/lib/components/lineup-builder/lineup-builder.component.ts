@@ -8,11 +8,16 @@ import {
   Output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Lineup, PassCatcher, Player, Quarterback } from '../../models';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
+import {
+  Lineup,
+  PassCatcher,
+  Player,
+  Quarterback,
+} from '@bryans-nx-workspace/draftkings-shared';
 import { LineupBuilderPositionComponent } from '../lineup-builder-position/lineup-builder-position.component';
 
 @Component({

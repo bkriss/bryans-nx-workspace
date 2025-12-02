@@ -1,7 +1,12 @@
-import { PassCatcher, Player, Quarterback, RunningBack } from '../../models';
+import {
+  PassCatcher,
+  Player,
+  Quarterback,
+  RunningBack,
+  PlayerProjections,
+  Position,
+} from '@bryans-nx-workspace/draftkings-shared';
 import { csvToJson } from '../csv-to-json.util';
-import { Position } from '../../enums';
-import { PlayerProjections } from '../../store/player-projections.service';
 
 interface RawPlayer {
   AvgPointsPerGame: string;
