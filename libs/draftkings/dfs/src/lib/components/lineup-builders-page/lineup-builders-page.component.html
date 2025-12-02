@@ -10,6 +10,8 @@
   @if (isLoading()) { Loading... } @else {
   <dfs-lineups
     [currentQb]="currentQb"
+    [isSmallSlate]="isSmallSlate()"
+    [maxRemainingSalary]="maxRemainingSalary()"
     [lineups]="lineups"
     [qbPool]="qbPool()"
     [rbPool]="rbPool()"

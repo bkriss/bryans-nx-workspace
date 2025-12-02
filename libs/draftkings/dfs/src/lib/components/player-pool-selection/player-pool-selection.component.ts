@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   OnDestroy,
@@ -26,9 +27,10 @@ import { PassCatcher, Player, Quarterback, RunningBack } from '../../models';
 import { SortPlayerPoolComponent } from '../sort-player-pool/sort-player-pool.component';
 import { SortPassCatcherPoolComponentComponent } from '../sort-pass-catcher-pool/sort-pass-catcher-pool.component';
 import { Position } from '../../enums';
-import { PlayerPoolsStore, SlatesStore } from '../../store';
+import { PlayerSelectionStore, SlatesStore } from '../../store';
 import { PlayerProjectionsStore } from '../../store/player-projections.store';
 import { PlayerScoringProjection } from '../../store/player-projections.service';
+import { draftKingsPlayersWithScoringProjections } from '../../utils';
 
 @Component({
   imports: [
@@ -50,7 +52,7 @@ import { PlayerScoringProjection } from '../../store/player-projections.service'
 export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly _formBuilder = inject(FormBuilder);
-  private readonly playerPoolsStore = inject(PlayerPoolsStore);
+  private readonly playerSelectionStore = inject(PlayerSelectionStore);
   private readonly playerProjectionsStore = inject(PlayerProjectionsStore);
   private readonly slatesStore = inject(SlatesStore);
 
@@ -61,61 +63,74 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   private teChangesSubscription: Subscription = new Subscription();
   private dstChangesSubscription: Subscription = new Subscription();
 
-  availableQuarterbacks = this.slatesStore.availableQuarterbacks;
-  availableRunningBacks = this.slatesStore.availableRunningBacks;
-  availableWideReceivers = this.slatesStore.availableWideReceivers;
-  availableTightEnds = this.slatesStore.availableTightEnds;
-  availableDsts = this.slatesStore.availableDefenses;
-  isLoading = this.slatesStore.isLoading;
+  availablePlayers = computed(() =>
+    draftKingsPlayersWithScoringProjections(
+      this.slatesStore.salariesForCurrentSlate(),
+      this.playerProjectionsStore.projections()
+    )
+  );
+  availableQuarterbacks = computed(() => this.availablePlayers().quarterbacks);
+  availableRunningBacks = computed(() => this.availablePlayers().runningBacks);
+  availableWideReceivers = computed(
+    () => this.availablePlayers().wideReceivers
+  );
+  availableTightEnds = computed(() => this.availablePlayers().tightEnds);
+  availableDsts = computed(() => this.availablePlayers().defenses);
+  loadingSlateData = this.slatesStore.isLoading;
+  loadingProjections = this.playerProjectionsStore.isLoading;
+  isLoading = computed(
+    () => this.loadingSlateData() || this.loadingProjections()
+  );
   position = Position;
-  playerPoolsLoaded = signal(false);
-  selectedQuarterbacks = this.playerPoolsStore.selectedQuarterbacks;
-  selectedRunningBacks = this.playerPoolsStore.selectedRunningBacks;
-  selectedWideReceivers = this.playerPoolsStore.selectedWideReceivers;
-  selectedTightEnds = this.playerPoolsStore.selectedTightEnds;
-  selectedDefenses = this.playerPoolsStore.selectedDefenses;
+  playerSelectionsLoaded = signal(false);
+  projectionsAddedToPlayers = signal(false);
+  selectedQuarterbacks = this.playerSelectionStore.quarterbacks;
+  selectedRunningBacks = this.playerSelectionStore.runningBacks;
+  selectedWideReceivers = this.playerSelectionStore.wideReceivers;
+  selectedTightEnds = this.playerSelectionStore.tightEnds;
+  selectedDefenses = this.playerSelectionStore.defenses;
 
   qbSelectionFormGroup = this._formBuilder.group({
     qbPoolCtrl: [
       this.selectedQuarterbacks() as Quarterback[],
-      [Validators.minLength(4), Validators.maxLength(5)],
+      [Validators.required, Validators.minLength(4), Validators.maxLength(5)],
     ],
   });
   rbSelectionFormGroup = this._formBuilder.group({
     rbPoolCtrl: [
       this.selectedRunningBacks() as RunningBack[],
-      [Validators.minLength(6), Validators.maxLength(9)],
+      [Validators.required, Validators.minLength(6), Validators.maxLength(9)],
     ],
   });
   wrSelectionFormGroup = this._formBuilder.group({
     wrPoolCtrl: [
       this.selectedWideReceivers() as PassCatcher[],
-      [Validators.minLength(30), Validators.maxLength(40)],
+      [Validators.required, Validators.minLength(18), Validators.maxLength(40)],
     ],
   });
   teSelectionFormGroup = this._formBuilder.group({
     tePoolCtrl: [
       this.selectedTightEnds() as PassCatcher[],
-      [Validators.minLength(7), Validators.maxLength(15)],
+      [Validators.required, Validators.minLength(6), Validators.maxLength(15)],
     ],
   });
   dstSelectionFormGroup = this._formBuilder.group({
     dstPoolCtrl: [
       this.selectedDefenses() as Player[],
-      [Validators.minLength(6), Validators.maxLength(10)],
+      [Validators.required, Validators.minLength(6), Validators.maxLength(10)],
     ],
   });
 
   constructor() {
     // Effect to load player pools after slates are successfully loaded
     effect(() => {
-      const isLoading = this.slatesStore.isLoading();
+      const loadingSlateData = this.slatesStore.isLoading();
       const currentSlate = this.slatesStore.currentSlate();
 
       // When loading completes and we have a valid slate, load player pools
-      if (!isLoading && currentSlate && !this.playerPoolsLoaded()) {
-        this.playerPoolsLoaded.set(true);
-        this.playerPoolsStore.loadPlayerPoolsFromFirestore();
+      if (!loadingSlateData && currentSlate && !this.playerSelectionsLoaded()) {
+        this.playerSelectionsLoaded.set(true);
+        this.playerSelectionStore.loadSelectedPlayersFromFirestore();
       }
     });
 
@@ -162,43 +177,47 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
     this.dstChangesSubscription.unsubscribe();
   }
 
-  // TODO: Refactor app so projectedPointsPerDollar is added right away.
   selectPlayersBasedOnProjections(position: Position) {
     if (position === Position.QB) {
-      const selectedPlayers = this.selectMostValuablePlayers(
-        this.availableQuarterbacks(),
-        this.playerProjectionsStore.quarterbacks(),
-        20
+      this.playerSelectionStore.setQuarterbacks(
+        [...this.availableQuarterbacks()]
+          .sort(
+            (a, b) => b.projectedPointsPerDollar - a.projectedPointsPerDollar
+          )
+          .slice(0, 30)
       );
-      this.playerPoolsStore.setQuarterbacks(selectedPlayers as Quarterback[]);
     } else if (position === Position.RB) {
-      const selectedPlayers = this.selectMostValuablePlayers(
-        this.availableRunningBacks(),
-        this.playerProjectionsStore.runningBacks(),
-        20
+      this.playerSelectionStore.setRunningBacks(
+        [...this.availableRunningBacks()]
+          .sort(
+            (a, b) => b.projectedPointsPerDollar - a.projectedPointsPerDollar
+          )
+          .slice(0, 30)
       );
-      this.playerPoolsStore.setRunningBacks(selectedPlayers as RunningBack[]);
     } else if (position === Position.WR) {
-      const selectedPlayers = this.selectMostValuablePlayers(
-        this.availableWideReceivers(),
-        this.playerProjectionsStore.wideReceivers(),
-        65
+      this.playerSelectionStore.setWideReceivers(
+        [...this.availableWideReceivers()]
+          .sort(
+            (a, b) => b.projectedPointsPerDollar - a.projectedPointsPerDollar
+          )
+          .slice(0, 65)
       );
-      this.playerPoolsStore.setWideReceivers(selectedPlayers as PassCatcher[]);
     } else if (position === Position.TE) {
-      const selectedPlayers = this.selectMostValuablePlayers(
-        this.availableTightEnds(),
-        this.playerProjectionsStore.tightEnds(),
-        25
+      this.playerSelectionStore.setTightEnds(
+        [...this.availableTightEnds()]
+          .sort(
+            (a, b) => b.projectedPointsPerDollar - a.projectedPointsPerDollar
+          )
+          .slice(0, 25)
       );
-      this.playerPoolsStore.setTightEnds(selectedPlayers as PassCatcher[]);
     } else if (position === Position.DST) {
-      const selectedPlayers = this.selectMostValuablePlayers(
-        this.availableDsts(),
-        this.playerProjectionsStore.dsts(),
-        25
+      this.playerSelectionStore.setDefenses(
+        [...this.availableDsts()]
+          .sort(
+            (a, b) => b.projectedPointsPerDollar - a.projectedPointsPerDollar
+          )
+          .slice(0, 30)
       );
-      this.playerPoolsStore.setDefenses(selectedPlayers as Player[]);
     }
   }
 
@@ -230,9 +249,9 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
             }
           : null;
       })
-      .filter((espnPlayer) => espnPlayer !== null)
-      .sort((a, b) => b.projectedPointsPerDollar - a.projectedPointsPerDollar)
-      .slice(0, numberOfPlayersToReturn);
+      .filter((espnPlayer) => espnPlayer !== null);
+    // .sort((a, b) => b.projectedPointsPerDollar - a.projectedPointsPerDollar)
+    // .slice(0, numberOfPlayersToReturn);
 
     return selectedPlayers;
   }
@@ -242,58 +261,63 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
     this.qbChangesSubscription =
       this.qbSelectionFormGroup.controls.qbPoolCtrl.valueChanges.subscribe(
         (selectedQbs) => {
-          this.playerPoolsStore.setQuarterbacks(selectedQbs || []);
+          this.playerSelectionStore.setQuarterbacks(selectedQbs || []);
         }
       );
     this.rbChangesSubscription =
       this.rbSelectionFormGroup.controls.rbPoolCtrl.valueChanges.subscribe(
         (selectedRBs) => {
-          this.playerPoolsStore.setRunningBacks(selectedRBs || []);
+          this.playerSelectionStore.setRunningBacks(selectedRBs || []);
         }
       );
     this.wrChangesSubscription =
       this.wrSelectionFormGroup.controls.wrPoolCtrl.valueChanges.subscribe(
         (selectedWRs) => {
-          this.playerPoolsStore.setWideReceivers(selectedWRs || []);
+          this.playerSelectionStore.setWideReceivers(selectedWRs || []);
         }
       );
     this.teChangesSubscription =
       this.teSelectionFormGroup.controls.tePoolCtrl.valueChanges.subscribe(
         (selectedTEs) => {
-          this.playerPoolsStore.setTightEnds(selectedTEs || []);
+          this.playerSelectionStore.setTightEnds(selectedTEs || []);
         }
       );
     this.dstChangesSubscription =
       this.dstSelectionFormGroup.controls.dstPoolCtrl.valueChanges.subscribe(
         (selectedDSTs) => {
-          this.playerPoolsStore.setDefenses(selectedDSTs || []);
+          this.playerSelectionStore.setDefenses(selectedDSTs || []);
         }
       );
   }
 
   saveQbSelections() {
     console.log('saveQbSelections');
-    this.playerPoolsStore.savePlayerPoolsToFirestore();
+    // TODO: Refactor so that we can patch each position separately without overwriting the others
+    this.playerSelectionStore.saveSelectedPlayersToFirestore();
   }
 
   saveRBSelections() {
     console.log('saveRBSelections');
-    this.playerPoolsStore.savePlayerPoolsToFirestore();
+    // TODO: Refactor so that we can patch each position separately without overwriting the others
+    this.playerSelectionStore.saveSelectedPlayersToFirestore();
   }
 
   saveWRSelections() {
     console.log('saveWRSelections');
-    this.playerPoolsStore.savePlayerPoolsToFirestore();
+    // TODO: Refactor so that we can patch each position separately without overwriting the others
+    this.playerSelectionStore.saveSelectedPlayersToFirestore();
   }
 
   saveTightEndSelections() {
     console.log('saveTESelections');
-    this.playerPoolsStore.savePlayerPoolsToFirestore();
+    // TODO: Refactor so that we can patch each position separately without overwriting the others
+    this.playerSelectionStore.saveSelectedPlayersToFirestore();
   }
 
   saveDSTSelections() {
     console.log('saveDSTSelections');
-    this.playerPoolsStore.savePlayerPoolsToFirestore();
+    // TODO: Refactor so that we can patch each position separately without overwriting the others
+    this.playerSelectionStore.saveSelectedPlayersToFirestore();
   }
 
   generateLineupBuilders() {

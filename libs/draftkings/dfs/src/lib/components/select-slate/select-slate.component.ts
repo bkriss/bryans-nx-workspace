@@ -37,6 +37,14 @@ export class SelectSlateComponent {
       name: 'Sun-Mon',
       id: Slate.SUN_TO_MON,
     },
+    {
+      name: 'Thur-Mon',
+      id: Slate.THUR_TO_MON,
+    },
+    {
+      name: 'Thanksgiving',
+      id: Slate.THANKSGIVING,
+    },
   ];
 
   selectedNewSlate(slate: Slate) {

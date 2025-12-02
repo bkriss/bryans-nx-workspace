@@ -12,7 +12,7 @@ export interface Player {
   teamAbbrev: string;
   opposingTeamAbbrev: string;
   onlyUseInLargerFieldContests?: boolean;
-  projectedPointsPerDollar?: number;
+  projectedPointsPerDollar: number;
 }
 
 export interface Quarterback extends Player {

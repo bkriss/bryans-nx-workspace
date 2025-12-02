@@ -51,7 +51,9 @@ import { LineupValidationModalComponent } from '../lineup-validation-modal/lineu
 })
 export class LineupsComponent {
   @Input() currentQb: Signal<Quarterback> = signal({} as Quarterback);
+  @Input() isSmallSlate = false;
   @Input() lineups: Signal<Lineup[]> = signal([]);
+  @Input() maxRemainingSalary = 300;
   @Input() qbPool: Quarterback[] = [];
   @Input() rbPool: RunningBack[] = [];
   @Input() wrPool: PassCatcher[] = [];
@@ -131,7 +133,9 @@ export class LineupsComponent {
       ]);
     }
 
-    if (totalSalary < 49700) {
+    const lowestTotalSalaryAllowed = 50000 - this.maxRemainingSalary;
+
+    if (totalSalary < lowestTotalSalaryAllowed) {
       this.errorMessages.update((messages) => [
         ...messages,
         `Lineup ${index + 1} is too far under salary cap.`,
@@ -157,12 +161,16 @@ export class LineupsComponent {
       }
     });
 
+    const numberOfPassCatchersAllowedNotFromQbMatchup = this.isSmallSlate
+      ? 2
+      : 1;
+
     const tooManyFromSameTeam = Object.values(teamCountForQbsPassCatchers).some(
       (count) => count > (qb?.maxNumberOfTeammatePasscatchers || 0)
     );
     const tooManyFromOtherTeams = Object.values(
       teamCountForPlayersNotOnQbsTeam
-    ).some((count) => count > 1);
+    ).some((count) => count > numberOfPassCatchersAllowedNotFromQbMatchup);
 
     if (tooManyFromSameTeam) {
       this.errorMessages.update((messages) => [
@@ -180,6 +188,7 @@ export class LineupsComponent {
   }
 
   checkIfAnyPlayersOnSameTeamAsDst(lineup: Lineup, index: number): void {
+    if (this.isSmallSlate) return;
     const { qb, wr1, wr2, wr3, te, flex, dst } = lineup;
 
     // Not checking for RBs since it's okay for them to be paired with their DST

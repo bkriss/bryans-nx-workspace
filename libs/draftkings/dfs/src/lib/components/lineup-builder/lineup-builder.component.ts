@@ -31,6 +31,7 @@ import { LineupBuilderPositionComponent } from '../lineup-builder-position/lineu
 })
 export class LineupBuilderComponent implements OnInit {
   @Input() lineup!: Lineup;
+  @Input() maxRemainingSalary = 300;
   @Input() qbPool!: Quarterback[];
   @Input() runningBackPool!: Player[];
   @Input() wideReceiverPool!: PassCatcher[];

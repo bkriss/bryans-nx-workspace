@@ -50,8 +50,6 @@ export class SlateSetupPageComponent implements OnInit {
             this.fileContent?.toString().includes('Salary') &&
             !this.fileContent?.toString().includes('Contest ID')
           ) {
-            console.log('salaries fileContent', this.fileContent);
-
             this.slatesStore.updateSlateData({
               salaries: {
                 [slate]: String(this.fileContent),
@@ -66,8 +64,6 @@ export class SlateSetupPageComponent implements OnInit {
 
         if (typeOfFileContent === 'entries') {
           if (this.fileContent?.toString().includes('Contest ID')) {
-            console.log('entries fileContent', this.fileContent);
-
             this.slatesStore.updateSlateData({
               entries: {
                 [slate]: String(this.fileContent),
@@ -81,41 +77,6 @@ export class SlateSetupPageComponent implements OnInit {
         }
       };
       reader.readAsText(this.selectedFile);
-    }
-  }
-
-  fetchCsvFiles(): void {
-    // TODO: Use service from NgRx Signal Store to fetch CSV files from Firebase Firestore
-    // TODO: Fetch DKSalaries and DKEntries for the Main Slate
-    // TODO: Fetch DKSalaries and DKEntries for the Early Only Slate
-    // TODO: Fetch DKSalaries and DKEntries for the Sun-Mon Slate
-  }
-
-  setSalaries(slate: Slate, fileContent: string): void {
-    if (!fileContent?.length) return;
-
-    if (slate === Slate.MAIN) {
-      this.slatesStore.setMainSlateSalaries(fileContent);
-    } else if (slate === Slate.EARLY_ONLY) {
-      this.slatesStore.setEarlyOnlySlateSalaries(fileContent);
-    } else if (slate === Slate.SUN_TO_MON) {
-      this.slatesStore.setSunToMonSlateSalaries(fileContent);
-    } else {
-      console.error('Unknown slate selected');
-    }
-  }
-
-  setEntries(slate: Slate, fileContent: string): void {
-    if (!fileContent?.length) return;
-
-    if (slate === Slate.MAIN) {
-      this.slatesStore.setMainSlateEntries(fileContent);
-    } else if (slate === Slate.EARLY_ONLY) {
-      this.slatesStore.setEarlyOnlySlateEntries(fileContent);
-    } else if (slate === Slate.SUN_TO_MON) {
-      this.slatesStore.setSunMonSlateEntries(fileContent);
-    } else {
-      console.error('Unknown slate selected');
     }
   }
 

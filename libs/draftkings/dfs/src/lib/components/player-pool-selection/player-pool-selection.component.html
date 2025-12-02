@@ -38,7 +38,12 @@
       ></dfs-sort-player-pool>
 
       <div class="mt-1">
-        <button (click)="saveQbSelections()" matButton matStepperNext>
+        <button
+          (click)="saveQbSelections()"
+          [disabled]="!qbSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
@@ -75,7 +80,12 @@
       ></dfs-sort-player-pool>
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
-        <button (click)="saveRBSelections()" matButton matStepperNext>
+        <button
+          (click)="saveRBSelections()"
+          [disabled]="!rbSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
@@ -112,7 +122,12 @@
 
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
-        <button (click)="saveWRSelections()" matButton matStepperNext>
+        <button
+          (click)="saveWRSelections()"
+          [disabled]="!wrSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
@@ -149,7 +164,12 @@
 
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
-        <button (click)="saveTightEndSelections()" matButton matStepperNext>
+        <button
+          (click)="saveTightEndSelections()"
+          [disabled]="!teSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
@@ -186,7 +206,12 @@
 
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
-        <button (click)="saveDSTSelections()" matButton matStepperNext>
+        <button
+          (click)="saveDSTSelections()"
+          [disabled]="!dstSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>

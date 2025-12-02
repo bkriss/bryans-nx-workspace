@@ -368,10 +368,99 @@ export const sunToMonContestSizes = [
   },
 ];
 
+export const thanksgivingContestSizes = [
+  {
+    name: 'NFL $50K Blind Side [Single Entry] (Thu)',
+    entries: 2159,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $75K Backyard Slant [2x Min Cash] (Thu)',
+    entries: 9803,
+    topPrize: 7500,
+  },
+  {
+    name: 'NFL $25K Front Four [20 Entry Max] (Thu)',
+    entries: 7431,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $12K Safety (Thu)',
+    entries: 7134,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $100K Plymouth Rock Classic [5 Entry Max] (Thu)',
+    entries: 7262,
+    topPrize: 20000,
+  },
+  {
+    name: 'NFL $40K Engage Eight [3 Entry Max] (Thu)',
+    entries: 5882,
+    topPrize: 4000,
+  },
+  {
+    name: 'NFL $25K Nickel [3 Entry Max] (Thu)',
+    entries: 5945,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $20K Triple Option [3 Entry Max] (Thu)',
+    entries: 7927,
+    topPrize: 2000,
+  },
+  {
+    name: 'NFL $10K Singleback [3 Entry Max] (Thu)',
+    entries: 11800,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $25K Blind Side [Single Entry] (Thu)',
+    entries: 1079,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $150K Fair Catch [Single Entry] (Thu)',
+    entries: 14700,
+    topPrize: 15000,
+  },
+  {
+    name: 'NFL $75K Fair Catch [Single Entry] (Thu)',
+    entries: 7352,
+    topPrize: 7500,
+  },
+  {
+    name: 'NFL $25K Fair Catch [Single Entry] (Thu)',
+    entries: 2450,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $50K Huddle [Single Entry] (Thu)',
+    entries: 11800,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $25K Huddle [Single Entry] (Thu)',
+    entries: 5945,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $30K Pumpkin Pielon [Single Entry] (Thu)',
+    entries: 11800,
+    topPrize: 3000,
+  },
+  {
+    name: 'NFL $10K Daily Dollar [Single Entry] (Thu)',
+    entries: 11800,
+    topPrize: 1000,
+  },
+];
+
 export const contestSizes = [
   ...earlyOnlyContestSizes,
   ...mainSlateContestSizes,
   ...sunToMonContestSizes,
+  ...thanksgivingContestSizes,
 ];
 
 export const renderDraftKingsEntriesAsJson = (entries: string) =>

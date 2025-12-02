@@ -1,5 +1,6 @@
 import { computed, inject } from '@angular/core';
-
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { catchError, finalize, of, tap } from 'rxjs';
 import {
   patchState,
   signalStore,
@@ -10,20 +11,11 @@ import {
 
 import { Slate } from '../enums';
 import { SlateData, SlatesService } from './slates.service';
-import { catchError, finalize, of, tap } from 'rxjs';
-import { PassCatcher, Player, Quarterback, RunningBack } from '../models';
-import { getAvailablePlayers } from '../utils';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
  * State interface for contest slates
  */
 export interface SlatesState {
-  availableQuarterbacks: Quarterback[];
-  availableRunningBacks: RunningBack[];
-  availableWideReceivers: PassCatcher[];
-  availableTightEnds: PassCatcher[];
-  availableDefenses: Player[];
   currentSlate: Slate;
   entries: Record<Slate, string>;
   error: string | null;
@@ -37,16 +29,12 @@ export interface SlatesState {
  * Initial state for slates
  */
 const initialState: SlatesState = {
-  availableQuarterbacks: [],
-  availableRunningBacks: [],
-  availableWideReceivers: [],
-  availableTightEnds: [],
-  availableDefenses: [],
   currentSlate: Slate.MAIN,
   entries: {
     [Slate.EARLY_ONLY]: '',
     [Slate.MAIN]: '',
     [Slate.SUN_TO_MON]: '',
+    [Slate.THANKSGIVING]: '',
     [Slate.THUR_TO_MON]: '',
   },
   error: null,
@@ -57,6 +45,7 @@ const initialState: SlatesState = {
     [Slate.EARLY_ONLY]: '',
     [Slate.MAIN]: '',
     [Slate.SUN_TO_MON]: '',
+    [Slate.THANKSGIVING]: '',
     [Slate.THUR_TO_MON]: '',
   },
 };
@@ -71,6 +60,10 @@ export const SlatesStore = signalStore(
     salariesForCurrentSlate: computed(
       () => store.salaries()[store.currentSlate()]
     ),
+    isSmallSlate: computed(() => {
+      const currentSlate = store.currentSlate();
+      return currentSlate === Slate.THANKSGIVING;
+    }),
   })),
   withMethods(
     (
@@ -79,6 +72,7 @@ export const SlatesStore = signalStore(
       slatesService = inject(SlatesService)
     ) => ({
       async loadSlates() {
+        console.log('loading slates...');
         patchState(store, { isLoading: true, error: null });
         slatesService
           .getSlateData()
@@ -87,19 +81,7 @@ export const SlatesStore = signalStore(
               next: (slateData) => {
                 const { entries, id, currentSlate, salaries } = slateData[0];
 
-                const salariesForCurrentSlate = salaries[currentSlate];
-
-                const { qbs, rbs, wrs, tes, dsts } = getAvailablePlayers(
-                  30,
-                  salariesForCurrentSlate
-                );
-
                 patchState(store, {
-                  availableQuarterbacks: qbs,
-                  availableRunningBacks: rbs,
-                  availableWideReceivers: wrs,
-                  availableTightEnds: tes,
-                  availableDefenses: dsts,
                   id,
                   currentSlate,
                   entries,
@@ -145,13 +127,6 @@ export const SlatesStore = signalStore(
           .updateSlate(store.id(), slateData)
           .pipe(
             tap(() => {
-              // _matSnackBar.open('Upload saved successfully', 'Close');
-
-              // const successMessage = updates.currentSlate
-              //   ? 'Current slate saved successfully'
-              //   : 'Upload saved successfully';
-              // _matSnackBar.open(successMessage, 'Close');
-
               if (!updates.currentSlate) {
                 _matSnackBar.open('Upload saved successfully', 'Close');
               }

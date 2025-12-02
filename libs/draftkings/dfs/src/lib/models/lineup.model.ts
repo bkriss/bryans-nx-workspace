@@ -24,7 +24,7 @@ export interface Lineup {
 }
 
 export interface SimpleLineup {
-  contestDetails?: DraftKingsContestDetails;
+  contestDetails: DraftKingsContestDetails | null;
   lineupGrade: number;
   lineupId: string;
   qb: SimplePlayer | null;

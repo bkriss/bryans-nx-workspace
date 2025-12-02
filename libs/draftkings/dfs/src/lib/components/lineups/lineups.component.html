@@ -61,6 +61,7 @@
 <div class="lineup-builders-container">
   @for (lineup of lineups(); track lineup.lineupId) {
   <dfs-lineup-builder
+    [maxRemainingSalary]="maxRemainingSalary"
     [qbPool]="qbPool"
     [runningBackPool]="rbPool"
     [wideReceiverPool]="wrPool"

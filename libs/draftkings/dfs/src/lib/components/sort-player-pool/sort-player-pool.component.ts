@@ -13,6 +13,7 @@ import {
   CdkDrag,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -20,8 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Player, Quarterback, RunningBack } from '../../models';
 import { calculateGrade } from '../../utils';
-import { PlayerPoolsStore } from '../../store';
-import { MatButtonModule } from '@angular/material/button';
+import { PlayerSelectionStore } from '../../store';
 import { Position } from '../../enums';
 
 @Component({
@@ -47,7 +47,7 @@ export class SortPlayerPoolComponent {
   @Input() runningBacks: RunningBack[] = [];
   @Input() dsts: Player[] = [];
   @Output() selectPlayersBasedOnProjections = new EventEmitter<Position>();
-  private readonly playerPoolsStore = inject(PlayerPoolsStore);
+  private readonly playerSelectionStore = inject(PlayerSelectionStore);
 
   dropQuarterback(event: CdkDragDrop<Quarterback[]>) {
     moveItemInArray(this.quarterbacks, event.previousIndex, event.currentIndex);
@@ -62,7 +62,7 @@ export class SortPlayerPoolComponent {
     });
 
     console.log('Updated Quarterbacks: ', quarterbacks);
-    this.playerPoolsStore.setQuarterbacks(quarterbacks);
+    this.playerSelectionStore.setQuarterbacks(quarterbacks);
   }
 
   dropRunningBack(event: CdkDragDrop<RunningBack[]>) {
@@ -83,7 +83,7 @@ export class SortPlayerPoolComponent {
     });
 
     console.log('Updated Running Backs: ', runningBacks);
-    this.playerPoolsStore.setRunningBacks(runningBacks);
+    this.playerSelectionStore.setRunningBacks(runningBacks);
   }
 
   dropDst(event: CdkDragDrop<Player[]>) {
@@ -109,7 +109,7 @@ export class SortPlayerPoolComponent {
     });
 
     console.log('Updated DSTs: ', dsts);
-    this.playerPoolsStore.setDefenses(dsts);
+    this.playerSelectionStore.setDefenses(dsts);
   }
 
   makeSuggestedSelections() {
@@ -117,25 +117,25 @@ export class SortPlayerPoolComponent {
   }
 
   savePlayerSelections(): void {
-    this.playerPoolsStore.savePlayerPoolsToFirestore();
+    this.playerSelectionStore.saveSelectedPlayersToFirestore();
   }
 
   removePlayerFromPool(player: Player, position: Position): void {
     switch (position) {
       case Position.QB:
-        this.playerPoolsStore.removeQuarterback(player.id);
+        this.playerSelectionStore.removeQuarterback(player.id);
         break;
       case Position.RB:
-        this.playerPoolsStore.removeRunningBack(player.id);
+        this.playerSelectionStore.removeRunningBack(player.id);
         break;
       case Position.WR:
-        this.playerPoolsStore.removeWideReceiver(player.id);
+        this.playerSelectionStore.removeWideReceiver(player.id);
         break;
       case Position.TE:
-        this.playerPoolsStore.removeTightEnd(player.id);
+        this.playerSelectionStore.removeTightEnd(player.id);
         break;
       case Position.DST:
-        this.playerPoolsStore.removeDefense(player.id);
+        this.playerSelectionStore.removeDefense(player.id);
         break;
       default:
         console.warn('Unknown position: ', position);

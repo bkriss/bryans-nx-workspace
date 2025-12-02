@@ -242,5 +242,81 @@
         </button>
       </div>
     </div>
+
+    <!-- THANKSGIVING -->
+    <div class="slate-card">
+      <h3 class="text-lg mb-2 slate-title">Thanksgiving</h3>
+      <p class="mb-4">
+        If you entered contests in the
+        <span class="italic">Thanksgiving</span> slate, you can upload your CSV
+        files below.
+      </p>
+      @if (isLoading() ) {
+      <p>Loading upload statuses...</p>
+      } @else {
+
+      <ul class="list-disc mb-4 ml-4">
+        <li class="py-1">
+          DKSalaries:
+
+          <span
+            [class.text-green-500]="salaries()[slateEnum.THANKSGIVING]"
+            [class.text-red-500]="!salaries()[slateEnum.THANKSGIVING]"
+          >
+            {{
+              salaries()[slateEnum.THANKSGIVING] ? 'Uploaded' : 'Not Uploaded'
+            }}
+          </span>
+        </li>
+        <li class="py-1">
+          DKEntries:
+          <span
+            [class.text-green-500]="entries()[slateEnum.THANKSGIVING]"
+            [class.text-red-500]="!entries()[slateEnum.THANKSGIVING]"
+          >
+            {{
+              entries()[slateEnum.THANKSGIVING] ? 'Uploaded' : 'Not Uploaded'
+            }}
+          </span>
+        </li>
+      </ul>
+      }
+
+      <div class="grid gap-2 grid-flow-col justify-center">
+        <!-- Salary CSV upload for Thanksgiving Slate -->
+        <input
+          accept=".csv"
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event, slateEnum.THANKSGIVING, 'salaries')"
+          #thanksgivingSalariesInput
+        />
+        <button
+          (click)="thanksgivingSalariesInput.click()"
+          [disabled]="isLoading() || isSaving()"
+          matButton
+        >
+          <mat-icon>upload_file</mat-icon>
+          Upload DKSalaries
+        </button>
+
+        <!-- Entries CSV upload for Thanksgiving Slate -->
+        <input
+          accept=".csv"
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event, slateEnum.THANKSGIVING, 'entries')"
+          #thanksgivingEntriesInput
+        />
+        <button
+          matButton
+          (click)="thanksgivingEntriesInput.click()"
+          [disabled]="isLoading() || isSaving()"
+        >
+          <mat-icon>upload_file</mat-icon>
+          Upload DKEntries
+        </button>
+      </div>
+    </div>
   </div>
 </div>

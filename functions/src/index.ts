@@ -251,10 +251,10 @@ export const playerScoringProjections = onCall(async (request) => {
 
     const quarterbacks = simplifiedData
       .filter((p) => p.position === 'QB')
-      .slice(0, 25);
+      .slice(0, 30);
     const runningBacks = simplifiedData
       .filter((p) => p.position === 'RB')
-      .slice(0, 25);
+      .slice(0, 30);
     const wideReceivers = simplifiedData
       .filter((p) => p.position === 'WR')
       .slice(0, 65);
