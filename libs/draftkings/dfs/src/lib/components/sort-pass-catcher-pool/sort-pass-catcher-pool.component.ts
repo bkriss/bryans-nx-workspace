@@ -120,7 +120,7 @@ export class SortPassCatcherPoolComponentComponent {
   }
 
   savePassCatcherSelections(): void {
-    this.playerSelectionStore.saveSelectedPlayersToFirestore();
+    this.playerSelectionStore.saveSelectedPlayersToFirestore(this.position);
   }
 
   removePlayerFromPool(player: Player, position: Position): void {

@@ -291,33 +291,23 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   }
 
   saveQbSelections() {
-    console.log('saveQbSelections');
-    // TODO: Refactor so that we can patch each position separately without overwriting the others
-    this.playerSelectionStore.saveSelectedPlayersToFirestore();
+    this.playerSelectionStore.saveSelectedPlayersToFirestore(Position.QB);
   }
 
   saveRBSelections() {
-    console.log('saveRBSelections');
-    // TODO: Refactor so that we can patch each position separately without overwriting the others
-    this.playerSelectionStore.saveSelectedPlayersToFirestore();
+    this.playerSelectionStore.saveSelectedPlayersToFirestore(Position.RB);
   }
 
   saveWRSelections() {
-    console.log('saveWRSelections');
-    // TODO: Refactor so that we can patch each position separately without overwriting the others
-    this.playerSelectionStore.saveSelectedPlayersToFirestore();
+    this.playerSelectionStore.saveSelectedPlayersToFirestore(Position.WR);
   }
 
   saveTightEndSelections() {
-    console.log('saveTESelections');
-    // TODO: Refactor so that we can patch each position separately without overwriting the others
-    this.playerSelectionStore.saveSelectedPlayersToFirestore();
+    this.playerSelectionStore.saveSelectedPlayersToFirestore(Position.TE);
   }
 
   saveDSTSelections() {
-    console.log('saveDSTSelections');
-    // TODO: Refactor so that we can patch each position separately without overwriting the others
-    this.playerSelectionStore.saveSelectedPlayersToFirestore();
+    this.playerSelectionStore.saveSelectedPlayersToFirestore(Position.DST);
   }
 
   generateLineupBuilders() {

@@ -16,7 +16,7 @@ import {
   RunningBack,
 } from '../models/player.model';
 import { SlatesStore } from './slates.store';
-import { Slate } from '../enums';
+import { Position, Slate } from '../enums';
 import {
   PlayerPoolSelections,
   PlayerSelectionService,
@@ -65,68 +65,6 @@ export const PlayerSelectionStore = signalStore(
     ),
   })),
 
-  withMethods((store) => ({
-    removeQuarterback(id: string): void {
-      const updatedQbs = store.quarterbacks().filter((qb) => qb.id !== id);
-      patchState(store, { quarterbacks: updatedQbs });
-    },
-    removeRunningBack(id: string): void {
-      const updatedRbs = store.runningBacks().filter((rb) => rb.id !== id);
-      patchState(store, { runningBacks: updatedRbs });
-    },
-    removeWideReceiver(id: string): void {
-      const updatedWrs = store.wideReceivers().filter((wr) => wr.id !== id);
-      patchState(store, { wideReceivers: updatedWrs });
-    },
-    removeTightEnd(id: string): void {
-      const updatedTes = store.tightEnds().filter((te) => te.id !== id);
-      patchState(store, { tightEnds: updatedTes });
-    },
-    removeDefense(id: string): void {
-      const updatedDsts = store.defenses().filter((dst) => dst.id !== id);
-      patchState(store, { defenses: updatedDsts });
-    },
-    setQuarterbacks(quarterbacks: Quarterback[]): void {
-      patchState(store, { quarterbacks: [...quarterbacks] });
-    },
-    setRunningBacks(runningBacks: RunningBack[]): void {
-      patchState(store, { runningBacks: [...runningBacks] });
-    },
-    setWideReceivers(wideReceivers: PassCatcher[]): void {
-      patchState(store, { wideReceivers: [...wideReceivers] });
-    },
-    setTightEnds(tightEnds: PassCatcher[]): void {
-      patchState(store, { tightEnds: [...tightEnds] });
-    },
-    setDefenses(defenses: Player[]): void {
-      patchState(store, { defenses: [...defenses] });
-    },
-    clearAllPools(): void {
-      patchState(store, initialState);
-    },
-
-    // clearPool(position: Position): void {
-    //   switch (position) {
-    //     case Position.QB:
-    //       patchState(store, { selectedQuarterbacks: [] });
-    //       break;
-    //     case Position.RB:
-    //       patchState(store, { selectedRunningBacks: [] });
-    //       break;
-    //     case Position.WR:
-    //       patchState(store, { selectedWideReceivers: [] });
-    //       break;
-    //     case Position.TE:
-    //       patchState(store, { selectedTightEnds: [] });
-    //       break;
-    //     case Position.DST:
-    //       patchState(store, { selectedDefenses: [] });
-    //       break;
-    //   }
-    // },
-  })),
-
-  // TODO: Refactor so there is only one instance of withMethods
   withMethods(
     (
       store,
@@ -187,21 +125,31 @@ export const PlayerSelectionStore = signalStore(
           )
           .subscribe();
       },
-
-      // TODO: Refactor so that we can patch each position separately without overwriting the others
-      saveSelectedPlayersToFirestore(): void {
+      saveSelectedPlayersToFirestore(position: Position): void {
         const currentSlate: Slate = slatesStore.currentSlate();
-        const selectedPlayers: PlayerPoolSelections = {
-          quarterbacks: store.quarterbacks(),
-          runningBacks: store.runningBacks(),
-          wideReceivers: store.wideReceivers(),
-          tightEnds: store.tightEnds(),
-          defenses: store.defenses(),
-        };
+        let partial: Partial<PlayerPoolSelections> = {};
+
+        switch (position) {
+          case Position.QB:
+            partial = { quarterbacks: store.quarterbacks() };
+            break;
+          case Position.RB:
+            partial = { runningBacks: store.runningBacks() };
+            break;
+          case Position.WR:
+            partial = { wideReceivers: store.wideReceivers() };
+            break;
+          case Position.TE:
+            partial = { tightEnds: store.tightEnds() };
+            break;
+          case Position.DST:
+            partial = { defenses: store.defenses() };
+            break;
+        }
 
         patchState(store, { isSaving: true, error: null });
         playerSelectionService
-          .saveSelectedPlayers(currentSlate, selectedPlayers)
+          .saveSelectedPlayers(currentSlate, partial)
           .pipe(
             tap(() => {
               _matSnackBar.open(
@@ -223,6 +171,44 @@ export const PlayerSelectionStore = signalStore(
             finalize(() => patchState(store, { isSaving: false }))
           )
           .subscribe();
+      },
+      removeQuarterback(id: string): void {
+        const updatedQbs = store.quarterbacks().filter((qb) => qb.id !== id);
+        patchState(store, { quarterbacks: updatedQbs });
+      },
+      removeRunningBack(id: string): void {
+        const updatedRbs = store.runningBacks().filter((rb) => rb.id !== id);
+        patchState(store, { runningBacks: updatedRbs });
+      },
+      removeWideReceiver(id: string): void {
+        const updatedWrs = store.wideReceivers().filter((wr) => wr.id !== id);
+        patchState(store, { wideReceivers: updatedWrs });
+      },
+      removeTightEnd(id: string): void {
+        const updatedTes = store.tightEnds().filter((te) => te.id !== id);
+        patchState(store, { tightEnds: updatedTes });
+      },
+      removeDefense(id: string): void {
+        const updatedDsts = store.defenses().filter((dst) => dst.id !== id);
+        patchState(store, { defenses: updatedDsts });
+      },
+      setQuarterbacks(quarterbacks: Quarterback[]): void {
+        patchState(store, { quarterbacks: [...quarterbacks] });
+      },
+      setRunningBacks(runningBacks: RunningBack[]): void {
+        patchState(store, { runningBacks: [...runningBacks] });
+      },
+      setWideReceivers(wideReceivers: PassCatcher[]): void {
+        patchState(store, { wideReceivers: [...wideReceivers] });
+      },
+      setTightEnds(tightEnds: PassCatcher[]): void {
+        patchState(store, { tightEnds: [...tightEnds] });
+      },
+      setDefenses(defenses: Player[]): void {
+        patchState(store, { defenses: [...defenses] });
+      },
+      clearAllPools(): void {
+        patchState(store, initialState);
       },
     })
   )

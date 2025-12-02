@@ -45,5 +45,3 @@ export class LineupsService {
     return from(setDoc(docRef, lineups, { merge: true }));
   }
 }
-
-

@@ -51,7 +51,7 @@ export class PlayerSelectionService {
    */
   saveSelectedPlayers(
     slate: Slate,
-    players: PlayerPoolSelections
+    players: Partial<PlayerPoolSelections>
   ): Observable<void> {
     const docRef = doc(this.firestore, 'selectedPlayers', slate);
 
