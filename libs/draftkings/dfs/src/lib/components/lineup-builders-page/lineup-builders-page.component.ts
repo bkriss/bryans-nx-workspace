@@ -22,6 +22,7 @@ import {
   LineupsStore,
   PlayerSelectionStore,
   SlatesStore,
+  Flex,
 } from '@bryans-nx-workspace/draftkings-shared';
 import { LineupsComponent } from '../lineups/lineups.component';
 
@@ -93,7 +94,7 @@ export class LineupBuildersPageComponent {
       qbTeamAbbrev: string;
       qbOpposingTeamAbbrev: string;
       numberOfTeammatePassCatchersPerLineup: number;
-      requirePassCatcherFromOpposingTeam: boolean;
+      requirePlayerFromOpposingTeam: boolean;
       opponentPassCatchers: PassCatcher[];
       teammatePassCatchers: PassCatcher[];
     }
@@ -158,7 +159,7 @@ export class LineupBuildersPageComponent {
     let minOwnershipWhenPairedWithOpposingQb: number =
       passCatcher.minOwnershipPercentage;
 
-    if (relevantQbPassCatcherData.requirePassCatcherFromOpposingTeam) {
+    if (relevantQbPassCatcherData.requirePlayerFromOpposingTeam) {
       maxOwnershipWhenPairedWithOpposingQb =
         defaultOpponentPassCatcherDistributions[
           numberOfAvailableOpposingPassCatchers
@@ -186,8 +187,7 @@ export class LineupBuildersPageComponent {
         qbOpposingTeamAbbrev: qb.opposingTeamAbbrev,
         numberOfTeammatePassCatchersPerLineup:
           qb.maxNumberOfTeammatePasscatchers,
-        requirePassCatcherFromOpposingTeam:
-          qb.requirePassCatcherFromOpposingTeam,
+        requirePlayerFromOpposingTeam: qb.requirePlayerFromOpposingTeam,
         opponentPassCatchers: allPassCatchers
           .filter((pc) => pc.teamAbbrev === qb.opposingTeamAbbrev)
           .sort((a, b) => b.gradeOutOfTen - a.gradeOutOfTen),
@@ -315,9 +315,14 @@ export class LineupBuildersPageComponent {
       .sort((a, b) => b.gradeOutOfTen - a.gradeOutOfTen);
   }
 
-  findEligibleDstsForLineup(currentLineup: Lineup): Player[] {
+  findEligibleDstsForLineup(
+    currentLineup: Lineup,
+    playerToAdd?: Flex
+  ): Player[] {
     const { qb, rb1, rb2, wr1, wr2, wr3, te, flex } = currentLineup;
     const restrictedDsts: string[] = [];
+
+    // TODO: Add logic for small slates
 
     if (qb) {
       restrictedDsts.push(qb.opposingTeamAbbrev);
@@ -338,21 +343,33 @@ export class LineupBuildersPageComponent {
       restrictedDsts.push(wr1.opposingTeamAbbrev);
       restrictedDsts.push(wr1.teamAbbrev);
     }
+
     if (wr2) {
       restrictedDsts.push(wr2.opposingTeamAbbrev);
       restrictedDsts.push(wr2.teamAbbrev);
     }
+
     if (wr3) {
       restrictedDsts.push(wr3.opposingTeamAbbrev);
       restrictedDsts.push(wr3.teamAbbrev);
     }
+
     if (te) {
       restrictedDsts.push(te.opposingTeamAbbrev);
       restrictedDsts.push(te.teamAbbrev);
     }
+
     if (flex) {
       restrictedDsts.push(flex.opposingTeamAbbrev);
       restrictedDsts.push(flex.teamAbbrev);
+    }
+
+    if (playerToAdd) {
+      restrictedDsts.push(playerToAdd.opposingTeamAbbrev);
+
+      if (playerToAdd.position !== Position.RB) {
+        restrictedDsts.push(playerToAdd.teamAbbrev);
+      }
     }
 
     const eligibleDsts = this.dstPool().filter((dst) => {
@@ -373,6 +390,42 @@ export class LineupBuildersPageComponent {
     return eligibleDsts;
   }
 
+  checkIfRestOfRosterIsAffordableIfThisFlexIsAdded(
+    currentLineup: Lineup,
+    flexToAdd: Flex
+  ): boolean {
+    const { remainingSalary } = currentLineup;
+
+    const eligibleDsts = this.findEligibleDstsForLineup(
+      currentLineup,
+      flexToAdd
+    );
+    const dstsSortedBySalary = [...eligibleDsts].sort(
+      (a, b) => a.salary - b.salary
+    );
+    const costOfCheapestDst = dstsSortedBySalary?.[0]?.salary || 2500;
+    const costOfAffordableDst: number =
+      eligibleDsts.find((dst) => {
+        const totalCostIfThisDstIsUsed = flexToAdd.salary + dst.salary;
+
+        const finalRemainingSalaryIfThisDstisUsed =
+          remainingSalary - totalCostIfThisDstIsUsed;
+
+        return (
+          finalRemainingSalaryIfThisDstisUsed >= 0 &&
+          finalRemainingSalaryIfThisDstisUsed <= this.maxRemainingSalary()
+        );
+      })?.salary || costOfCheapestDst;
+
+    const finalRemainingSalary =
+      remainingSalary - (flexToAdd.salary + costOfAffordableDst);
+
+    return (
+      finalRemainingSalary >= 0 &&
+      finalRemainingSalary <= this.maxRemainingSalary()
+    );
+  }
+
   checkIfRestOfRosterIsAffordableIfThisPassCatcherIsAdded(
     currentLineup: Lineup,
     passCatcherToAdd: PassCatcher,
@@ -381,10 +434,9 @@ export class LineupBuildersPageComponent {
   ): boolean {
     const { wr1, wr2, wr3, te, flex, dst, remainingSalary } = currentLineup;
 
-    const eligibleDsts = this.findEligibleDstsForLineup(currentLineup).filter(
-      (dst) =>
-        dst.teamAbbrev !== passCatcherToAdd.teamAbbrev &&
-        dst.teamAbbrev !== passCatcherToAdd.opposingTeamAbbrev
+    const eligibleDsts = this.findEligibleDstsForLineup(
+      currentLineup,
+      passCatcherToAdd
     );
 
     // Sort defenses by salary ascending to get cost of cheapest DST first
@@ -466,7 +518,7 @@ export class LineupBuildersPageComponent {
 
             return (
               finalRemainingSalaryIfThisDstisUsed >= 0 &&
-              finalRemainingSalaryIfThisDstisUsed < this.maxRemainingSalary()
+              finalRemainingSalaryIfThisDstisUsed <= this.maxRemainingSalary()
             );
           })?.salary || costOfCheapestDst;
 
@@ -497,15 +549,13 @@ export class LineupBuildersPageComponent {
 
     // Last position (FLEX)
     if (numberOfMissingWideReceiversAfterAddingThisPlayer === 0) {
-      const biggestDifferenceInDstPrices =
-        costOfMostExpensiveDst - costOfCheapestDst;
-
       return (
         finalRemainingSalary >= 0 &&
-        finalRemainingSalary < biggestDifferenceInDstPrices
+        finalRemainingSalary <= this.maxRemainingSalary()
       );
     }
 
+    // TODO: Should this include maxRemainingSalary check?
     return finalRemainingSalary >= 0;
   }
 
@@ -532,7 +582,7 @@ export class LineupBuildersPageComponent {
         rb2.teamAbbrev,
       ];
 
-      if (qb.requirePassCatcherFromOpposingTeam) {
+      if (qb.requirePlayerFromOpposingTeam) {
         restrictedPassCatcherTeams.push(qb.opposingTeamAbbrev);
       }
     }
@@ -626,11 +676,27 @@ export class LineupBuildersPageComponent {
       let wr2: PassCatcher | null = null;
       let wr3: PassCatcher | null = null;
       let te: PassCatcher | null = null;
-      let flex: PassCatcher | null = null;
+      let flex: Flex | null = null;
       let dst: Player | null = null;
 
-      const passCatcherStacksAccountingForPlayerLimits =
+      let passCatcherStacksAccountingForPlayerLimits =
         this.generateQbPassCatcherStacksAccountingForPlayerLimits(qb);
+
+      if (!this.isSmallSlate()) {
+        // Exclude pass catcher stacks that include players from the RBs' teams
+        passCatcherStacksAccountingForPlayerLimits =
+          passCatcherStacksAccountingForPlayerLimits.filter((stack) => {
+            const passCatcherTeamAbbrevs = stack.passCatchers.map(
+              (pc) => pc.teamAbbrev
+            );
+
+            return (
+              !passCatcherTeamAbbrevs.includes(rb1.teamAbbrev) &&
+              !passCatcherTeamAbbrevs.includes(rb2.teamAbbrev)
+            );
+          });
+      }
+
       // randomly sort the stacks to reduce excessive overlap from one lineup to the next
       const randomlySortedQbPassCatcherStacks =
         passCatcherStacksAccountingForPlayerLimits.sort(
@@ -727,14 +793,14 @@ export class LineupBuildersPageComponent {
           rb2.teamAbbrev,
         ];
 
-        if (qb.requirePassCatcherFromOpposingTeam) {
+        if (qb.requirePlayerFromOpposingTeam) {
           restrictedPassCatcherTeams.push(qb.opposingTeamAbbrev);
         }
       }
 
       if (!wr1) {
         wr1 = this.findWideReceiverThatFitsBudget(
-          { ...currentLineup() },
+          currentLineup(),
           restrictedPassCatcherTeams
         );
 
@@ -755,7 +821,7 @@ export class LineupBuildersPageComponent {
 
       if (!wr2) {
         wr2 = this.findWideReceiverThatFitsBudget(
-          { ...currentLineup() },
+          currentLineup(),
           restrictedPassCatcherTeams
         );
 
@@ -776,7 +842,7 @@ export class LineupBuildersPageComponent {
 
       if (!wr3) {
         wr3 = this.findWideReceiverThatFitsBudget(
-          { ...currentLineup() },
+          currentLineup(),
           restrictedPassCatcherTeams
         );
 
@@ -797,9 +863,11 @@ export class LineupBuildersPageComponent {
 
       if (!te) {
         te = this.findTightEndThatFitsBudget(
-          { ...currentLineup() },
+          currentLineup(),
           restrictedPassCatcherTeams
         );
+
+        // TODO: If no TE found, consider ignoring ownership limits?
 
         if (te) {
           currentLineup.update((lineup) => ({
@@ -820,10 +888,24 @@ export class LineupBuildersPageComponent {
         // TODO: Find Flex That Fits Budget
 
         flex = this.findWideReceiverThatFitsBudget(
-          { ...currentLineup() },
+          currentLineup(),
           restrictedPassCatcherTeams,
           true
         );
+
+        if (!flex) {
+          console.log(
+            'could not find flex wide receiver that fits budget',
+            flex
+          );
+          // Couldn't find WR for Flex, try RB instead
+          flex = this.findRunningBackForFlexThatFitsBudget(
+            currentLineup(),
+            restrictedPassCatcherTeams
+          );
+        }
+
+        // TODO: If still no flex found, consider ignoring ownership limits for WRs?
 
         if (flex) {
           currentLineup.update((lineup) => ({
@@ -841,7 +923,7 @@ export class LineupBuildersPageComponent {
       }
 
       if (qb && rb1 && rb2 && wr1 && wr2 && wr3 && te && flex && !dst) {
-        dst = this.findDstThatFitsBudget({ ...currentLineup() });
+        dst = this.findDstThatFitsBudget(currentLineup());
       }
 
       if (dst) {
@@ -1000,6 +1082,42 @@ export class LineupBuildersPageComponent {
     );
   }
 
+  findRunningBackForFlexThatFitsBudget(
+    currentLineup: Lineup,
+    restrictedTeams: string[]
+  ): RunningBack | null {
+    const eligibleRunningBacks = this.rbPool().filter((rb) => {
+      const currentNumberOfLineupsWithThisRb = this.lineups().filter(
+        (lineup) => lineup.rb1?.id === rb.id || lineup.rb2?.id === rb.id
+      ).length;
+
+      const maxNumberAllowed = Math.ceil(
+        (rb.maxOwnershipPercentage / 100) *
+          this.currentQb().numberOfLineupsWithThisPlayer
+      );
+
+      // TODO: Add logic for small slates that allows RBs from same team as QB in flex
+
+      return (
+        !restrictedTeams.includes(rb.teamAbbrev) &&
+        currentNumberOfLineupsWithThisRb < maxNumberAllowed
+      );
+    });
+
+    const runningBack: RunningBack | null =
+      eligibleRunningBacks.find((rb) => {
+        const willThisBeAffordable =
+          this.checkIfRestOfRosterIsAffordableIfThisFlexIsAdded(
+            currentLineup,
+            rb
+          );
+
+        return willThisBeAffordable;
+      }) || null;
+
+    return runningBack;
+  }
+
   findWideReceiverThatFitsBudget(
     currentLineup: Lineup,
     restrictedPassCatcherTeams: string[],
@@ -1013,19 +1131,11 @@ export class LineupBuildersPageComponent {
       fillingFlexPosition
     );
 
-    let passCatchersToChooseFrom = [...eligibleWideReceivers];
-    if (fillingFlexPosition && this.isSmallSlate()) {
-      passCatchersToChooseFrom = [
-        ...eligibleWideReceivers,
-        ...eligibleTightEnds,
-      ];
-    }
-
     const wideReceiver: PassCatcher | null =
-      passCatchersToChooseFrom.find((wr) => {
+      eligibleWideReceivers.find((wr) => {
         const willThisBeAffordable =
           this.checkIfRestOfRosterIsAffordableIfThisPassCatcherIsAdded(
-            { ...currentLineup },
+            currentLineup,
             wr,
             eligibleWideReceivers,
             eligibleTightEnds
@@ -1042,65 +1152,21 @@ export class LineupBuildersPageComponent {
   }
 
   findDstThatFitsBudget(currentLineup: Lineup): Player | null {
-    const { qb, rb1, rb2, wr1, wr2, wr3, te, flex, remainingSalary } =
-      currentLineup;
+    const { remainingSalary } = currentLineup;
 
-    const restrictedDsts: string[] = [];
+    const eligibleDsts = this.findEligibleDstsForLineup(currentLineup);
 
-    if (!this.isSmallSlate()) {
-      if (qb) {
-        restrictedDsts.push(qb.opposingTeamAbbrev);
-        restrictedDsts.push(qb.teamAbbrev);
-      }
-      if (rb1) {
-        // Lineups can have defense and RB from same team
-        restrictedDsts.push(rb1.opposingTeamAbbrev);
-      }
-      if (rb2) {
-        // Lineups can have defense and RB from same team
-        restrictedDsts.push(rb2.opposingTeamAbbrev);
-      }
-      if (wr1) {
-        restrictedDsts.push(wr1.opposingTeamAbbrev);
-        restrictedDsts.push(wr1.teamAbbrev);
-      }
-      if (wr2) {
-        restrictedDsts.push(wr2.opposingTeamAbbrev);
-        restrictedDsts.push(wr2.teamAbbrev);
-      }
-      if (wr3) {
-        restrictedDsts.push(wr3.opposingTeamAbbrev);
-        restrictedDsts.push(wr3.teamAbbrev);
-      }
-      if (te) {
-        restrictedDsts.push(te.opposingTeamAbbrev);
-        restrictedDsts.push(te.teamAbbrev);
-      }
-      if (flex) {
-        restrictedDsts.push(flex.opposingTeamAbbrev);
-        restrictedDsts.push(flex.teamAbbrev);
-      }
-    }
-
-    // console.log('restrictedDsts for DST selection:', restrictedDsts);
-
-    // const maxRemainingSalary = this.isSmallSlate() ? 600 : 400;
-
-    // TODO: If small slate, map dsts and reduce grade for defenses that have a player in the lineup, then re-sort by grade to reduce chance they're selected
-
-    // Put most expensive DSTs first so we use as much of remaining salary as possible
-    const dst: Player | null =
-      [...this.dstPool()]
-        // .sort((a, b) => b.salary - a.salary)
+    const defense: Player | null =
+      eligibleDsts
         .sort((a, b) => b.gradeOutOfTen - a.gradeOutOfTen)
         .find(
           (dst) =>
-            !restrictedDsts.includes(dst.teamAbbrev) &&
             dst.salary <= remainingSalary &&
-            remainingSalary - dst.salary < this.maxRemainingSalary()
+            remainingSalary - dst.salary <= this.maxRemainingSalary()
         ) || null;
 
-    return dst;
+    // TODO: If small slate, map dsts and reduce grade for defenses that have a player in the lineup, then re-sort by grade to reduce chance they're selected
+    return defense;
   }
 
   generateRbCombos(numberOfRb1s: number): RunningBack[][] {
@@ -1185,7 +1251,7 @@ export class LineupBuildersPageComponent {
         }
       }
 
-      if (qb.requirePassCatcherFromOpposingTeam) {
+      if (qb.requirePlayerFromOpposingTeam) {
         for (
           let groupIndex = 0;
           groupIndex < passCatchersFromOpposingTeam.length;
@@ -1211,7 +1277,7 @@ export class LineupBuildersPageComponent {
         }
       }
 
-      const stacks = qb.requirePassCatcherFromOpposingTeam
+      const stacks = qb.requirePlayerFromOpposingTeam
         ? passCatcherCombosIncludingOpponent
         : passCatcherCombosWithoutOpponent;
 

@@ -105,7 +105,7 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   rbSelectionFormGroup = this._formBuilder.group({
     rbPoolCtrl: [
       this.selectedRunningBacks() as RunningBack[],
-      [Validators.required, Validators.minLength(6), Validators.maxLength(9)],
+      [Validators.required, Validators.minLength(6), Validators.maxLength(12)],
     ],
   });
   wrSelectionFormGroup = this._formBuilder.group({

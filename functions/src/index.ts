@@ -161,16 +161,6 @@ export const simplifyEspnReturnData = (
     .sort((a, b) => b.projectedPoints - a.projectedPoints);
 };
 
-// const findPosition = (positionId: number): Position => {
-//   const positionMap: { [key: number]: Position } = {
-//     1: Position.QB,
-//     2: Position.RB,
-//     3: Position.WR,
-//     4: Position.TE,
-//     16: Position.DST,
-//   };
-//   return positionMap[positionId];
-// };
 const findPosition = (positionId: number): string => {
   const positionMap: { [key: number]: string } = {
     1: 'QB',
@@ -185,23 +175,27 @@ const findPosition = (positionId: number): string => {
 export const playerScoringProjections = onCall(async (request) => {
   const payload = request.data.query as {
     limit: number;
+    numberOfTeams: number;
     season: number;
     week: number;
   };
 
   const leagueId = 648971614;
+  const limit = payload.limit;
+  const numberOfTeams = payload.numberOfTeams;
   const season = payload.season;
   const week = payload.week;
-  const limit = payload.limit;
   const s2 =
     'AECYIdEMl7ompig%2FI1CVi1ke8kX7u8VQ7Doo7l1ICSRCDqhg%2FHV8buAmqfjTXKFAQtvqJtGzMY5HPsc8%2FCXXJCbsfjX1YaPCEbt%2BQf6Boi3FoKmgFhH1iCDuziRn7cTgwcvsdjLYQI8XRXOpRrVbsNrySOqHJUwOEkXwOySdEPUmH4FUEhMvTxzzzjv5Vz8paNNdQN67PnSYifAePEgu2hA9YgWtiwGPr0pEKe%2FomM0BG9lMOrs72xb%2F%2FxuaYyNfY7E1%2FaWYzYZ3AMrUWbFpK9Ex1WaDuyaEmCr887imPaxGLg%3D%3D';
   const swid = '{F9A0366F-B19B-4481-AA52-06D9FC8634CA}';
 
-  if (!season || !week) {
-    logger.error('Invalid argument: season and week are required.');
+  if (!season || !week || !numberOfTeams) {
+    logger.error(
+      'Invalid argument: season, week, and numberOfTeams are required.'
+    );
     throw new HttpsError(
       'invalid-argument',
-      'The "season" and "week" fields are required.'
+      'The "season", "week", and "numberOfTeams" fields are required.'
     );
   }
 
@@ -251,19 +245,19 @@ export const playerScoringProjections = onCall(async (request) => {
 
     const quarterbacks = simplifiedData
       .filter((p) => p.position === 'QB')
-      .slice(0, 30);
+      .slice(0, numberOfTeams);
     const runningBacks = simplifiedData
       .filter((p) => p.position === 'RB')
-      .slice(0, 30);
+      .slice(0, numberOfTeams);
     const wideReceivers = simplifiedData
       .filter((p) => p.position === 'WR')
-      .slice(0, 65);
+      .slice(0, numberOfTeams * 3);
     const tightEnds = simplifiedData
       .filter((p) => p.position === 'TE')
-      .slice(0, 30);
+      .slice(0, numberOfTeams);
     const dsts = simplifiedData
       .filter((p) => p.position === 'DST')
-      .slice(0, 25);
+      .slice(0, numberOfTeams);
 
     return { quarterbacks, runningBacks, wideReceivers, tightEnds, dsts };
   } catch (err: unknown) {

@@ -125,7 +125,7 @@ export const draftKingsPlayersWithScoringProjections = (
       minOwnershipPercentage: 100,
       numberOfLineupsWithThisPlayer: 10,
       passCatcherStacks: [],
-      requirePassCatcherFromOpposingTeam: true,
+      requirePlayerFromOpposingTeam: true,
       sortOrder: 0,
     };
 

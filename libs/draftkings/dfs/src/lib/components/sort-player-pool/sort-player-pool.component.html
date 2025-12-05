@@ -101,14 +101,14 @@
 
     <div class="grid h-[56px] self-end items-center">
       <mat-slide-toggle
-        name="requirePassCatcherFromOpposingTeam"
-        [checked]="quarterbacks[i].requirePassCatcherFromOpposingTeam"
+        name="requirePlayerFromOpposingTeam"
+        [checked]="quarterbacks[i].requirePlayerFromOpposingTeam"
         (change)="
-          quarterbacks[i].requirePassCatcherFromOpposingTeam =
-            !quarterbacks[i].requirePassCatcherFromOpposingTeam
+          quarterbacks[i].requirePlayerFromOpposingTeam =
+            !quarterbacks[i].requirePlayerFromOpposingTeam
         "
       >
-        Require Opp. Pass Catcher
+        Require Opp. Player
       </mat-slide-toggle>
     </div>
 
@@ -133,7 +133,7 @@
 >
   @for (rb of runningBacks; let i = $index; track rb.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span class="rb-rank sort-order text-xl shadow-md shadow-gray-800">
@@ -185,6 +185,16 @@
       "
     >
       Use As Alternate
+    </mat-slide-toggle>
+
+    <mat-slide-toggle
+      name="allowOnlyAsFlex"
+      [checked]="runningBacks[i].allowOnlyAsFlex"
+      (change)="
+        runningBacks[i].allowOnlyAsFlex = !runningBacks[i].allowOnlyAsFlex
+      "
+    >
+      Flex Only
     </mat-slide-toggle>
 
     <div class="grid h-[56px] self-end items-center delete-icon-button">

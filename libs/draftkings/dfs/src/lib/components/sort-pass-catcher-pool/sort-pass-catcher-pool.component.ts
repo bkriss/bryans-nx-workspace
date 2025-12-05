@@ -67,12 +67,12 @@ export class SortPassCatcherPoolComponentComponent {
         }
 
         if (i > 19 && i < 25) {
-          maxOwnershipPercentage = 5;
+          maxOwnershipPercentage = 3;
           minOwnershipPercentage = 0;
         }
 
         if (i >= 25) {
-          maxOwnershipPercentage = 2;
+          maxOwnershipPercentage = 1;
           minOwnershipPercentage = 0;
         }
       }

@@ -20,7 +20,7 @@ export interface Quarterback extends Player {
   minNumberOfTeammatePasscatchers: number;
   numberOfLineupsWithThisPlayer: number;
   passCatcherStacks: PassCatcherStack[];
-  requirePassCatcherFromOpposingTeam: boolean;
+  requirePlayerFromOpposingTeam: boolean;
   sortOrder: number;
 }
 
@@ -87,5 +87,5 @@ export interface SimplePlayer {
   // salary?: number;
   // teamAbbrev?: string;
   // opposingTeamAbbrev?: string;
-  // requirePassCatcherFromOpposingTeam?: boolean;
+  // requirePlayerFromOpposingTeam?: boolean;
 }

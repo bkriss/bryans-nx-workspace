@@ -41,6 +41,7 @@ export class PlayerProjectionsService {
     const query = {
       season: 2025,
       week: 14,
+      numberOfTeams: 28,
     };
 
     return callFunction({ query }) as Observable<PlayerProjections>;

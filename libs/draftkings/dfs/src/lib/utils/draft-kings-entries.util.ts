@@ -89,6 +89,71 @@ export const earlyOnlyContestSizes = [
 
 export const mainSlateContestSizes = [
   {
+    name: 'NFL $25K Hot Route [$5K to 1st]',
+    entries: 277,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $75K Slant [2x Min Cash]',
+    entries: 9803,
+    topPrize: 7500,
+  },
+  {
+    name: 'NFL $100K Three-Point Stance [5 Entry Max]',
+    entries: 3533,
+    topPrize: 10000,
+  },
+  {
+    name: 'NFL $60K Screen Pass [5 Entry Max]',
+    entries: 4705,
+    topPrize: 6000,
+  },
+  {
+    name: 'NFL $40K Engage Eight [5 Entry Max]',
+    entries: 5882,
+    topPrize: 4000,
+  },
+  {
+    name: 'NFL $30K Nickel [5 Entry Max]',
+    entries: 7134,
+    topPrize: 3000,
+  },
+  {
+    name: 'NFL $20K Triple Option [5 Entry Max]',
+    entries: 7927,
+    topPrize: 2000,
+  },
+  {
+    name: 'NFL $15K Singleback [5 Entry Max]',
+    entries: 17800,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $20K End Zone [Single Entry]',
+    entries: 303,
+    topPrize: 2000,
+  },
+  {
+    name: 'NFL $150K Red Zone [Single Entry]',
+    entries: 3409,
+    topPrize: 15000,
+  },
+  {
+    name: 'NFL $60K Blind Side [Single Entry]',
+    entries: 2591,
+    topPrize: 6000,
+  },
+  {
+    name: 'NFL $25K Goal Line [5 Entry Max]',
+    entries: 378,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $25K Spy [Single Entry]',
+    entries: 277,
+    topPrize: 5000,
+  },
+  {
     name: 'NFL $400K Spy [$100K to 1st Single Entry]',
     entries: 4444,
     topPrize: 100000,

@@ -144,18 +144,28 @@ export class LineupsComponent {
   }
 
   checkIfTooManyPassCatchersFromSameTeam(lineup: Lineup, index: number): void {
-    const { qb, wr1, wr2, wr3, te, flex } = lineup;
+    const { qb, rb1, rb2, wr1, wr2, wr3, te, flex } = lineup;
     const teamCountForQbsPassCatchers: { [teamAbbrev: string]: number } = {};
     const teamCountForPlayersNotOnQbsTeam: { [teamAbbrev: string]: number } =
       {};
 
+    if (rb1) {
+      teamCountForPlayersNotOnQbsTeam[rb1.teamAbbrev] =
+        (teamCountForPlayersNotOnQbsTeam[rb1.teamAbbrev] || 0) + 1;
+    }
+
+    if (rb2) {
+      teamCountForPlayersNotOnQbsTeam[rb2.teamAbbrev] =
+        (teamCountForPlayersNotOnQbsTeam[rb2.teamAbbrev] || 0) + 1;
+    }
+
     [wr1, wr2, wr3, te, flex].forEach((player) => {
-      if (player?.teamAbbrev && player.teamAbbrev === qb?.teamAbbrev) {
+      if (player && player.teamAbbrev === qb?.teamAbbrev) {
         teamCountForQbsPassCatchers[player.teamAbbrev] =
           (teamCountForQbsPassCatchers[player.teamAbbrev] || 0) + 1;
       }
 
-      if (player?.teamAbbrev && player.teamAbbrev !== qb?.teamAbbrev) {
+      if (player && player.teamAbbrev !== qb?.teamAbbrev) {
         teamCountForPlayersNotOnQbsTeam[player.teamAbbrev] =
           (teamCountForPlayersNotOnQbsTeam[player.teamAbbrev] || 0) + 1;
       }
@@ -182,7 +192,7 @@ export class LineupsComponent {
     if (tooManyFromOtherTeams) {
       this.errorMessages.update((messages) => [
         ...messages,
-        `Lineup ${index + 1} has too many pass catchers from other teams`,
+        `Lineup ${index + 1} has too many players from the same team`,
       ]);
     }
   }
