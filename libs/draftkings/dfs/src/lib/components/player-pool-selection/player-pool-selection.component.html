@@ -5,7 +5,7 @@
 <mat-stepper [linear]="true" #stepper>
   <mat-step [stepControl]="qbSelectionFormGroup">
     <form [formGroup]="qbSelectionFormGroup">
-      <ng-template matStepLabel>Select 4-5 QBs</ng-template>
+      <ng-template matStepLabel>Select 4-6 QBs</ng-template>
 
       @if (isLoading()) {
       <div>Loading available players...</div>
@@ -19,11 +19,16 @@
         <mat-list-option [selected]="qb.isSelectedForPlayerPool" [value]="qb">
           <span class="qb-text-color mr-3">QB</span>
           <span class="font-bold">{{ qb.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ qb.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ qb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ qb.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ qb.projectedPointsPerDollar | number : '1.3-3' }}
+            <span class="text-xs">PTS/$100</span>
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
@@ -50,7 +55,7 @@
       }
     </form>
   </mat-step>
-  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 6-12 RBs">
+  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 7-15 RBs">
     <form [formGroup]="rbSelectionFormGroup">
       <mat-selection-list
         #rbs
@@ -61,11 +66,15 @@
         <mat-list-option [selected]="rb.isSelectedForPlayerPool" [value]="rb">
           <span class="rb-text-color mr-3">RB</span>
           <span class="font-bold">{{ rb.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ rb.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ rb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ rb.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ rb.projectedPointsPerDollar | number : '1.3-3' }} PTS/$100
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
@@ -102,11 +111,15 @@
         <mat-list-option [selected]="wr.isSelectedForPlayerPool" [value]="wr">
           <span class="wr-text-color mr-3">WR</span>
           <span class="font-bold">{{ wr.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ wr.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ wr.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ wr.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ wr.projectedPointsPerDollar | number : '1.3-3' }} PTS/$100
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
@@ -144,11 +157,15 @@
         <mat-list-option [selected]="te.isSelectedForPlayerPool" [value]="te">
           <span class="te-text-color mr-3">TE</span>
           <span class="font-bold">{{ te.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ te.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ te.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ te.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ te.projectedPointsPerDollar | number : '1.3-3' }} PTS/$100
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
@@ -175,7 +192,7 @@
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="dstSelectionFormGroup" label="Select 6-10 DSTs">
+  <mat-step [stepControl]="dstSelectionFormGroup" label="Select 8-12 DSTs">
     <form [formGroup]="dstSelectionFormGroup">
       <mat-selection-list
         #dsts
@@ -186,11 +203,15 @@
         <mat-list-option [selected]="dst.isSelectedForPlayerPool" [value]="dst">
           <span class="dst-text-color mr-3">DST</span>
           <span class="font-bold">{{ dst.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ dst.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ dst.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ dst.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ dst.projectedPointsPerDollar | number : '1.3-3' }} PTS/$100
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
@@ -221,6 +242,8 @@
     <ng-template matStepLabel>Done</ng-template>
 
     <div>
+      <dfs-qb-pass-catcher-ownership></dfs-qb-pass-catcher-ownership>
+
       <button matButton matStepperPrevious>Back</button>
       <button matButton (click)="generateLineupBuilders()">
         Generate Lineup Builders

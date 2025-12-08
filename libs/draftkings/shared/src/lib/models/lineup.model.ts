@@ -10,6 +10,7 @@ import {
 export interface Lineup {
   contestDetails?: DraftKingsContestDetails;
   lineupGrade: number;
+  lineupScore: number; // lineupGrade + totalProjectedPoints
   lineupId: string;
   qb: Quarterback | null;
   rb1: RunningBack | null;
@@ -21,11 +22,13 @@ export interface Lineup {
   flex: Flex | null;
   dst: Player | null;
   remainingSalary: number;
+  totalProjectedPoints: number;
 }
 
 export interface SimpleLineup {
   contestDetails: DraftKingsContestDetails | null;
   lineupGrade: number;
+  lineupScore: number; // lineupGrade + totalProjectedPoints
   lineupId: string;
   qb: SimplePlayer | null;
   rb1: SimplePlayer | null;
@@ -37,6 +40,7 @@ export interface SimpleLineup {
   flex: SimplePlayer | null;
   dst: SimplePlayer | null;
   remainingSalary?: number;
+  totalProjectedPoints: number;
 }
 
 export interface DraftKingsContestDetails {

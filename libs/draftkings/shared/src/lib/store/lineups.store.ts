@@ -23,6 +23,7 @@ export interface LineupsState {
   lineupsForQb3: SimpleLineup[];
   lineupsForQb4: SimpleLineup[];
   lineupsForQb5: SimpleLineup[];
+  lineupsForQb6: SimpleLineup[];
 }
 
 const initialState: LineupsState = {
@@ -34,6 +35,7 @@ const initialState: LineupsState = {
   lineupsForQb3: [],
   lineupsForQb4: [],
   lineupsForQb5: [],
+  lineupsForQb6: [],
 };
 
 export const LineupsStore = signalStore(
@@ -47,6 +49,7 @@ export const LineupsStore = signalStore(
       ...store.lineupsForQb3(),
       ...store.lineupsForQb4(),
       ...store.lineupsForQb5(),
+      ...store.lineupsForQb6(),
     ]),
     hasAnyLineups: computed(
       () =>
@@ -54,7 +57,8 @@ export const LineupsStore = signalStore(
           store.lineupsForQb2().length +
           store.lineupsForQb3().length +
           store.lineupsForQb4().length +
-          store.lineupsForQb5().length >
+          store.lineupsForQb5().length +
+          store.lineupsForQb6().length >
         0
     ),
   })),
@@ -81,6 +85,7 @@ export const LineupsStore = signalStore(
                   lineupsForQb3: lineups.lineupsForQb3 ?? [],
                   lineupsForQb4: lineups.lineupsForQb4 ?? [],
                   lineupsForQb5: lineups.lineupsForQb5 ?? [],
+                  lineupsForQb6: lineups.lineupsForQb6 ?? [],
                 });
               } else {
                 // No lineups saved yet for this slate; clear the store
@@ -153,6 +158,9 @@ export const LineupsStore = signalStore(
       },
       setLineupsForQb5(lineups: SimpleLineup[]): void {
         patchState(store, { lineupsForQb5: [...lineups] });
+      },
+      setLineupsForQb6(lineups: SimpleLineup[]): void {
+        patchState(store, { lineupsForQb6: [...lineups] });
       },
 
       clearAllLineups(): void {

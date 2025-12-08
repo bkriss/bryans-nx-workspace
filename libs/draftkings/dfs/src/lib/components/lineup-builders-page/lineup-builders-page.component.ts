@@ -770,9 +770,9 @@ export class LineupBuildersPageComponent {
       // };
       const currentLineup: WritableSignal<Lineup> = signal({
         lineupId: `${qb.id}-${i}`,
-        lineupGrade: 0,
+        lineupGrade: 0, // Will be calculated later
+        lineupScore: 0, // Will be calculated later
         qb: { ...qb, passCatcherStacks: [] },
-        // qb,
         rb1,
         rb2,
         wr1,
@@ -782,6 +782,7 @@ export class LineupBuildersPageComponent {
         flex,
         dst,
         remainingSalary: 50000 - currentCost,
+        totalProjectedPoints: 0, // Will be calculated later
       });
 
       let restrictedPassCatcherTeams: string[] = [];
@@ -885,27 +886,10 @@ export class LineupBuildersPageComponent {
       }
 
       if (!flex) {
-        // TODO: Find Flex That Fits Budget
-
-        flex = this.findWideReceiverThatFitsBudget(
+        flex = this.findFlexThatFitsBudget(
           currentLineup(),
-          restrictedPassCatcherTeams,
-          true
+          restrictedPassCatcherTeams
         );
-
-        if (!flex) {
-          console.log(
-            'could not find flex wide receiver that fits budget',
-            flex
-          );
-          // Couldn't find WR for Flex, try RB instead
-          flex = this.findRunningBackForFlexThatFitsBudget(
-            currentLineup(),
-            restrictedPassCatcherTeams
-          );
-        }
-
-        // TODO: If still no flex found, consider ignoring ownership limits for WRs?
 
         if (flex) {
           currentLineup.update((lineup) => ({
@@ -936,9 +920,17 @@ export class LineupBuildersPageComponent {
         currentCost += dst.salary;
       }
 
+      const lineupGrade = this.calculateLineupGrade(currentLineup());
+      const totalProjectedPoints = this.calculateTotalProjectedPoints(
+        currentLineup()
+      );
+      const lineupScore = lineupGrade + totalProjectedPoints;
+
       currentLineup.update((lineup) => ({
         ...lineup,
-        lineupGrade: this.calculateLineupGrade(currentLineup()),
+        lineupGrade,
+        lineupScore,
+        totalProjectedPoints,
       }));
       // currentLineup.lineupGrade = this.calculateLineupGrade(currentLineup);
 
@@ -1031,6 +1023,22 @@ export class LineupBuildersPageComponent {
     return Number(((combinedScore / 90) * 100).toFixed(3));
   }
 
+  calculateTotalProjectedPoints(lineup: Lineup): number {
+    const { qb, rb1, rb2, wr1, wr2, wr3, te, flex, dst } = lineup;
+    const totalProjectedPoints =
+      (qb?.projectedPointsAvg || 0) +
+      (rb1?.projectedPointsAvg || 0) +
+      (rb2?.projectedPointsAvg || 0) +
+      (wr1?.projectedPointsAvg || 0) +
+      (wr2?.projectedPointsAvg || 0) +
+      (wr3?.projectedPointsAvg || 0) +
+      (te?.projectedPointsAvg || 0) +
+      (flex?.projectedPointsAvg || 0) +
+      (dst?.projectedPointsAvg || 0);
+
+    return Number(totalProjectedPoints.toFixed(3));
+  }
+
   findTightEndThatFitsBudget(
     currentLineup: Lineup,
     restrictedPassCatcherTeams: string[]
@@ -1046,7 +1054,7 @@ export class LineupBuildersPageComponent {
       eligibleTightEnds.find((te) => {
         const willThisBeAffordable =
           this.checkIfRestOfRosterIsAffordableIfThisPassCatcherIsAdded(
-            { ...currentLineup }, // TODO: Once everything is working, change to just currentLineup and see if anything breaks
+            currentLineup,
             te,
             eligibleWideReceivers,
             eligibleTightEnds
@@ -1082,40 +1090,50 @@ export class LineupBuildersPageComponent {
     );
   }
 
-  findRunningBackForFlexThatFitsBudget(
+  findFlexThatFitsBudget(
     currentLineup: Lineup,
     restrictedTeams: string[]
-  ): RunningBack | null {
-    const eligibleRunningBacks = this.rbPool().filter((rb) => {
-      const currentNumberOfLineupsWithThisRb = this.lineups().filter(
-        (lineup) => lineup.rb1?.id === rb.id || lineup.rb2?.id === rb.id
-      ).length;
+  ): Flex | null {
+    const eligibleRunningBacks = this.rbPool()
+      .sort((a, b) => b.maxOwnershipPercentage - a.maxOwnershipPercentage)
+      .slice(7)
+      .filter((rb) => {
+        const currentNumberOfLineupsWithThisRb = this.lineups().filter(
+          (lineup) => lineup.rb1?.id === rb.id || lineup.rb2?.id === rb.id
+        ).length;
 
-      const maxNumberAllowed = Math.ceil(
-        (rb.maxOwnershipPercentage / 100) *
-          this.currentQb().numberOfLineupsWithThisPlayer
-      );
+        const maxNumberAllowed = Math.ceil(
+          (rb.maxOwnershipPercentage / 100) *
+            this.currentQb().numberOfLineupsWithThisPlayer
+        );
 
-      // TODO: Add logic for small slates that allows RBs from same team as QB in flex
+        // TODO: Add logic for small slates that allows RBs from same team as QB in flex
 
-      return (
-        !restrictedTeams.includes(rb.teamAbbrev) &&
-        currentNumberOfLineupsWithThisRb < maxNumberAllowed
-      );
-    });
+        return (
+          !restrictedTeams.includes(rb.teamAbbrev) &&
+          currentNumberOfLineupsWithThisRb < maxNumberAllowed
+        );
+      });
 
-    const runningBack: RunningBack | null =
-      eligibleRunningBacks.find((rb) => {
-        const willThisBeAffordable =
-          this.checkIfRestOfRosterIsAffordableIfThisFlexIsAdded(
-            currentLineup,
-            rb
-          );
+    const eligibleWideReceivers = this.findEligibleWideReceiversForLineup(
+      restrictedTeams,
+      true
+    );
 
-        return willThisBeAffordable;
-      }) || null;
+    const flex: Flex | null =
+      [...eligibleRunningBacks, ...eligibleWideReceivers]
+        .sort((a, b) => b.maxOwnershipPercentage - a.maxOwnershipPercentage)
+        .find((player) => {
+          const willThisBeAffordable =
+            this.checkIfRestOfRosterIsAffordableIfThisFlexIsAdded(
+              currentLineup,
+              player
+            );
 
-    return runningBack;
+          return willThisBeAffordable;
+        }) || null;
+
+    return flex;
   }
 
   findWideReceiverThatFitsBudget(
@@ -1362,7 +1380,9 @@ export class LineupBuildersPageComponent {
         return {
           contestDetails: lineup.contestDetails || null,
           lineupId: lineup.lineupId,
-          lineupGrade: lineup.lineupGrade,
+          lineupGrade: 0,
+          lineupScore: 0,
+          totalProjectedPoints: 0,
           qb: null,
           rb1: null,
           rb2: null,
@@ -1379,6 +1399,8 @@ export class LineupBuildersPageComponent {
         contestDetails: lineup.contestDetails || null,
         lineupId: lineup.lineupId,
         lineupGrade: lineup.lineupGrade,
+        lineupScore: lineup.lineupScore,
+        totalProjectedPoints: lineup.totalProjectedPoints,
         qb: this.convertToSimplePlayer(qb),
         rb1: this.convertToSimplePlayer(rb1),
         rb2: this.convertToSimplePlayer(rb2),
@@ -1425,6 +1447,12 @@ export class LineupBuildersPageComponent {
       this.lineupsStore.setLineupsForQb5(lineupsToSave);
       this.lineupsStore.saveLineupsToFirestore({
         lineupsForQb5: lineupsToSave,
+      });
+    } else if (sortOrder === 6) {
+      console.log('saving lineups for QB6', lineupsToSave);
+      this.lineupsStore.setLineupsForQb6(lineupsToSave);
+      this.lineupsStore.saveLineupsToFirestore({
+        lineupsForQb6: lineupsToSave,
       });
     } else {
       console.error(`Unknown sortOrder for quarterback: ${sortOrder}`);

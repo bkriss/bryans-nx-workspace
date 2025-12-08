@@ -44,7 +44,9 @@
         <span>
           {{ player.gameInfo }}
           &bull;
-          {{ player.projectedPointsPerDollar | number : '1.3-3' }} PPD
+          {{ player.projectedPointsAvg | number : '1.0-1' }} Pts &bull;
+          {{ player.projectedPointsPerDollar | number : '1.3-3' }}
+          <span class="text-xs">PTS/$100</span>
         </span>
       </span>
     </div>

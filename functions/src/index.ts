@@ -2,6 +2,9 @@ import { setGlobalOptions } from 'firebase-functions/v2';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 
+const admin = require('firebase-admin');
+admin.initializeApp();
+
 // Global options for all v2 functions
 setGlobalOptions({
   region: 'us-central1',
@@ -66,10 +69,65 @@ type FantasyFilter = {
   };
 };
 
+interface RawFantasyFootballersProjections {
+  defenses: string;
+  quarterbacks: string;
+  runningBacks: string;
+  tightEnds: string;
+  wideReceivers: string;
+}
+
+interface RawFantasyFootballersPlayer {
+  '"Name"': string;
+  '"PTS"': string;
+  '"Team"': string;
+}
+
+interface MappedFantasyFootballersPlayer {
+  name: string;
+  projectedPoints: number;
+  teamAbbrev: string;
+}
+
+// TODO: Import csvToJson from shared library
+export const csvToJson = (csvString: string): any[] => {
+  const rows = csvString.split('\n');
+  const headers = rows[0].split(',');
+  const jsonData = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const values = rows[i].split(',');
+    const obj: any = {};
+
+    for (let j = 0; j < headers.length; j++) {
+      const key = headers[j].trim();
+      const value = values[j] ? values[j].trim() : ''; // Handle potential missing values
+      obj[key] = value;
+    }
+
+    jsonData.push(obj);
+  }
+
+  return jsonData;
+};
+
+export const renderFantasyFootballersScoringProjectionsAsJson = (
+  csvData: string
+) =>
+  csvToJson(csvData).map(
+    (player: RawFantasyFootballersPlayer): MappedFantasyFootballersPlayer => {
+      return {
+        name: player['"Name"'].replace(/"/g, ''),
+        projectedPoints: Number(player['"PTS"'].replace(/"/g, '')),
+        teamAbbrev: player['"Team"'].replace(/"/g, ''),
+      };
+    }
+  );
+
 function buildFantasyFilter(
   season: number,
   week: number,
-  limit = 1000
+  limit = 500
 ): FantasyFilter {
   return {
     players: {
@@ -128,8 +186,8 @@ const findTeamAbbrev = (proTeamId: number): string => {
     28: 'WAS',
     29: 'CAR',
     30: 'JAX',
-    31: '',
-    32: '',
+    31: 'Unknown',
+    32: 'Unknown',
     33: 'BAL',
     34: 'HOU',
   };
@@ -138,15 +196,86 @@ const findTeamAbbrev = (proTeamId: number): string => {
 
 export const simplifyEspnReturnData = (
   espnPlayerData: EspnPlayerData[],
-  week: number
+  week: number,
+  fantasyFootballersProjections?: RawFantasyFootballersProjections
 ) => {
+  const { quarterbacks, runningBacks, wideReceivers, tightEnds, defenses } =
+    fantasyFootballersProjections || {};
+
+  const fantasyFootballersPlayerProjections =
+    [] as MappedFantasyFootballersPlayer[];
+  if (quarterbacks?.length) {
+    fantasyFootballersPlayerProjections.push(
+      ...renderFantasyFootballersScoringProjectionsAsJson(quarterbacks)
+    );
+  }
+  if (runningBacks?.length) {
+    fantasyFootballersPlayerProjections.push(
+      ...renderFantasyFootballersScoringProjectionsAsJson(runningBacks)
+    );
+  }
+  if (wideReceivers?.length) {
+    fantasyFootballersPlayerProjections.push(
+      ...renderFantasyFootballersScoringProjectionsAsJson(wideReceivers)
+    );
+  }
+  if (tightEnds?.length) {
+    fantasyFootballersPlayerProjections.push(
+      ...renderFantasyFootballersScoringProjectionsAsJson(tightEnds)
+    );
+  }
+  if (defenses?.length) {
+    fantasyFootballersPlayerProjections.push(
+      ...renderFantasyFootballersScoringProjectionsAsJson(defenses).map(
+        (defense) => ({
+          ...defense,
+          name: defense.name.split(' ')[1], // Use "Vikings" instead of "Minnesota Vikings"
+        })
+      )
+    );
+  }
+
   return espnPlayerData
     .map((item) => {
       const { player } = item;
 
-      const appliedTotal = player.stats?.find(
+      const espnProjectedPoints = player.stats?.find(
         (stat) => stat.scoringPeriodId === week && stat.statSourceId === 1
       )?.appliedTotal;
+
+      const fantasyFootballersPlayer = fantasyFootballersPlayerProjections.find(
+        (p) => {
+          // TODO: Add replace method for Jr., Sr., III, etc.
+          // TODO: Add replace method for D/ST so that we can stop using includes
+          const playerNameFromEspnProjections = player.fullName
+            .replace(/\./g, '')
+            .toLowerCase();
+          const playerNameFromFantasyFootballersProjections = p.name
+            .replace(/\./g, '')
+            .toLowerCase();
+
+          // TODO: Change to playerNameFromEspnProjections === playerNameFromFantasyFootballersProjections once replacements are added
+          return playerNameFromEspnProjections.includes(
+            playerNameFromFantasyFootballersProjections
+          );
+        }
+      );
+
+      if (!fantasyFootballersPlayer) {
+        logger.warn(
+          `No DFS Pass projection found for player: ${player.fullName}`
+        );
+      }
+
+      let averageProjectedPoints = 0;
+      if (espnProjectedPoints && fantasyFootballersPlayer?.projectedPoints) {
+        averageProjectedPoints =
+          (espnProjectedPoints + fantasyFootballersPlayer.projectedPoints) / 2;
+      } else if (espnProjectedPoints) {
+        averageProjectedPoints = espnProjectedPoints;
+      } else if (fantasyFootballersPlayer?.projectedPoints) {
+        averageProjectedPoints = fantasyFootballersPlayer.projectedPoints;
+      }
 
       return {
         fullName: player.fullName,
@@ -154,11 +283,14 @@ export const simplifyEspnReturnData = (
         id: player.id,
         lastName: player.lastName,
         position: findPosition(player.defaultPositionId),
-        projectedPoints: appliedTotal || 0,
+        projectedPointsAvg: averageProjectedPoints,
+        projectedPointsEspn: espnProjectedPoints || 0,
+        projectedPointsFantasyFootballers:
+          fantasyFootballersPlayer?.projectedPoints || 0,
         teamAbbrev: findTeamAbbrev(player.proTeamId),
       };
     })
-    .sort((a, b) => b.projectedPoints - a.projectedPoints);
+    .sort((a, b) => b.projectedPointsAvg - a.projectedPointsAvg);
 };
 
 const findPosition = (positionId: number): string => {
@@ -240,8 +372,18 @@ export const playerScoringProjections = onCall(async (request) => {
       };
     }
 
+    const configDocRef = admin
+      .firestore()
+      .collection('projections')
+      .doc('draftKings');
+    const fantasyFootballersProjections = await configDocRef.get();
+
     const data = (await resp.json()) as EspnPlayerData[];
-    const simplifiedData = simplifyEspnReturnData(data, week);
+    const simplifiedData = simplifyEspnReturnData(
+      data,
+      week,
+      fantasyFootballersProjections.data()
+    );
 
     const quarterbacks = simplifiedData
       .filter((p) => p.position === 'QB')

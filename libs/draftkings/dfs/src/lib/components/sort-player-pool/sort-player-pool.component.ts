@@ -73,15 +73,35 @@ export class SortPlayerPoolComponent {
     moveItemInArray(this.runningBacks, event.previousIndex, event.currentIndex);
 
     const runningBacks = this.runningBacks.map((rb, i) => {
-      const generalMax = 35 - Math.ceil(i * 2.5);
-      const generalMin = 25 - Math.ceil(i * 2.5);
+      let maxOwnershipPercentage = 0;
+      let minOwnershipPercentage = 0;
+
+      if (i >= 0 && i <= 2) {
+        maxOwnershipPercentage = 33;
+        minOwnershipPercentage = 25;
+      }
+
+      if (i >= 3) {
+        maxOwnershipPercentage = 33 - i;
+        minOwnershipPercentage = 25 - i;
+      }
+
+      if (i >= 7) {
+        maxOwnershipPercentage = 50 - Math.ceil(i * 4);
+        minOwnershipPercentage = 42 - Math.ceil(i * 4);
+      }
+
+      maxOwnershipPercentage =
+        maxOwnershipPercentage > 0 ? maxOwnershipPercentage : 1;
+      minOwnershipPercentage =
+        minOwnershipPercentage >= 0 ? minOwnershipPercentage : 0;
 
       return {
         ...rb,
         allowOnlyAsFlex: i >= 8,
         gradeOutOfTen: calculateGrade(i),
-        maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
-        minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
+        maxOwnershipPercentage,
+        minOwnershipPercentage,
         useAsAlternate: i === 7,
       };
     });
@@ -93,22 +113,22 @@ export class SortPlayerPoolComponent {
   dropDst(event: CdkDragDrop<Player[]>) {
     moveItemInArray(this.dsts, event.previousIndex, event.currentIndex);
 
-    const totalOwnershipPercentage = 125;
-
-    const maxOwnershipForTopDst = Math.ceil(
-      totalOwnershipPercentage / this.dsts.length + this.dsts.length
-    );
-
     const dsts = this.dsts.map((dst, i) => {
-      const generalMax = maxOwnershipForTopDst - Math.ceil(i * 2);
-      const generalMin =
-        maxOwnershipForTopDst - this.dsts.length - Math.ceil(i * 2);
+      let maxOwnershipPercentage = 25 - Math.ceil(i * 2);
+      let minOwnershipPercentage = maxOwnershipPercentage - 8;
+
+      if (i >= 8) {
+        maxOwnershipPercentage = 1;
+        minOwnershipPercentage = 0;
+      }
 
       return {
         ...dst,
         gradeOutOfTen: calculateGrade(i, 1),
-        maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
-        minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
+        maxOwnershipPercentage:
+          maxOwnershipPercentage >= 1 ? maxOwnershipPercentage : 1,
+        minOwnershipPercentage:
+          minOwnershipPercentage >= 0 ? minOwnershipPercentage : 0,
       };
     });
 

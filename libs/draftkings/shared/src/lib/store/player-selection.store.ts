@@ -86,26 +86,36 @@ export const PlayerSelectionStore = signalStore(
                     players.quarterbacks?.map((player) => ({
                       ...player,
                       gradeOutOfTen: +player.gradeOutOfTen,
+                      numberOfLineupsWithThisPlayer:
+                        +player.numberOfLineupsWithThisPlayer,
                     })) ?? [],
                   runningBacks:
                     players.runningBacks?.map((player) => ({
                       ...player,
                       gradeOutOfTen: +player.gradeOutOfTen,
+                      maxOwnershipPercentage: +player.maxOwnershipPercentage,
+                      minOwnershipPercentage: +player.minOwnershipPercentage,
                     })) ?? [],
                   wideReceivers:
                     players.wideReceivers?.map((player) => ({
                       ...player,
                       gradeOutOfTen: +player.gradeOutOfTen,
+                      maxOwnershipPercentage: +player.maxOwnershipPercentage,
+                      minOwnershipPercentage: +player.minOwnershipPercentage,
                     })) ?? [],
                   tightEnds:
                     players.tightEnds?.map((player) => ({
                       ...player,
                       gradeOutOfTen: +player.gradeOutOfTen,
+                      maxOwnershipPercentage: +player.maxOwnershipPercentage,
+                      minOwnershipPercentage: +player.minOwnershipPercentage,
                     })) ?? [],
                   defenses:
                     players.defenses?.map((player) => ({
                       ...player,
                       gradeOutOfTen: +player.gradeOutOfTen,
+                      maxOwnershipPercentage: +player.maxOwnershipPercentage,
+                      minOwnershipPercentage: +player.minOwnershipPercentage,
                     })) ?? [],
                 });
               }

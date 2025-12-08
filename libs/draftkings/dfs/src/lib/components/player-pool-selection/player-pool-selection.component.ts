@@ -32,11 +32,11 @@ import {
   PlayerSelectionStore,
   SlatesStore,
   PlayerProjectionsStore,
-  PlayerScoringProjection,
 } from '@bryans-nx-workspace/draftkings-shared';
 import { SortPlayerPoolComponent } from '../sort-player-pool/sort-player-pool.component';
 import { SortPassCatcherPoolComponentComponent } from '../sort-pass-catcher-pool/sort-pass-catcher-pool.component';
 import { draftKingsPlayersWithScoringProjections } from '../../utils';
+import { QbPassCatcherOwnershipComponent } from '../qb-pass-catcher-ownership/qb-pass-catcher-ownership.component';
 
 @Component({
   imports: [
@@ -47,6 +47,7 @@ import { draftKingsPlayersWithScoringProjections } from '../../utils';
     MatFormFieldModule,
     MatInputModule,
     MatListModule,
+    QbPassCatcherOwnershipComponent,
     ReactiveFormsModule,
     SortPassCatcherPoolComponentComponent,
     SortPlayerPoolComponent,
@@ -99,13 +100,13 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   qbSelectionFormGroup = this._formBuilder.group({
     qbPoolCtrl: [
       this.selectedQuarterbacks() as Quarterback[],
-      [Validators.required, Validators.minLength(4), Validators.maxLength(5)],
+      [Validators.required, Validators.minLength(4), Validators.maxLength(6)],
     ],
   });
   rbSelectionFormGroup = this._formBuilder.group({
     rbPoolCtrl: [
       this.selectedRunningBacks() as RunningBack[],
-      [Validators.required, Validators.minLength(6), Validators.maxLength(12)],
+      [Validators.required, Validators.minLength(7), Validators.maxLength(15)],
     ],
   });
   wrSelectionFormGroup = this._formBuilder.group({
@@ -123,7 +124,7 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   dstSelectionFormGroup = this._formBuilder.group({
     dstPoolCtrl: [
       this.selectedDefenses() as Player[],
-      [Validators.required, Validators.minLength(6), Validators.maxLength(10)],
+      [Validators.required, Validators.minLength(8), Validators.maxLength(12)],
     ],
   });
 
@@ -224,41 +225,6 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
           .slice(0, 30)
       );
     }
-  }
-
-  // TODO: Refactor app so projectedPointsPerDollar is added right away.
-  selectMostValuablePlayers(
-    dkPlayers: Player[],
-    playersWithProjections: PlayerScoringProjection[],
-    numberOfPlayersToReturn: number
-  ) {
-    const selectedPlayers = playersWithProjections
-      .map((espnPlayer) => {
-        const player = dkPlayers.find(
-          (dkPlayer) =>
-            dkPlayer.teamAbbrev === espnPlayer.teamAbbrev &&
-            espnPlayer.fullName.includes(dkPlayer.name)
-        );
-
-        if (!player) {
-          console.warn(
-            `Couldn't find DK match for: ${espnPlayer.fullName} (${espnPlayer.teamAbbrev})`
-          );
-        }
-        return player
-          ? {
-              ...player,
-              projectedPointsPerDollar: Number(
-                ((espnPlayer.projectedPoints / player.salary) * 100).toFixed(4)
-              ),
-            }
-          : null;
-      })
-      .filter((espnPlayer) => espnPlayer !== null);
-    // .sort((a, b) => b.projectedPointsPerDollar - a.projectedPointsPerDollar)
-    // .slice(0, numberOfPlayersToReturn);
-
-    return selectedPlayers;
   }
 
   // TODO: Remove updateSignalsWhenFormValuesChange and refactor once Signal Forms is stable

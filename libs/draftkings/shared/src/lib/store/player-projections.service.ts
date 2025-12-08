@@ -8,7 +8,9 @@ export interface PlayerScoringProjection {
   id: number;
   lastName: string;
   position: string;
-  projectedPoints: number;
+  projectedPointsAvg: number;
+  projectedPointsEspn: number;
+  projectedPointsFantasyFootballers: number;
   teamAbbrev: string;
 }
 

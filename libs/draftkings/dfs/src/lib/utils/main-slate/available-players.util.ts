@@ -1,4 +1,5 @@
 import {
+  csvToJson,
   PassCatcher,
   Player,
   Quarterback,
@@ -6,7 +7,6 @@ import {
   PlayerProjections,
   Position,
 } from '@bryans-nx-workspace/draftkings-shared';
-import { csvToJson } from '../csv-to-json.util';
 
 interface RawPlayer {
   AvgPointsPerGame: string;
@@ -48,7 +48,17 @@ export const draftKingsPlayersWithScoringProjections = (
 
   console.log('draftKingsPlayersWithScoringProjections called 2');
 
-  csvToJson(playerSalaries).forEach((rawPlayer: RawPlayer) => {
+  const teamsPlayingInThisSlate: Set<string> = new Set<string>();
+  const playerSalariesJson = csvToJson(playerSalaries);
+  playerSalariesJson.forEach((line: RawPlayer) => {
+    teamsPlayingInThisSlate.add(line.TeamAbbrev);
+  });
+
+  console.log('playerSalariesJson length: ', playerSalariesJson.length);
+
+  // TODO: Separate this by position and then slice it so that we limit the number of players we're looping through (currently going though 566)
+
+  playerSalariesJson.forEach((rawPlayer: RawPlayer) => {
     const firstName = rawPlayer.Name.split(' ')[0];
     const lastName = renderLastName(rawPlayer.Name);
     const nameAbbrev =
@@ -74,22 +84,39 @@ export const draftKingsPlayersWithScoringProjections = (
     const teamAbbrev = rawPlayer.TeamAbbrev;
 
     const matchedPlayerFromDkAndProjections = playerProjections.find(
-      (playerFromProjections) =>
-        teamAbbrev === playerFromProjections.teamAbbrev &&
-        playerFromProjections.fullName.includes(name)
+      (playerFromProjections) => {
+        // TODO: Add replace method for Jr., Sr., III, etc.
+        // TODO: Add replace method for D/ST so that we can stop using includes
+        const playerNameFromEspnProjections = playerFromProjections.fullName
+          .replace(/\./g, '')
+          .toLowerCase();
+        const playerNameFromDkSalaries = name.replace(/\./g, '').toLowerCase();
+
+        return (
+          teamAbbrev === playerFromProjections.teamAbbrev &&
+          playerNameFromEspnProjections.includes(playerNameFromDkSalaries)
+        );
+      }
     );
 
-    if (!matchedPlayerFromDkAndProjections) {
-      console.warn(
-        `Couldn't find scoring projection for: ${name} (${teamAbbrev})`
-      );
-    }
+    // if (
+    //   !matchedPlayerFromDkAndProjections &&
+    //   teamsPlayingInThisSlate.has(teamAbbrev)
+    // ) {
+    //   console.warn(
+    //     `Couldn't find scoring projection for: ${name} (${teamAbbrev})`
+    //   );
+    // }
 
-    const projectedPoints =
-      matchedPlayerFromDkAndProjections?.projectedPoints ?? 0;
+    const projectedPointsAvg =
+      matchedPlayerFromDkAndProjections?.projectedPointsAvg ?? 0;
+    const projectedPointsEspn =
+      matchedPlayerFromDkAndProjections?.projectedPointsEspn ?? 0;
+    const projectedPointsFantasyFootballers =
+      matchedPlayerFromDkAndProjections?.projectedPointsFantasyFootballers ?? 0;
 
     const projectedPointsPerDollar = Number(
-      ((projectedPoints / salary) * 100).toFixed(4)
+      ((projectedPointsAvg / salary) * 100).toFixed(4)
     );
 
     const player: Player = {
@@ -103,6 +130,9 @@ export const draftKingsPlayersWithScoringProjections = (
       nameAbbrev,
       opposingTeamAbbrev,
       position: rawPlayer.Position,
+      projectedPointsAvg,
+      projectedPointsEspn,
+      projectedPointsFantasyFootballers,
       projectedPointsPerDollar,
       salary,
       teamAbbrev,

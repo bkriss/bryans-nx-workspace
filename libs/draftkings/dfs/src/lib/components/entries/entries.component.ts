@@ -47,6 +47,7 @@ export class EntriesComponent {
   lineupsForQb3 = this.lineupsStore.lineupsForQb3;
   lineupsForQb4 = this.lineupsStore.lineupsForQb4;
   lineupsForQb5 = this.lineupsStore.lineupsForQb5;
+  lineupsForQb6 = this.lineupsStore.lineupsForQb6;
   lineupsForAllQbs: Signal<SimpleLineup[]> = computed(() => {
     return [
       ...this.lineupsForQb1(),
@@ -54,7 +55,8 @@ export class EntriesComponent {
       ...this.lineupsForQb3(),
       ...this.lineupsForQb4(),
       ...this.lineupsForQb5(),
-    ].sort((a, b) => b.lineupGrade - a.lineupGrade);
+      ...this.lineupsForQb6(),
+    ].sort((a, b) => b.lineupScore - a.lineupScore);
   });
   loadedLineups: WritableSignal<boolean> = signal(false);
   numberOfLineupsMatchNumberOfEntries = computed(() => {
@@ -75,6 +77,8 @@ export class EntriesComponent {
     'FLEX',
     'DST',
     'lineupGrade',
+    'totalProjectedPoints',
+    'lineupScore',
   ];
   entries = computed(() => {
     return this.assignLineupsToContests(this.lineupsForAllQbs());
@@ -103,7 +107,7 @@ export class EntriesComponent {
     entries: TableFriendlyDraftKingsEntry[],
     lineups: SimpleLineup[]
   ): TableFriendlyDraftKingsEntry[] {
-    const sortedLineups = lineups.sort((a, b) => b.lineupGrade - a.lineupGrade);
+    const sortedLineups = lineups.sort((a, b) => b.lineupScore - a.lineupScore);
     return entries
       .sort((a, b) => b.contestScore - a.contestScore)
       .map((entry, i) => {
@@ -138,6 +142,8 @@ export class EntriesComponent {
           FLEX_NAME: flex?.nameAbbrev || '',
           DST_NAME: dst?.nameAbbrev || '',
           lineupGrade: sortedLineups[i]?.lineupGrade || 0,
+          lineupScore: sortedLineups[i]?.lineupScore || 0,
+          totalProjectedPoints: sortedLineups[i]?.totalProjectedPoints || 0,
         };
       });
   }
@@ -157,7 +163,7 @@ export class EntriesComponent {
           flex?.onlyUseInLargerFieldContests
         );
       })
-      .sort((a, b) => b.lineupGrade - a.lineupGrade);
+      .sort((a, b) => b.lineupScore - a.lineupScore);
 
     const lineupsForRemainingContests = lineupsForAllQbs
       .filter((lineup) => {
@@ -171,7 +177,7 @@ export class EntriesComponent {
           !flex?.onlyUseInLargerFieldContests
         );
       })
-      .sort((a, b) => b.lineupGrade - a.lineupGrade);
+      .sort((a, b) => b.lineupScore - a.lineupScore);
 
     const entriesSortedBySize = [
       ...renderDraftKingsEntriesAsJson(this.draftKingsEntries()),

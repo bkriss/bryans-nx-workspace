@@ -12,6 +12,7 @@ export interface Lineups {
   lineupsForQb3: SimpleLineup[];
   lineupsForQb4: SimpleLineup[];
   lineupsForQb5: SimpleLineup[];
+  lineupsForQb6: SimpleLineup[];
 }
 
 @Injectable({

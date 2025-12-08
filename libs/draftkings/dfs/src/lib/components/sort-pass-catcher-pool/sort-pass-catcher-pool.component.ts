@@ -56,17 +56,17 @@ export class SortPassCatcherPoolComponentComponent {
     const passCatchers: PassCatcher[] = this.passCatchers.map((player, i) => {
       const { position } = player;
       let maxOwnershipPercentage =
-        position === Position.WR ? 28 - i : 23 - Math.ceil(i * 3);
+        position === Position.WR ? 26 - i : 20 - Math.ceil(i * 2);
       let minOwnershipPercentage =
-        position === Position.WR ? 22 - i : 15 - Math.ceil(i * 3);
+        position === Position.WR ? 20 - i : 14 - Math.ceil(i * 2);
 
       if (position === Position.WR) {
-        if (i > 14 && i < 20) {
-          maxOwnershipPercentage = 8;
+        if (i >= 15 && i <= 19) {
+          maxOwnershipPercentage = 5;
           minOwnershipPercentage = 0;
         }
 
-        if (i > 19 && i < 25) {
+        if (i >= 20 && i <= 24) {
           maxOwnershipPercentage = 3;
           minOwnershipPercentage = 0;
         }
@@ -77,8 +77,15 @@ export class SortPassCatcherPoolComponentComponent {
         }
       }
 
+      if (position === Position.TE) {
+        if (i >= 5) {
+          maxOwnershipPercentage = 13 - i;
+          minOwnershipPercentage = 7 - i;
+        }
+      }
+
       maxOwnershipPercentage =
-        maxOwnershipPercentage >= 2 ? maxOwnershipPercentage : 2;
+        maxOwnershipPercentage >= 0 ? maxOwnershipPercentage : 1;
       minOwnershipPercentage =
         minOwnershipPercentage >= 0 ? minOwnershipPercentage : 0;
 

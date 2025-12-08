@@ -1,5 +1,7 @@
-import { TableFriendlyDraftKingsEntry } from '@bryans-nx-workspace/draftkings-shared';
-import { csvToJson } from './csv-to-json.util';
+import {
+  csvToJson,
+  TableFriendlyDraftKingsEntry,
+} from '@bryans-nx-workspace/draftkings-shared';
 
 interface RawEntry {
   'Contest ID': string;
@@ -88,6 +90,11 @@ export const earlyOnlyContestSizes = [
 ];
 
 export const mainSlateContestSizes = [
+  {
+    name: 'NFL $15K Spy [Single Entry]',
+    entries: 166,
+    topPrize: 2500,
+  },
   {
     name: 'NFL $25K Hot Route [$5K to 1st]',
     entries: 277,
