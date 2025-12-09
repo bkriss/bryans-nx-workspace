@@ -6,14 +6,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { Position } from '../../enums';
 import {
   Lineup,
   PassCatcher,
   Player,
   PlayerOverlapReview,
+  Position,
   RunningBack,
-} from '../../models';
+} from '@bryans-nx-workspace/draftkings-shared';
 import { MatDialog } from '@angular/material/dialog';
 import { PlayerOverlapImbalanceModalComponent } from '../player-overlap-imbalance-modal/player-overlap-imbalance-modal.component';
 import { MatIconModule } from '@angular/material/icon';

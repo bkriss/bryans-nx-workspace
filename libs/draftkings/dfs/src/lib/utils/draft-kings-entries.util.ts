@@ -1,7 +1,7 @@
-import { TableFriendlyDraftKingsEntry } from '../models';
-import { csvToJson } from './csv-to-json.util';
-// import { entries } from './early-only/entries';
-import { entries } from './main-slate/entries';
+import {
+  csvToJson,
+  TableFriendlyDraftKingsEntry,
+} from '@bryans-nx-workspace/draftkings-shared';
 
 interface RawEntry {
   'Contest ID': string;
@@ -16,32 +16,7 @@ interface RawEntry {
   WR: string;
 }
 
-export const contestSizes = [
-  {
-    name: 'NFL $10K Huddle [Single Entry] (Sun-Mon)',
-    entries: 2378,
-    topPrize: 1000,
-  },
-  {
-    name: 'NFL $15K Sun-Mon Special [$5K to 1st] (Sun-Mon)',
-    entries: 1470,
-    topPrize: 5000,
-  },
-  {
-    name: 'NFL $5K Play-Action [20 Entry Max] (Sun-Mon)',
-    entries: 1981,
-    topPrize: 500,
-  },
-  {
-    name: 'NFL $3K First Down [20 Entry Max] (Sun-Mon)',
-    entries: 3567,
-    topPrize: 300,
-  },
-  {
-    name: 'NFL $5K Fair Catch [Single Entry] (Sun-Mon)',
-    entries: 490,
-    topPrize: 500,
-  },
+export const earlyOnlyContestSizes = [
   {
     name: 'NFL $25K Fair Catch [Single Entry] (Early Only)',
     entries: 2450,
@@ -56,21 +31,6 @@ export const contestSizes = [
     name: 'NFL $50K Huddle [Single Entry] (Early Only)',
     entries: 11800,
     topPrize: 5000,
-  },
-  {
-    name: 'NFL $700K Play-Action [20 Entry Max]',
-    entries: 277400,
-    topPrize: 50000,
-  },
-  {
-    name: 'NFL $100K Fair Catch [Single Entry]',
-    entries: 9803,
-    topPrize: 10000,
-  },
-  {
-    name: 'NFL $40K Front Four [$10K to 1st]',
-    entries: 11800,
-    topPrize: 10000,
   },
   {
     name: 'NFL $50K Bootleg [$10K to 1st] (Early Only)',
@@ -127,7 +87,114 @@ export const contestSizes = [
     entries: 5945,
     topPrize: 500,
   },
+];
 
+export const mainSlateContestSizes = [
+  {
+    name: 'NFL $15K Spy [Single Entry]',
+    entries: 166,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $25K Hot Route [$5K to 1st]',
+    entries: 277,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $75K Slant [2x Min Cash]',
+    entries: 9803,
+    topPrize: 7500,
+  },
+  {
+    name: 'NFL $100K Three-Point Stance [5 Entry Max]',
+    entries: 3533,
+    topPrize: 10000,
+  },
+  {
+    name: 'NFL $60K Screen Pass [5 Entry Max]',
+    entries: 4705,
+    topPrize: 6000,
+  },
+  {
+    name: 'NFL $40K Engage Eight [5 Entry Max]',
+    entries: 5882,
+    topPrize: 4000,
+  },
+  {
+    name: 'NFL $30K Nickel [5 Entry Max]',
+    entries: 7134,
+    topPrize: 3000,
+  },
+  {
+    name: 'NFL $20K Triple Option [5 Entry Max]',
+    entries: 7927,
+    topPrize: 2000,
+  },
+  {
+    name: 'NFL $15K Singleback [5 Entry Max]',
+    entries: 17800,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $20K End Zone [Single Entry]',
+    entries: 303,
+    topPrize: 2000,
+  },
+  {
+    name: 'NFL $150K Red Zone [Single Entry]',
+    entries: 3409,
+    topPrize: 15000,
+  },
+  {
+    name: 'NFL $60K Blind Side [Single Entry]',
+    entries: 2591,
+    topPrize: 6000,
+  },
+  {
+    name: 'NFL $25K Goal Line [5 Entry Max]',
+    entries: 378,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $25K Spy [Single Entry]',
+    entries: 277,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $400K Spy [$100K to 1st Single Entry]',
+    entries: 4444,
+    topPrize: 100000,
+  },
+  {
+    name: 'NFL $80K Octopus [$20K to 1st 8 Entry Max]',
+    entries: 1033,
+    topPrize: 20000,
+  },
+  {
+    name: 'NFL $30K Goal Line [3 Entry Max]',
+    entries: 454,
+    topPrize: 3000,
+  },
+  {
+    name: 'NFL $150K Spy [$25K to 1st Single Entry]',
+    entries: 1666,
+    topPrize: 25000,
+  },
+  {
+    name: 'NFL $700K Play-Action [20 Entry Max]',
+    entries: 277400,
+    topPrize: 50000,
+  },
+  {
+    name: 'NFL $100K Fair Catch [Single Entry]',
+    entries: 9803,
+    topPrize: 10000,
+  },
+  {
+    name: 'NFL $40K Front Four [$10K to 1st]',
+    entries: 11800,
+    topPrize: 10000,
+  },
   {
     name: 'NFL $15K Daily Dollar [Single Entry]',
     entries: 17800,
@@ -192,6 +259,61 @@ export const contestSizes = [
     name: 'NFL $75K Screen Pass [3 Entry Max]',
     entries: 5882,
     topPrize: 10000,
+  },
+  {
+    name: 'NFL $50K Spy [Single Entry]',
+    entries: 555,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $50K Fair Catch [Single Entry]',
+    entries: 4901,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $25K 4th and 10 [10 Entry Max $5K to 1st]',
+    entries: 728,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $25K Goal Line [3 Entry Max]',
+    entries: 378,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $20K Screen Pass [3 Entry Max]',
+    entries: 1568,
+    topPrize: 2000,
+  },
+  {
+    name: 'NFL $35K Nickel [3 Entry Max]',
+    entries: 8323,
+    topPrize: 4000,
+  },
+  {
+    name: 'NFL $10K Singleback [3 Entry Max]',
+    entries: 11800,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $25K End Zone [Single Entry $5K to 1st]',
+    entries: 378,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $75K Red Zone [Single Entry]',
+    entries: 1704,
+    topPrize: 7500,
+  },
+  {
+    name: 'NFL $35K Pylon [Single Entry]',
+    entries: 13800,
+    topPrize: 3000,
+  },
+  {
+    name: 'NFL $10K Daily Dollar [Single Entry]',
+    entries: 11800,
+    topPrize: 1000,
   },
   {
     name: 'NFL $40K Engage Eight [3 Entry Max]',
@@ -290,51 +412,175 @@ export const contestSizes = [
   },
 ];
 
-export const draftKingsEntries = csvToJson(entries)
-  .map((rawEntry: RawEntry): TableFriendlyDraftKingsEntry => {
-    const contest = contestSizes.find(
-      (contest) => contest.name === rawEntry['Contest Name']
-    );
-    const contestSize = contest?.entries || 0;
-    const topPrize = contest?.topPrize || 0;
+export const sunToMonContestSizes = [
+  {
+    name: 'NFL $10K Huddle [Single Entry] (Sun-Mon)',
+    entries: 2378,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $15K Sun-Mon Special [$5K to 1st] (Sun-Mon)',
+    entries: 1470,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $5K Play-Action [20 Entry Max] (Sun-Mon)',
+    entries: 1981,
+    topPrize: 500,
+  },
+  {
+    name: 'NFL $3K First Down [20 Entry Max] (Sun-Mon)',
+    entries: 3567,
+    topPrize: 300,
+  },
+  {
+    name: 'NFL $5K Fair Catch [Single Entry] (Sun-Mon)',
+    entries: 490,
+    topPrize: 500,
+  },
+];
 
-    if (!contestSize || !topPrize) {
-      console.warn(
-        'Could not find contest size or top prize for entry:',
-        rawEntry['Contest Name']
+export const thanksgivingContestSizes = [
+  {
+    name: 'NFL $50K Blind Side [Single Entry] (Thu)',
+    entries: 2159,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $75K Backyard Slant [2x Min Cash] (Thu)',
+    entries: 9803,
+    topPrize: 7500,
+  },
+  {
+    name: 'NFL $25K Front Four [20 Entry Max] (Thu)',
+    entries: 7431,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $12K Safety (Thu)',
+    entries: 7134,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $100K Plymouth Rock Classic [5 Entry Max] (Thu)',
+    entries: 7262,
+    topPrize: 20000,
+  },
+  {
+    name: 'NFL $40K Engage Eight [3 Entry Max] (Thu)',
+    entries: 5882,
+    topPrize: 4000,
+  },
+  {
+    name: 'NFL $25K Nickel [3 Entry Max] (Thu)',
+    entries: 5945,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $20K Triple Option [3 Entry Max] (Thu)',
+    entries: 7927,
+    topPrize: 2000,
+  },
+  {
+    name: 'NFL $10K Singleback [3 Entry Max] (Thu)',
+    entries: 11800,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $25K Blind Side [Single Entry] (Thu)',
+    entries: 1079,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $150K Fair Catch [Single Entry] (Thu)',
+    entries: 14700,
+    topPrize: 15000,
+  },
+  {
+    name: 'NFL $75K Fair Catch [Single Entry] (Thu)',
+    entries: 7352,
+    topPrize: 7500,
+  },
+  {
+    name: 'NFL $25K Fair Catch [Single Entry] (Thu)',
+    entries: 2450,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $50K Huddle [Single Entry] (Thu)',
+    entries: 11800,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $25K Huddle [Single Entry] (Thu)',
+    entries: 5945,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $30K Pumpkin Pielon [Single Entry] (Thu)',
+    entries: 11800,
+    topPrize: 3000,
+  },
+  {
+    name: 'NFL $10K Daily Dollar [Single Entry] (Thu)',
+    entries: 11800,
+    topPrize: 1000,
+  },
+];
+
+export const contestSizes = [
+  ...earlyOnlyContestSizes,
+  ...mainSlateContestSizes,
+  ...sunToMonContestSizes,
+  ...thanksgivingContestSizes,
+];
+
+export const renderDraftKingsEntriesAsJson = (entries: string) =>
+  csvToJson(entries)
+    .map((rawEntry: RawEntry): TableFriendlyDraftKingsEntry => {
+      const contest = contestSizes.find(
+        (contest) => contest.name === rawEntry['Contest Name']
       );
-    }
+      const contestSize = contest?.entries || 0;
+      const topPrize = contest?.topPrize || 0;
 
-    const entry: TableFriendlyDraftKingsEntry = {
-      'Entry ID': rawEntry['Entry ID'],
-      'Contest Name': rawEntry['Contest Name'],
-      'Contest ID': rawEntry['Contest ID'],
-      'Entry Fee': rawEntry['Entry Fee'],
-      entryFeeAsNumber: Number(rawEntry['Entry Fee'].replace('$', '')),
-      QB: '',
-      RB1: '',
-      RB2: '',
-      WR1: '',
-      WR2: '',
-      WR3: '',
-      TE: '',
-      FLEX: '',
-      DST: '',
-      QB_NAME: '',
-      RB1_NAME: '',
-      RB2_NAME: '',
-      WR1_NAME: '',
-      WR2_NAME: '',
-      WR3_NAME: '',
-      TE_NAME: '',
-      FLEX_NAME: '',
-      DST_NAME: '',
-      contestSize,
-      contestScore: contestSize ? (topPrize * 5) / contestSize : 0,
-      topPrize,
-    };
+      if (!contestSize || !topPrize) {
+        console.warn(
+          'Could not find contest size or top prize for entry:',
+          rawEntry['Contest Name']
+        );
+      }
 
-    return entry;
-  })
-  .filter((entry) => entry['Entry ID']?.length > 0)
-  .sort((a, b) => b.contestScore - a.contestScore);
+      const entry: TableFriendlyDraftKingsEntry = {
+        'Entry ID': rawEntry['Entry ID'],
+        'Contest Name': rawEntry['Contest Name'],
+        'Contest ID': rawEntry['Contest ID'],
+        'Entry Fee': rawEntry['Entry Fee'],
+        entryFeeAsNumber: Number(rawEntry['Entry Fee'].replace('$', '')),
+        QB: '',
+        RB1: '',
+        RB2: '',
+        WR1: '',
+        WR2: '',
+        WR3: '',
+        TE: '',
+        FLEX: '',
+        DST: '',
+        QB_NAME: '',
+        RB1_NAME: '',
+        RB2_NAME: '',
+        WR1_NAME: '',
+        WR2_NAME: '',
+        WR3_NAME: '',
+        TE_NAME: '',
+        FLEX_NAME: '',
+        DST_NAME: '',
+        contestSize,
+        contestScore: contestSize ? (topPrize * 5) / contestSize : 0,
+        topPrize,
+      };
+
+      return entry;
+    })
+    .filter((entry) => entry['Entry ID']?.length > 0)
+    .sort((a, b) => b.contestScore - a.contestScore);

@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterModule } from '@angular/router';
-import { HeaderComponent } from '@bryans-nx-workspace/draftkings-shared';
+import {
+  HeaderComponent,
+  SlatesStore,
+} from '@bryans-nx-workspace/draftkings-shared';
 import { NavLink } from '../models';
 
 @Component({
@@ -12,6 +15,7 @@ import { NavLink } from '../models';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
+  private readonly slatesStore = inject(SlatesStore);
   activeRoute = window.location.pathname;
   links: NavLink[] = [
     { iconName: 'upload_file', label: 'Slate', path: '/dfs/slate-setup' },
@@ -23,4 +27,8 @@ export class AppComponent {
     },
     { iconName: 'table_view', label: 'Entries', path: '/dfs/entries' },
   ];
+
+  constructor() {
+    this.slatesStore.loadSlates();
+  }
 }

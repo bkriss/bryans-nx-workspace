@@ -17,17 +17,17 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { PlayerOverlapImbalanceButtonComponent } from '../player-overlap-imbalance-button/player-overlap-imbalance-button.component';
-import { PlayerDistributionsComponent } from '../player-distributions/player-distributions.component';
-import { LineupBuilderComponent } from '../lineup-builder/lineup-builder.component';
-import { SelectSlateComponent } from '../select-slate/select-slate.component';
 import {
   Lineup,
   PassCatcher,
   Player,
   Quarterback,
   RunningBack,
-} from '../../models';
+} from '@bryans-nx-workspace/draftkings-shared';
+import { PlayerOverlapImbalanceButtonComponent } from '../player-overlap-imbalance-button/player-overlap-imbalance-button.component';
+import { PlayerDistributionsComponent } from '../player-distributions/player-distributions.component';
+import { LineupBuilderComponent } from '../lineup-builder/lineup-builder.component';
+import { SelectSlateComponent } from '../select-slate/select-slate.component';
 import { LineupValidationModalComponent } from '../lineup-validation-modal/lineup-validation-modal.component';
 
 @Component({
@@ -51,7 +51,9 @@ import { LineupValidationModalComponent } from '../lineup-validation-modal/lineu
 })
 export class LineupsComponent {
   @Input() currentQb: Signal<Quarterback> = signal({} as Quarterback);
+  @Input() isSmallSlate = false;
   @Input() lineups: Signal<Lineup[]> = signal([]);
+  @Input() maxRemainingSalary = 300;
   @Input() qbPool: Quarterback[] = [];
   @Input() rbPool: RunningBack[] = [];
   @Input() wrPool: PassCatcher[] = [];
@@ -131,7 +133,9 @@ export class LineupsComponent {
       ]);
     }
 
-    if (totalSalary < 49700) {
+    const lowestTotalSalaryAllowed = 50000 - this.maxRemainingSalary;
+
+    if (totalSalary < lowestTotalSalaryAllowed) {
       this.errorMessages.update((messages) => [
         ...messages,
         `Lineup ${index + 1} is too far under salary cap.`,
@@ -140,29 +144,43 @@ export class LineupsComponent {
   }
 
   checkIfTooManyPassCatchersFromSameTeam(lineup: Lineup, index: number): void {
-    const { qb, wr1, wr2, wr3, te, flex } = lineup;
+    const { qb, rb1, rb2, wr1, wr2, wr3, te, flex } = lineup;
     const teamCountForQbsPassCatchers: { [teamAbbrev: string]: number } = {};
     const teamCountForPlayersNotOnQbsTeam: { [teamAbbrev: string]: number } =
       {};
 
+    if (rb1) {
+      teamCountForPlayersNotOnQbsTeam[rb1.teamAbbrev] =
+        (teamCountForPlayersNotOnQbsTeam[rb1.teamAbbrev] || 0) + 1;
+    }
+
+    if (rb2) {
+      teamCountForPlayersNotOnQbsTeam[rb2.teamAbbrev] =
+        (teamCountForPlayersNotOnQbsTeam[rb2.teamAbbrev] || 0) + 1;
+    }
+
     [wr1, wr2, wr3, te, flex].forEach((player) => {
-      if (player?.teamAbbrev && player.teamAbbrev === qb?.teamAbbrev) {
+      if (player && player.teamAbbrev === qb?.teamAbbrev) {
         teamCountForQbsPassCatchers[player.teamAbbrev] =
           (teamCountForQbsPassCatchers[player.teamAbbrev] || 0) + 1;
       }
 
-      if (player?.teamAbbrev && player.teamAbbrev !== qb?.teamAbbrev) {
+      if (player && player.teamAbbrev !== qb?.teamAbbrev) {
         teamCountForPlayersNotOnQbsTeam[player.teamAbbrev] =
           (teamCountForPlayersNotOnQbsTeam[player.teamAbbrev] || 0) + 1;
       }
     });
+
+    const numberOfPassCatchersAllowedNotFromQbMatchup = this.isSmallSlate
+      ? 2
+      : 1;
 
     const tooManyFromSameTeam = Object.values(teamCountForQbsPassCatchers).some(
       (count) => count > (qb?.maxNumberOfTeammatePasscatchers || 0)
     );
     const tooManyFromOtherTeams = Object.values(
       teamCountForPlayersNotOnQbsTeam
-    ).some((count) => count > 1);
+    ).some((count) => count > numberOfPassCatchersAllowedNotFromQbMatchup);
 
     if (tooManyFromSameTeam) {
       this.errorMessages.update((messages) => [
@@ -174,12 +192,13 @@ export class LineupsComponent {
     if (tooManyFromOtherTeams) {
       this.errorMessages.update((messages) => [
         ...messages,
-        `Lineup ${index + 1} has too many pass catchers from other teams`,
+        `Lineup ${index + 1} has too many players from the same team`,
       ]);
     }
   }
 
   checkIfAnyPlayersOnSameTeamAsDst(lineup: Lineup, index: number): void {
+    if (this.isSmallSlate) return;
     const { qb, wr1, wr2, wr3, te, flex, dst } = lineup;
 
     // Not checking for RBs since it's okay for them to be paired with their DST

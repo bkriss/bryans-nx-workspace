@@ -8,8 +8,8 @@
     "@angular/forms": "20.3.9",
     "@angular/router": "20.3.9",
     "@angular/cdk": "20.2.9",
-    "@ngrx/signals": "^20.1.0",
-    "@nx/angular": "22.0.3"
+    "rxjs": "~7.8.2",
+    "@bryans-nx-workspace/draftkings-shared": "0.0.1"
   },
   "sideEffects": false
 }

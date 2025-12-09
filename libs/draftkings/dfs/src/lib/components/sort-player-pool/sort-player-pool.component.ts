@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  inject,
   Input,
   Output,
 } from '@angular/core';
@@ -12,12 +13,19 @@ import {
   CdkDrag,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { Player, Quarterback, RunningBack } from '../../models';
+import {
+  Player,
+  Quarterback,
+  RunningBack,
+  PlayerSelectionStore,
+  Position,
+} from '@bryans-nx-workspace/draftkings-shared';
 import { calculateGrade } from '../../utils';
 
 @Component({
@@ -26,6 +34,7 @@ import { calculateGrade } from '../../utils';
     CdkDropList,
     CdkDrag,
     CommonModule,
+    MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -37,12 +46,12 @@ import { calculateGrade } from '../../utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SortPlayerPoolComponent {
+  @Input() position: Position = Position.WR;
   @Input() quarterbacks: Quarterback[] = [];
   @Input() runningBacks: RunningBack[] = [];
   @Input() dsts: Player[] = [];
-  @Output() updateQuarterbacks = new EventEmitter<Quarterback[]>();
-  @Output() updateRunningBacks = new EventEmitter<RunningBack[]>();
-  @Output() updateDsts = new EventEmitter<Player[]>();
+  @Output() selectPlayersBasedOnProjections = new EventEmitter<Position>();
+  private readonly playerSelectionStore = inject(PlayerSelectionStore);
 
   dropQuarterback(event: CdkDragDrop<Quarterback[]>) {
     moveItemInArray(this.quarterbacks, event.previousIndex, event.currentIndex);
@@ -56,54 +65,105 @@ export class SortPlayerPoolComponent {
       };
     });
 
-    console.log('Updated Quarterbacks:', quarterbacks);
-    this.updateQuarterbacks.emit(quarterbacks);
+    console.log('Updated Quarterbacks: ', quarterbacks);
+    this.playerSelectionStore.setQuarterbacks(quarterbacks);
   }
 
   dropRunningBack(event: CdkDragDrop<RunningBack[]>) {
     moveItemInArray(this.runningBacks, event.previousIndex, event.currentIndex);
 
     const runningBacks = this.runningBacks.map((rb, i) => {
-      const generalMax = 35 - Math.ceil(i * 2.5);
-      const generalMin = 25 - Math.ceil(i * 2.5);
+      let maxOwnershipPercentage = 0;
+      let minOwnershipPercentage = 0;
+
+      if (i >= 0 && i <= 2) {
+        maxOwnershipPercentage = 33;
+        minOwnershipPercentage = 25;
+      }
+
+      if (i >= 3) {
+        maxOwnershipPercentage = 33 - i;
+        minOwnershipPercentage = 25 - i;
+      }
+
+      if (i >= 7) {
+        maxOwnershipPercentage = 50 - Math.ceil(i * 4);
+        minOwnershipPercentage = 42 - Math.ceil(i * 4);
+      }
+
+      maxOwnershipPercentage =
+        maxOwnershipPercentage > 0 ? maxOwnershipPercentage : 1;
+      minOwnershipPercentage =
+        minOwnershipPercentage >= 0 ? minOwnershipPercentage : 0;
 
       return {
         ...rb,
         allowOnlyAsFlex: i >= 8,
         gradeOutOfTen: calculateGrade(i),
-        maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
-        minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
+        maxOwnershipPercentage,
+        minOwnershipPercentage,
         useAsAlternate: i === 7,
       };
     });
 
-    console.log('Updated Running Backs:', runningBacks);
-    this.updateRunningBacks.emit(runningBacks);
+    console.log('Updated Running Backs: ', runningBacks);
+    this.playerSelectionStore.setRunningBacks(runningBacks);
   }
 
   dropDst(event: CdkDragDrop<Player[]>) {
     moveItemInArray(this.dsts, event.previousIndex, event.currentIndex);
 
-    const totalOwnershipPercentage = 125;
-
-    const maxOwnershipForTopDst = Math.ceil(
-      totalOwnershipPercentage / this.dsts.length + this.dsts.length
-    );
-
     const dsts = this.dsts.map((dst, i) => {
-      const generalMax = maxOwnershipForTopDst - Math.ceil(i * 2);
-      const generalMin =
-        maxOwnershipForTopDst - this.dsts.length - Math.ceil(i * 2);
+      let maxOwnershipPercentage = 25 - Math.ceil(i * 2);
+      let minOwnershipPercentage = maxOwnershipPercentage - 8;
+
+      if (i >= 8) {
+        maxOwnershipPercentage = 1;
+        minOwnershipPercentage = 0;
+      }
 
       return {
         ...dst,
         gradeOutOfTen: calculateGrade(i, 1),
-        maxOwnershipPercentage: generalMax >= 3 ? generalMax : 3,
-        minOwnershipPercentage: generalMin >= 0 ? generalMin : 0,
+        maxOwnershipPercentage:
+          maxOwnershipPercentage >= 1 ? maxOwnershipPercentage : 1,
+        minOwnershipPercentage:
+          minOwnershipPercentage >= 0 ? minOwnershipPercentage : 0,
       };
     });
 
-    console.log('Updated DSTs 1:', dsts);
-    this.updateDsts.emit(dsts);
+    console.log('Updated DSTs: ', dsts);
+    this.playerSelectionStore.setDefenses(dsts);
+  }
+
+  makeSuggestedSelections() {
+    this.selectPlayersBasedOnProjections.emit(this.position);
+  }
+
+  savePlayerSelections(): void {
+    this.playerSelectionStore.saveSelectedPlayersToFirestore(this.position);
+  }
+
+  removePlayerFromPool(player: Player, position: Position): void {
+    switch (position) {
+      case Position.QB:
+        this.playerSelectionStore.removeQuarterback(player.id);
+        break;
+      case Position.RB:
+        this.playerSelectionStore.removeRunningBack(player.id);
+        break;
+      case Position.WR:
+        this.playerSelectionStore.removeWideReceiver(player.id);
+        break;
+      case Position.TE:
+        this.playerSelectionStore.removeTightEnd(player.id);
+        break;
+      case Position.DST:
+        this.playerSelectionStore.removeDefense(player.id);
+        break;
+      default:
+        console.warn('Unknown position: ', position);
+        break;
+    }
   }
 }

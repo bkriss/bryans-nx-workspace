@@ -5,8 +5,11 @@
 <mat-stepper [linear]="true" #stepper>
   <mat-step [stepControl]="qbSelectionFormGroup">
     <form [formGroup]="qbSelectionFormGroup">
-      <ng-template matStepLabel>Select 4-5 QBs</ng-template>
+      <ng-template matStepLabel>Select 4-6 QBs</ng-template>
 
+      @if (isLoading()) {
+      <div>Loading available players...</div>
+      } @else {
       <mat-selection-list
         #qbs
         class="max-h-[385px] overflow-scroll rounded"
@@ -16,29 +19,43 @@
         <mat-list-option [selected]="qb.isSelectedForPlayerPool" [value]="qb">
           <span class="qb-text-color mr-3">QB</span>
           <span class="font-bold">{{ qb.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ qb.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ qb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ qb.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ qb.projectedPointsPerDollar | number : '1.3-3' }}
+            <span class="text-xs">PTS/$100</span>
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
 
       <dfs-sort-player-pool
         class="block mt-4"
-        [quarterbacks]="qbSelectionFormGroup.controls.qbPoolCtrl.value || []"
-        (updateQuarterbacks)="updateQuarterbacks($event)"
+        [position]="position.QB"
+        [quarterbacks]="selectedQuarterbacks()"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-player-pool>
 
       <div class="mt-1">
-        <button (click)="saveQbSelections()" matButton matStepperNext>
+        <button
+          (click)="saveQbSelections()"
+          [disabled]="!qbSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
+      }
     </form>
   </mat-step>
-  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 7-9 RBs">
+  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 7-15 RBs">
     <form [formGroup]="rbSelectionFormGroup">
       <mat-selection-list
         #rbs
@@ -49,23 +66,35 @@
         <mat-list-option [selected]="rb.isSelectedForPlayerPool" [value]="rb">
           <span class="rb-text-color mr-3">RB</span>
           <span class="font-bold">{{ rb.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ rb.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ rb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ rb.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ rb.projectedPointsPerDollar | number : '1.3-3' }} PTS/$100
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
 
       <dfs-sort-player-pool
         class="block mt-4"
-        [runningBacks]="rbSelectionFormGroup.controls.rbPoolCtrl.value || []"
-        (updateRunningBacks)="updateRunningBacks($event)"
+        [position]="position.RB"
+        [runningBacks]="selectedRunningBacks()"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-player-pool>
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
-        <button (click)="saveRBSelections()" matButton matStepperNext>
+        <button
+          (click)="saveRBSelections()"
+          [disabled]="!rbSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
@@ -82,31 +111,42 @@
         <mat-list-option [selected]="wr.isSelectedForPlayerPool" [value]="wr">
           <span class="wr-text-color mr-3">WR</span>
           <span class="font-bold">{{ wr.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ wr.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ wr.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ wr.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ wr.projectedPointsPerDollar | number : '1.3-3' }} PTS/$100
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
 
       <dfs-sort-pass-catcher-pool
         class="block mt-4"
-        [passCatchers]="wrSelectionFormGroup.controls.wrPoolCtrl.value || []"
+        [passCatchers]="selectedWideReceivers()"
         [position]="position.WR"
-        (updatePassCatchers)="updateWideReceivers($event)"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-pass-catcher-pool>
 
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
-        <button (click)="saveWRSelections()" matButton matStepperNext>
+        <button
+          (click)="saveWRSelections()"
+          [disabled]="!wrSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="teSelectionFormGroup" label="Select 4-10 TEs">
+  <mat-step [stepControl]="teSelectionFormGroup" label="Select 7-15 TEs">
     <form [formGroup]="teSelectionFormGroup">
       <mat-selection-list
         #tes
@@ -117,31 +157,42 @@
         <mat-list-option [selected]="te.isSelectedForPlayerPool" [value]="te">
           <span class="te-text-color mr-3">TE</span>
           <span class="font-bold">{{ te.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ te.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ te.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ te.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ te.projectedPointsPerDollar | number : '1.3-3' }} PTS/$100
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
 
       <dfs-sort-pass-catcher-pool
         class="block mt-4"
-        [passCatchers]="teSelectionFormGroup.controls.tePoolCtrl.value || []"
+        [passCatchers]="selectedTightEnds()"
         [position]="position.TE"
-        (updatePassCatchers)="updateTightEnds($event)"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-pass-catcher-pool>
 
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
-        <button (click)="saveTightEndSelections()" matButton matStepperNext>
+        <button
+          (click)="saveTightEndSelections()"
+          [disabled]="!teSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="dstSelectionFormGroup" label="Select 5-10 DSTs">
+  <mat-step [stepControl]="dstSelectionFormGroup" label="Select 8-12 DSTs">
     <form [formGroup]="dstSelectionFormGroup">
       <mat-selection-list
         #dsts
@@ -152,24 +203,36 @@
         <mat-list-option [selected]="dst.isSelectedForPlayerPool" [value]="dst">
           <span class="dst-text-color mr-3">DST</span>
           <span class="font-bold">{{ dst.name }}</span>
-          <span class="ml-2 text-slate-300 text-sm">
+          <span class="ml-2 text-slate-300 text-sm">{{ dst.gameInfo }}</span>
+          &bull;
+          <span class="text-slate-300 text-sm">
             {{ dst.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
           </span>
           &bull;
-          <span class="text-slate-300 text-sm">{{ dst.gameInfo }}</span>
+          <span class="text-slate-300 text-sm">
+            {{ dst.projectedPointsPerDollar | number : '1.3-3' }} PTS/$100
+          </span>
         </mat-list-option>
         }
       </mat-selection-list>
 
       <dfs-sort-player-pool
         class="block mt-4"
-        [dsts]="dstSelectionFormGroup.controls.dstPoolCtrl.value || []"
-        (updateDsts)="updateDsts($event)"
+        [dsts]="selectedDefenses()"
+        [position]="position.DST"
+        (selectPlayersBasedOnProjections)="
+          selectPlayersBasedOnProjections($event)
+        "
       ></dfs-sort-player-pool>
 
       <div class="mt-1">
         <button matButton matStepperPrevious>Back</button>
-        <button (click)="saveDSTSelections()" matButton matStepperNext>
+        <button
+          (click)="saveDSTSelections()"
+          [disabled]="!dstSelectionFormGroup.valid"
+          matButton
+          matStepperNext
+        >
           Next
         </button>
       </div>
@@ -179,6 +242,8 @@
     <ng-template matStepLabel>Done</ng-template>
 
     <div>
+      <dfs-qb-pass-catcher-ownership></dfs-qb-pass-catcher-ownership>
+
       <button matButton matStepperPrevious>Back</button>
       <button matButton (click)="generateLineupBuilders()">
         Generate Lineup Builders

@@ -7,8 +7,11 @@
 }
 
 <div class="p-4">
+  @if (isLoading()) { Loading... } @else {
   <dfs-lineups
     [currentQb]="currentQb"
+    [isSmallSlate]="isSmallSlate()"
+    [maxRemainingSalary]="maxRemainingSalary()"
     [lineups]="lineups"
     [qbPool]="qbPool()"
     [rbPool]="rbPool()"
@@ -19,4 +22,5 @@
     (selectedNewQuarterback)="selectedNewQuarterback($event)"
     (updateLineup)="updateLineup($event)"
   ></dfs-lineups>
+  }
 </div>

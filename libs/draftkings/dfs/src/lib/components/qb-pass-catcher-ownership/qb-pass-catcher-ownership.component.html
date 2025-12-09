@@ -1,0 +1,38 @@
+<div>
+  @for (qb of selectedQuarterbacks(); track qb.id) {
+
+  <div class="mb-2">
+    <h2 class="text-xl mt-4">{{ qb.name }}</h2>
+    <h3 class="text-base my-2">Wide Receivers:</h3>
+    <ul>
+      @for (wr of selectedWideReceivers(); track wr.id) {
+
+      <ng-container>
+        @if (wr.teamAbbrev === qb.teamAbbrev) {
+        <li>
+          {{ wr.name }} | {{ wr.minOwnershipWhenPairedWithQb }} -
+          {{ wr.maxOwnershipWhenPairedWithQb }}
+        </li>
+        }
+      </ng-container>
+
+      }
+    </ul>
+
+    <h3 class="text-base my-2">Tight Ends:</h3>
+    <ul>
+      @for (te of selectedTightEnds(); track te.id) {
+      <ng-container>
+        @if (te.teamAbbrev === qb.teamAbbrev) {
+        <li>
+          {{ te.name }} | {{ te.minOwnershipWhenPairedWithQb }} -
+          {{ te.maxOwnershipWhenPairedWithQb }}
+        </li>
+        }
+      </ng-container>
+      }
+    </ul>
+  </div>
+
+  }
+</div>

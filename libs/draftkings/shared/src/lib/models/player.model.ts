@@ -7,11 +7,15 @@ export interface Player {
   minOwnershipPercentage: number;
   name: string;
   nameAbbrev: string;
+  onlyUseInLargerFieldContests?: boolean;
+  opposingTeamAbbrev: string;
   position: string;
+  projectedPointsAvg: number;
+  projectedPointsEspn: number;
+  projectedPointsFantasyFootballers: number;
+  projectedPointsPerDollar: number;
   salary: number;
   teamAbbrev: string;
-  opposingTeamAbbrev: string;
-  onlyUseInLargerFieldContests?: boolean;
 }
 
 export interface Quarterback extends Player {
@@ -19,7 +23,7 @@ export interface Quarterback extends Player {
   minNumberOfTeammatePasscatchers: number;
   numberOfLineupsWithThisPlayer: number;
   passCatcherStacks: PassCatcherStack[];
-  requirePassCatcherFromOpposingTeam: boolean;
+  requirePlayerFromOpposingTeam: boolean;
   sortOrder: number;
 }
 
@@ -86,5 +90,5 @@ export interface SimplePlayer {
   // salary?: number;
   // teamAbbrev?: string;
   // opposingTeamAbbrev?: string;
-  // requirePassCatcherFromOpposingTeam?: boolean;
+  // requirePlayerFromOpposingTeam?: boolean;
 }

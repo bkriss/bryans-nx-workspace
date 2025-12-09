@@ -2,65 +2,63 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  Input,
-  OnInit,
+  effect,
+  inject,
   Signal,
   signal,
   WritableSignal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import {
-  convertJsonToCsv,
-  downloadCsvFile,
-  draftKingsEntries,
-} from '../../utils';
 import {
   DraftKingsEntry,
   Player,
   SimpleLineup,
   TableFriendlyDraftKingsEntry,
-} from '../../models';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+  Slate,
+  LineupsStore,
+  SlatesStore,
+} from '@bryans-nx-workspace/draftkings-shared';
 import {
-  lineupsForQb1,
-  lineupsForQb2,
-  lineupsForQb3,
-  lineupsForQb4,
-} from '../../utils/main-slate/lineups';
-// import {
-//   lineupsForQb1,
-//   lineupsForQb2,
-//   lineupsForQb3,
-//   lineupsForQb4,
-// } from '../../utils/early-only/lineups';
-import { Slate } from '../../enums';
+  convertJsonToCsv,
+  downloadCsvFile,
+  renderDraftKingsEntriesAsJson,
+} from '../../utils';
 
 @Component({
-  selector: 'dfs-entries',
   imports: [CommonModule, MatButtonModule, MatIconModule, MatTableModule],
   templateUrl: './entries.component.html',
   styleUrl: './entries.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EntriesComponent implements OnInit {
-  @Input() numberOfQbs = 4; // TODO: Get this from NgRx Signal Store
-  currentSlate = Slate.SUN_TO_MON; // TODO: Get this from NgRx Signal Store
-  draftKingsEntries = draftKingsEntries;
-  lineupsForQb1: WritableSignal<SimpleLineup[]> = signal([]);
-  lineupsForQb2: WritableSignal<SimpleLineup[]> = signal([]);
-  lineupsForQb3: WritableSignal<SimpleLineup[]> = signal([]);
-  lineupsForQb4: WritableSignal<SimpleLineup[]> = signal([]);
+export class EntriesComponent {
+  private readonly slatesStore = inject(SlatesStore);
+  private readonly lineupsStore = inject(LineupsStore);
+  readonly loadingLineups = this.lineupsStore.isLoading;
+  readonly loadingSlates = this.slatesStore.isLoading;
+
+  currentSlate = this.slatesStore.currentSlate();
+  draftKingsEntries = this.slatesStore.entriesForCurrentSlate;
+  isLoading = computed(() => this.loadingSlates() || this.loadingLineups());
+  lineupsForQb1 = this.lineupsStore.lineupsForQb1;
+  lineupsForQb2 = this.lineupsStore.lineupsForQb2;
+  lineupsForQb3 = this.lineupsStore.lineupsForQb3;
+  lineupsForQb4 = this.lineupsStore.lineupsForQb4;
+  lineupsForQb5 = this.lineupsStore.lineupsForQb5;
+  lineupsForQb6 = this.lineupsStore.lineupsForQb6;
   lineupsForAllQbs: Signal<SimpleLineup[]> = computed(() => {
     return [
       ...this.lineupsForQb1(),
       ...this.lineupsForQb2(),
       ...this.lineupsForQb3(),
       ...this.lineupsForQb4(),
-    ].sort((a, b) => b.lineupGrade - a.lineupGrade);
+      ...this.lineupsForQb5(),
+      ...this.lineupsForQb6(),
+    ].sort((a, b) => b.lineupScore - a.lineupScore);
   });
-
+  loadedLineups: WritableSignal<boolean> = signal(false);
   numberOfLineupsMatchNumberOfEntries = computed(() => {
     return this.lineupsForAllQbs().length === this.entries().length;
   });
@@ -79,16 +77,26 @@ export class EntriesComponent implements OnInit {
     'FLEX',
     'DST',
     'lineupGrade',
+    'totalProjectedPoints',
+    'lineupScore',
   ];
   entries = computed(() => {
     return this.assignLineupsToContests(this.lineupsForAllQbs());
   });
 
-  ngOnInit(): void {
-    this.fetchLineupsForQb1();
-    this.fetchLineupsForQb2();
-    this.fetchLineupsForQb3();
-    this.fetchLineupsForQb4();
+  constructor() {
+    effect(() => {
+      const entriesForCurrentSlate = this.slatesStore.entriesForCurrentSlate();
+
+      if (
+        !this.loadingSlates() &&
+        entriesForCurrentSlate &&
+        !this.loadedLineups()
+      ) {
+        this.loadedLineups.set(true);
+        this.lineupsStore.loadLineupsFromFirestore();
+      }
+    });
   }
 
   renderEntryPosition(player: Player): string {
@@ -99,7 +107,7 @@ export class EntriesComponent implements OnInit {
     entries: TableFriendlyDraftKingsEntry[],
     lineups: SimpleLineup[]
   ): TableFriendlyDraftKingsEntry[] {
-    const sortedLineups = lineups.sort((a, b) => b.lineupGrade - a.lineupGrade);
+    const sortedLineups = lineups.sort((a, b) => b.lineupScore - a.lineupScore);
     return entries
       .sort((a, b) => b.contestScore - a.contestScore)
       .map((entry, i) => {
@@ -134,6 +142,8 @@ export class EntriesComponent implements OnInit {
           FLEX_NAME: flex?.nameAbbrev || '',
           DST_NAME: dst?.nameAbbrev || '',
           lineupGrade: sortedLineups[i]?.lineupGrade || 0,
+          lineupScore: sortedLineups[i]?.lineupScore || 0,
+          totalProjectedPoints: sortedLineups[i]?.totalProjectedPoints || 0,
         };
       });
   }
@@ -153,7 +163,7 @@ export class EntriesComponent implements OnInit {
           flex?.onlyUseInLargerFieldContests
         );
       })
-      .sort((a, b) => b.lineupGrade - a.lineupGrade);
+      .sort((a, b) => b.lineupScore - a.lineupScore);
 
     const lineupsForRemainingContests = lineupsForAllQbs
       .filter((lineup) => {
@@ -167,11 +177,11 @@ export class EntriesComponent implements OnInit {
           !flex?.onlyUseInLargerFieldContests
         );
       })
-      .sort((a, b) => b.lineupGrade - a.lineupGrade);
+      .sort((a, b) => b.lineupScore - a.lineupScore);
 
-    const entriesSortedBySize = [...draftKingsEntries].sort(
-      (a, b) => b.contestSize - a.contestSize
-    );
+    const entriesSortedBySize = [
+      ...renderDraftKingsEntriesAsJson(this.draftKingsEntries()),
+    ].sort((a, b) => b.contestSize - a.contestSize);
     const largerFieldEntries = entriesSortedBySize.slice(
       0,
       lineupsForLargeFieldContests.length
@@ -195,37 +205,6 @@ export class EntriesComponent implements OnInit {
     ].sort((a, b) => b.contestScore - a.contestScore);
 
     return entries;
-  }
-
-  fetchLineupsForQb1(): void {
-    console.log('fetchLineupsForQb1');
-
-    // TODO: Fetch lineupsForQb1 from NgRx Signal Store Service
-    this.lineupsForQb1.set([...lineupsForQb1]);
-  }
-
-  fetchLineupsForQb2(): void {
-    if (this.numberOfQbs < 2) return;
-    console.log('fetchLineupsForQb2', lineupsForQb2);
-
-    // TODO: Fetch lineupsForQb2 from NgRx Signal Store Service
-    this.lineupsForQb2.set([...lineupsForQb2]);
-  }
-
-  fetchLineupsForQb3(): void {
-    if (this.numberOfQbs < 3) return;
-    console.log('fetchLineupsForQb3');
-
-    // TODO: Fetch lineupsForQb3 from NgRx Signal Store Service
-    this.lineupsForQb3.set([...lineupsForQb3]);
-  }
-
-  fetchLineupsForQb4(): void {
-    if (this.numberOfQbs < 4) return;
-    console.log('fetchLineupsForQb4');
-
-    // TODO: Fetch lineupsForQb4 from NgRx Signal Store Service
-    this.lineupsForQb4.set([...lineupsForQb4]);
   }
 
   downloadCsv(): void {

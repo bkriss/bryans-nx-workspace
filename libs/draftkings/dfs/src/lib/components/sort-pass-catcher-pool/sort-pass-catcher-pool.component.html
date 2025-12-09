@@ -1,8 +1,23 @@
+<div class="flex items-end justify-between mt-6 mb-4">
+  <h2 class="flex items-center text-2xl">
+    <mat-icon class="mat-icon-2xl mr-1">swap_vert</mat-icon>
+    Sort Players &amp; Set Preferences Below:
+  </h2>
+
+  <div>
+    <button class="mr-2" matFab extended (click)="makeSuggestedSelections()">
+      <mat-icon>check_box</mat-icon>
+      Make Suggested Selections
+    </button>
+
+    <button matFab extended (click)="savePassCatcherSelections()">
+      <mat-icon>save</mat-icon>
+      Save Selections
+    </button>
+  </div>
+</div>
+
 @if (passCatchers.length) {
-<h2 class="flex items-center text-xl mt-6 py-2">
-  <mat-icon class="mr-1">swap_vert</mat-icon>
-  Sort Players &amp; Set Preferences Below:
-</h2>
 <div
   cdkDropList
   class="sorted-player-list"
@@ -10,7 +25,7 @@
 >
   @for (player of passCatchers; let i = $index; track player.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span
@@ -26,7 +41,13 @@
         {{ player.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
 
         <span class="px-1">&bull;</span>
-        <span class="gray-text">{{ player.gameInfo }}</span>
+        <span>
+          {{ player.gameInfo }}
+          &bull;
+          {{ player.projectedPointsAvg | number : '1.0-1' }} Pts &bull;
+          {{ player.projectedPointsPerDollar | number : '1.3-3' }}
+          <span class="text-xs">PTS/$100</span>
+        </span>
       </span>
     </div>
 
@@ -81,90 +102,6 @@
       </div>
     </div>
 
-    <div>
-      <mat-label class="block mb-1 text-center text-gray-300">
-        Usage With QB
-      </mat-label>
-
-      <div>
-        <mat-form-field class="w-[95px] mb-0">
-          <mat-label>Min</mat-label>
-          <input
-            min="0"
-            max="70"
-            matInput
-            [value]="passCatchers[i].minOwnershipWhenPairedWithQb"
-            (input)="
-              passCatchers[i].minOwnershipWhenPairedWithQb = $any(
-                $event.target
-              ).value
-            "
-            type="number"
-          />
-          <span class="pl-1" matTextSuffix>&#37;</span>
-        </mat-form-field>
-
-        <mat-form-field class="ml-2 w-[95px] mb-0">
-          <mat-label>Max</mat-label>
-          <input
-            min="0"
-            max="90"
-            matInput
-            [value]="passCatchers[i].maxOwnershipWhenPairedWithQb"
-            (input)="
-              passCatchers[i].maxOwnershipWhenPairedWithQb = $any(
-                $event.target
-              ).value
-            "
-            type="number"
-          />
-          <span class="pl-1" matTextSuffix>&#37;</span>
-        </mat-form-field>
-      </div>
-    </div>
-
-    <div>
-      <mat-label class="block mb-1 text-center text-gray-300">
-        Usage Against QB
-      </mat-label>
-
-      <div>
-        <mat-form-field class="w-[95px] mb-0">
-          <mat-label>Min</mat-label>
-          <input
-            min="0"
-            max="50"
-            matInput
-            [value]="passCatchers[i].minOwnershipWhenPairedWithOpposingQb"
-            (input)="
-              passCatchers[i].minOwnershipWhenPairedWithOpposingQb = $any(
-                $event.target
-              ).value
-            "
-            type="number"
-          />
-          <span class="pl-1" matTextSuffix>&#37;</span>
-        </mat-form-field>
-
-        <mat-form-field class="ml-2 w-[95px] mb-0">
-          <mat-label>Max</mat-label>
-          <input
-            min="0"
-            max="70"
-            matInput
-            [value]="passCatchers[i].maxOwnershipWhenPairedWithOpposingQb"
-            (input)="
-              passCatchers[i].maxOwnershipWhenPairedWithOpposingQb = $any(
-                $event.target
-              ).value
-            "
-            type="number"
-          />
-          <span class="pl-1" matTextSuffix>&#37;</span>
-        </mat-form-field>
-      </div>
-    </div>
-
     <div class="gap-2 grid self-end">
       <mat-slide-toggle
         name="onlyUseIfPartOfStackOrPlayingWithOrAgainstQb"
@@ -188,8 +125,21 @@
         Large Field Only
       </mat-slide-toggle>
     </div>
+
+    <div class="grid h-[56px] self-end items-center delete-icon-button">
+      <button
+        aria-label="remove player button"
+        class="text-red-600"
+        (click)="removePlayerFromPool(player, position)"
+        matIconButton
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
   </div>
   }
 </div>
 
-}
+} @else { Begin by either selecting players individually from above, or click
+"Make Suggested Selections" to automatically add recommended players to your
+pool. }

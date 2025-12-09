@@ -1,4 +1,4 @@
-import { DraftKingsEntry } from '../models';
+import { DraftKingsEntry } from '@bryans-nx-workspace/draftkings-shared';
 
 export const convertJsonToCsv = (jsonData: DraftKingsEntry[]): string => {
   if (!jsonData || jsonData.length === 0) {

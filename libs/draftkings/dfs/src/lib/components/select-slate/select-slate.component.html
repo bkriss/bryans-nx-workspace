@@ -1,8 +1,9 @@
 <mat-form-field class="justify-self-end">
   <mat-label>Current Slate</mat-label>
   <mat-select
+    [disabled]="isLoading() || isSaving()"
+    [ngModel]="currentSlate()"
     (selectionChange)="selectedNewSlate($event.value)"
-    [ngModel]="currentSlate"
   >
     @for (slate of slatePool; track slate.id) {
     <mat-option [value]="slate.id">

@@ -1,9 +1,10 @@
 @use 'tailwindcss';
+@use './scss-partials/sort-player-pool';
 @use './scss-partials/material-overrides';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// @tailwind base;
+// @tailwind components;
+// @tailwind utilities;
 
 :root {
   --qb-red: #fc2b6d;

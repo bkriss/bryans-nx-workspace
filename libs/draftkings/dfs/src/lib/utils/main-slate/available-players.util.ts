@@ -1,6 +1,12 @@
-import { PassCatcher, Player, Quarterback, RunningBack } from '../../models';
-import { csvToJson } from '../csv-to-json.util';
-import { Position } from '../../enums';
+import {
+  csvToJson,
+  PassCatcher,
+  Player,
+  Quarterback,
+  RunningBack,
+  PlayerProjections,
+  Position,
+} from '@bryans-nx-workspace/draftkings-shared';
 
 interface RawPlayer {
   AvgPointsPerGame: string;
@@ -25,8 +31,34 @@ const renderLastName = (fullName: string): string => {
   return lastName;
 };
 
-export const draftKingsPlayers = (playerSalaries: string) =>
-  csvToJson(playerSalaries).map((rawPlayer: RawPlayer) => {
+export const draftKingsPlayersWithScoringProjections = (
+  playerSalaries: string,
+  projections: PlayerProjections | null
+) => {
+  console.log('draftKingsPlayersWithScoringProjections called 1');
+  const availablePlayers = {
+    quarterbacks: [] as Quarterback[],
+    runningBacks: [] as RunningBack[],
+    wideReceivers: [] as PassCatcher[],
+    tightEnds: [] as PassCatcher[],
+    defenses: [] as Player[],
+  };
+
+  if (!playerSalaries?.length || !projections) return availablePlayers;
+
+  console.log('draftKingsPlayersWithScoringProjections called 2');
+
+  const teamsPlayingInThisSlate: Set<string> = new Set<string>();
+  const playerSalariesJson = csvToJson(playerSalaries);
+  playerSalariesJson.forEach((line: RawPlayer) => {
+    teamsPlayingInThisSlate.add(line.TeamAbbrev);
+  });
+
+  console.log('playerSalariesJson length: ', playerSalariesJson.length);
+
+  // TODO: Separate this by position and then slice it so that we limit the number of players we're looping through (currently going though 566)
+
+  playerSalariesJson.forEach((rawPlayer: RawPlayer) => {
     const firstName = rawPlayer.Name.split(' ')[0];
     const lastName = renderLastName(rawPlayer.Name);
     const nameAbbrev =
@@ -39,6 +71,54 @@ export const draftKingsPlayers = (playerSalaries: string) =>
         ? gameInfo.split('@')[0]
         : gameInfo.split('@')[1];
 
+    const playerProjections = [
+      ...projections.quarterbacks,
+      ...projections.runningBacks,
+      ...projections.wideReceivers,
+      ...projections.tightEnds,
+      ...projections.dsts,
+    ];
+
+    const name = rawPlayer.Name;
+    const salary = parseInt(rawPlayer.Salary, 10);
+    const teamAbbrev = rawPlayer.TeamAbbrev;
+
+    const matchedPlayerFromDkAndProjections = playerProjections.find(
+      (playerFromProjections) => {
+        // TODO: Add replace method for Jr., Sr., III, etc.
+        // TODO: Add replace method for D/ST so that we can stop using includes
+        const playerNameFromEspnProjections = playerFromProjections.fullName
+          .replace(/\./g, '')
+          .toLowerCase();
+        const playerNameFromDkSalaries = name.replace(/\./g, '').toLowerCase();
+
+        return (
+          teamAbbrev === playerFromProjections.teamAbbrev &&
+          playerNameFromEspnProjections.includes(playerNameFromDkSalaries)
+        );
+      }
+    );
+
+    // if (
+    //   !matchedPlayerFromDkAndProjections &&
+    //   teamsPlayingInThisSlate.has(teamAbbrev)
+    // ) {
+    //   console.warn(
+    //     `Couldn't find scoring projection for: ${name} (${teamAbbrev})`
+    //   );
+    // }
+
+    const projectedPointsAvg =
+      matchedPlayerFromDkAndProjections?.projectedPointsAvg ?? 0;
+    const projectedPointsEspn =
+      matchedPlayerFromDkAndProjections?.projectedPointsEspn ?? 0;
+    const projectedPointsFantasyFootballers =
+      matchedPlayerFromDkAndProjections?.projectedPointsFantasyFootballers ?? 0;
+
+    const projectedPointsPerDollar = Number(
+      ((projectedPointsAvg / salary) * 100).toFixed(4)
+    );
+
     const player: Player = {
       gameInfo,
       gradeOutOfTen: 0,
@@ -46,12 +126,16 @@ export const draftKingsPlayers = (playerSalaries: string) =>
       isSelectedForPlayerPool: false,
       maxOwnershipPercentage: 30,
       minOwnershipPercentage: 10,
-      name: rawPlayer.Name,
+      name,
       nameAbbrev,
       opposingTeamAbbrev,
       position: rawPlayer.Position,
-      salary: parseInt(rawPlayer.Salary, 10),
-      teamAbbrev: rawPlayer.TeamAbbrev,
+      projectedPointsAvg,
+      projectedPointsEspn,
+      projectedPointsFantasyFootballers,
+      projectedPointsPerDollar,
+      salary,
+      teamAbbrev,
     };
 
     const runningBack: RunningBack = {
@@ -65,13 +149,13 @@ export const draftKingsPlayers = (playerSalaries: string) =>
 
     const quarterback: Quarterback = {
       ...player,
-      maxNumberOfTeammatePasscatchers: 2,
+      maxNumberOfTeammatePasscatchers: 1,
       minNumberOfTeammatePasscatchers: 1,
       maxOwnershipPercentage: 100,
       minOwnershipPercentage: 100,
       numberOfLineupsWithThisPlayer: 10,
       passCatcherStacks: [],
-      requirePassCatcherFromOpposingTeam: true,
+      requirePlayerFromOpposingTeam: true,
       sortOrder: 0,
     };
 
@@ -87,72 +171,30 @@ export const draftKingsPlayers = (playerSalaries: string) =>
       onlyUseInLargerFieldContests: false,
     };
 
-    if (player.position === 'QB') {
-      return quarterback;
+    if (player.position === Position.QB) {
+      // return quarterback;
+      availablePlayers.quarterbacks.push(quarterback);
     }
 
-    if (player.position === 'RB') {
-      return runningBack;
+    if (player.position === Position.RB) {
+      availablePlayers.runningBacks.push(runningBack);
+      // return runningBack;
     }
 
-    if (player.position === 'WR' || player.position === 'TE') {
-      return passCatcher;
+    if (player.position === Position.WR) {
+      availablePlayers.wideReceivers.push(passCatcher);
     }
 
-    return player;
+    if (player.position === Position.TE) {
+      availablePlayers.tightEnds.push(passCatcher);
+    }
+
+    if (player.position === Position.DST) {
+      availablePlayers.defenses.push(player);
+    }
+
+    // return player;
   });
 
-const availableQuarterbacks = (numberOfTeams: number, playerSalaries: string) =>
-  draftKingsPlayers(playerSalaries)
-    .filter((player) => player.position === 'QB')
-    .slice(0, numberOfTeams)
-    .map((player) => ({
-      ...player,
-      maxNumberOfTeammatePasscatchers: 2,
-      minNumberOfTeammatePasscatchers: 1,
-      numberOfLineupsWithThisPlayer: 0,
-      passCatcherStacks: [],
-      requirePassCatcherFromOpposingTeam: true,
-      sortOrder: 0,
-    })) as Quarterback[];
-
-const availableRunningBacks = (numberOfTeams: number, playerSalaries: string) =>
-  draftKingsPlayers(playerSalaries)
-    .filter((player) => player.position === 'RB')
-    .slice(0, numberOfTeams * 2) as RunningBack[];
-const availableWideReceivers = (
-  numberOfTeams: number,
-  playerSalaries: string
-) =>
-  draftKingsPlayers(playerSalaries)
-    .filter((player) => player.position === 'WR')
-    .slice(0, numberOfTeams * 4)
-    .map((player) => ({
-      ...player,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    })) as PassCatcher[];
-const availableTightEnds = (numberOfTeams: number, playerSalaries: string) =>
-  draftKingsPlayers(playerSalaries)
-    .filter((player) => player.position === 'TE')
-    .slice(0, numberOfTeams)
-    .map((player) => ({
-      ...player,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-    })) as PassCatcher[];
-const availableDefenses = (playerSalaries: string) =>
-  draftKingsPlayers(playerSalaries).filter(
-    (player) => player.position === Position.DST
-  ) as Player[];
-
-export const getAvailablePlayers = (
-  numberOfTeams: number,
-  playerSalaries: string
-) => {
-  const qbs = availableQuarterbacks(numberOfTeams, playerSalaries);
-  const rbs = availableRunningBacks(numberOfTeams, playerSalaries);
-  const wrs = availableWideReceivers(numberOfTeams, playerSalaries);
-  const tes = availableTightEnds(numberOfTeams, playerSalaries);
-  const dsts = availableDefenses(playerSalaries);
-
-  return { qbs, rbs, wrs, tes, dsts };
+  return availablePlayers;
 };

@@ -1,14 +1,22 @@
 <div class="p-4">
   <div class="grid justify-between gap-1 grid-flow-col mb-4">
-    <h1 class="text-2xl self-end">DraftKings Entries</h1>
+    <h1 class="text-2xl self-end">
+      DraftKings Entries ({{ entries().length }})
+    </h1>
     <div>
-      <button class="" matFab extended (click)="downloadCsv()">
+      <button
+        (click)="downloadCsv()"
+        [disabled]="!entries().length"
+        extended
+        matFab
+      >
         <mat-icon>download</mat-icon>
         Download CSV
       </button>
     </div>
   </div>
 
+  @if (isLoading()) { Loading... } @else {
   <table mat-table [dataSource]="entries()" class="mat-elevation-z8">
     <!-- Entry ID -->
     <ng-container matColumnDef="entryID">
@@ -112,7 +120,24 @@
       </td>
     </ng-container>
 
+    <!-- Projected Points -->
+    <ng-container matColumnDef="totalProjectedPoints">
+      <th mat-header-cell *matHeaderCellDef>TPP</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element['totalProjectedPoints'] | number : '1.0-1' }}
+      </td>
+    </ng-container>
+
+    <!-- Projected Points -->
+    <ng-container matColumnDef="lineupScore">
+      <th mat-header-cell *matHeaderCellDef>Score</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element['lineupScore'] | number : '1.0-1' }}
+      </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
+  }
 </div>

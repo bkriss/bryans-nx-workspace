@@ -1,9 +1,24 @@
-@if (quarterbacks.length || runningBacks.length || dsts.length){
-<h2 class="flex items-center text-xl mt-6 py-2">
-  <mat-icon class="mr-1">swap_vert</mat-icon>
-  Sort Players &amp; Set Preferences Below:
-</h2>
-} @if (quarterbacks.length > 0 ){
+<div class="flex items-end justify-between mt-6 mb-4">
+  <h2 class="flex items-center text-2xl">
+    <mat-icon class="mat-icon-2xl mr-1">swap_vert</mat-icon>
+    Sort Players &amp; Set Preferences Below:
+  </h2>
+
+  <div>
+    <button class="mr-2" matFab extended (click)="makeSuggestedSelections()">
+      <mat-icon>check_box</mat-icon>
+      Make Suggested Selections
+    </button>
+
+    <button matFab extended (click)="savePlayerSelections()">
+      <mat-icon>save</mat-icon>
+      Save Selections
+    </button>
+  </div>
+</div>
+
+<!-- TODO: Create reusable component for each position to reduce repeat code -->
+@if (quarterbacks.length > 0 ) {
 <div
   cdkDropList
   class="sorted-player-list"
@@ -11,7 +26,7 @@
 >
   @for (qb of quarterbacks; let i = $index; track qb.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span class="qb-rank sort-order text-xl">
@@ -23,7 +38,13 @@
         {{ qb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
 
         <span class="px-1">&bull;</span>
-        <span>{{ qb.gameInfo }}</span>
+        <span>
+          {{ qb.gameInfo }}
+          &bull;
+          {{ qb.projectedPointsAvg | number : '1.0-1' }} Pts &bull;
+          {{ qb.projectedPointsPerDollar | number : '1.3-3' }}
+          <span class="text-xs">PTS/$100</span>
+        </span>
       </span>
     </div>
 
@@ -83,15 +104,26 @@
 
     <div class="grid h-[56px] self-end items-center">
       <mat-slide-toggle
-        name="requirePassCatcherFromOpposingTeam"
-        [checked]="quarterbacks[i].requirePassCatcherFromOpposingTeam"
+        name="requirePlayerFromOpposingTeam"
+        [checked]="quarterbacks[i].requirePlayerFromOpposingTeam"
         (change)="
-          quarterbacks[i].requirePassCatcherFromOpposingTeam =
-            !quarterbacks[i].requirePassCatcherFromOpposingTeam
+          quarterbacks[i].requirePlayerFromOpposingTeam =
+            !quarterbacks[i].requirePlayerFromOpposingTeam
         "
       >
-        Require Opp. Pass Catcher
+        Require Opp. Player
       </mat-slide-toggle>
+    </div>
+
+    <div class="grid h-[56px] self-end items-center delete-icon-button">
+      <button
+        aria-label="remove player button"
+        class="text-red-600"
+        (click)="removePlayerFromPool(qb, position)"
+        matIconButton
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
     </div>
   </div>
   }
@@ -104,7 +136,7 @@
 >
   @for (rb of runningBacks; let i = $index; track rb.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span class="rb-rank sort-order text-xl shadow-md shadow-gray-800">
@@ -116,7 +148,13 @@
         {{ rb.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
 
         <span class="px-1">&bull;</span>
-        <span>{{ rb.gameInfo }}</span>
+        <span>
+          {{ rb.gameInfo }}
+          &bull;
+          {{ rb.projectedPointsAvg | number : '1.0-1' }} Pts &bull;
+          {{ rb.projectedPointsPerDollar | number : '1.3-3' }}
+          <span class="text-xs">PTS/$100</span>
+        </span>
       </span>
     </div>
 
@@ -153,6 +191,27 @@
     >
       Use As Alternate
     </mat-slide-toggle>
+
+    <mat-slide-toggle
+      name="allowOnlyAsFlex"
+      [checked]="runningBacks[i].allowOnlyAsFlex"
+      (change)="
+        runningBacks[i].allowOnlyAsFlex = !runningBacks[i].allowOnlyAsFlex
+      "
+    >
+      Flex Only
+    </mat-slide-toggle>
+
+    <div class="grid h-[56px] self-end items-center delete-icon-button">
+      <button
+        aria-label="remove player button"
+        class="text-red-600"
+        (click)="removePlayerFromPool(rb, position)"
+        matIconButton
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
   </div>
   }
 </div>
@@ -164,7 +223,7 @@
 >
   @for (dst of dsts; let i = $index; track dst.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
     <span class="dst-rank sort-order text-xl">
@@ -176,7 +235,13 @@
         {{ dst.salary | currency : 'USD' : 'symbol' : '1.0-0' }}
 
         <span class="px-1">&bull;</span>
-        <span>{{ dst.gameInfo }}</span>
+        <span>
+          {{ dst.gameInfo }}
+          &bull;
+          {{ dst.projectedPointsAvg | number : '1.0-1' }} Pts &bull;
+          {{ dst.projectedPointsPerDollar | number : '1.3-3' }}
+          <span class="text-xs">PTS/$100</span>
+        </span>
       </span>
     </div>
 
@@ -226,7 +291,19 @@
         </mat-form-field>
       </div>
     </div>
+    <div class="grid h-[56px] self-end items-center delete-icon-button">
+      <button
+        aria-label="remove player button"
+        class="text-red-600"
+        (click)="removePlayerFromPool(dst, position)"
+        matIconButton
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
   </div>
   }
 </div>
-} @else { No Players Selected }
+} @else { Begin by either selecting players individually from above, or click
+"Make Suggested Selections" to automatically add recommended players to your
+pool. }
