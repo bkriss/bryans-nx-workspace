@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SavePlayerModalComponent } from './save-player-modal.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('SavePlayerModalComponent', () => {
   let component: SavePlayerModalComponent;
@@ -8,6 +9,7 @@ describe('SavePlayerModalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SavePlayerModalComponent],
+      providers: [provideHttpClient()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SavePlayerModalComponent);
