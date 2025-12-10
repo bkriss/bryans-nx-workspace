@@ -1,0 +1,49 @@
+@if (player) {
+<div>
+  <span class="mb-1 block text-slate-300">
+    <span class="font-bold">{{ player.nameAbbrev }}</span>
+    &bull;
+    {{ player.teamAbbrev }}
+    &bull;
+    <span
+      [class.wr-text-color]="player.position === position.WR"
+      [class.te-text-color]="player.position === position.TE"
+    >
+      {{ player.position }}
+    </span>
+  </span>
+  <div>
+    <div>
+      <mat-form-field class="w-[90px] mb-0">
+        <mat-label>Min</mat-label>
+        <input
+          min="0"
+          max="70"
+          matInput
+          [value]="player.minOwnershipWhenPairedWithQb"
+          (input)="
+            player.minOwnershipWhenPairedWithQb = $any($event.target).value
+          "
+          type="number"
+        />
+        <span class="pl-1" matTextSuffix>&#37;</span>
+      </mat-form-field>
+
+      <mat-form-field class="ml-2 w-[90px] mb-0">
+        <mat-label>Max</mat-label>
+        <input
+          min="0"
+          max="90"
+          matInput
+          [value]="player.maxOwnershipWhenPairedWithQb"
+          (input)="
+            player.maxOwnershipWhenPairedWithQb = $any($event.target).value
+          "
+          type="number"
+        />
+        <span class="pl-1" matTextSuffix>&#37;</span>
+      </mat-form-field>
+    </div>
+  </div>
+</div>
+}

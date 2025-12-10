@@ -88,9 +88,21 @@ export const draftKingsPlayersWithScoringProjections = (
         // TODO: Add replace method for Jr., Sr., III, etc.
         // TODO: Add replace method for D/ST so that we can stop using includes
         const playerNameFromEspnProjections = playerFromProjections.fullName
+          .toLowerCase()
           .replace(/\./g, '')
-          .toLowerCase();
-        const playerNameFromDkSalaries = name.replace(/\./g, '').toLowerCase();
+          .replace(/ /g, '')
+          .replace('d/st', '')
+          .replace('jr', '')
+          .replace('sr', '')
+          .replace('iii', '');
+        const playerNameFromDkSalaries = name
+          .toLowerCase()
+          .replace(/\./g, '')
+          .replace(/ /g, '')
+          .replace('d/st', '')
+          .replace('jr', '')
+          .replace('sr', '')
+          .replace('iii', '');
 
         return (
           teamAbbrev === playerFromProjections.teamAbbrev &&

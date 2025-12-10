@@ -16,10 +16,8 @@ Run `nx test dfs` to execute the unit tests.
 
 ## TODO: Next Steps
 
-1. Update Cloud function to get other projection data
-2. Include total projected points (not PPD) for each lineup when calculating lineup score. Factor in both DFS Pass projections and ESPN.
-   If no TE found when generating lineups, consider ignoring ownership limits and trying again?
-   If no flex found when generating lineups, consider ignoring ownership limits for WRs and trying again?
+1. Address TODOs in available-players.utils
+2. Get qb-pass-catcher-ownership component working so that I can customize ownership for pass catchers playing with/against lineup's QB
 3. Add logic to set logical usages for pass catchers when they're teammates/opponents of QB
 4. Create new component for Slate info cards in slate-setup-page to reduce duplicate code
 5. Implement better error handling

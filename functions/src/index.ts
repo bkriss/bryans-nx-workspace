@@ -127,7 +127,7 @@ export const renderFantasyFootballersScoringProjectionsAsJson = (
 function buildFantasyFilter(
   season: number,
   week: number,
-  limit = 500
+  limit = 750
 ): FantasyFilter {
   return {
     players: {
@@ -248,12 +248,21 @@ export const simplifyEspnReturnData = (
           // TODO: Add replace method for Jr., Sr., III, etc.
           // TODO: Add replace method for D/ST so that we can stop using includes
           const playerNameFromEspnProjections = player.fullName
+            .toLowerCase()
             .replace(/\./g, '')
-            .toLowerCase();
+            .replace(/ /g, '')
+            .replace('d/st', '')
+            .replace('jr', '')
+            .replace('sr', '')
+            .replace('iii', '');
           const playerNameFromFantasyFootballersProjections = p.name
+            .toLowerCase()
             .replace(/\./g, '')
-            .toLowerCase();
-
+            .replace(/ /g, '')
+            .replace('d/st', '')
+            .replace('jr', '')
+            .replace('sr', '')
+            .replace('iii', '');
           // TODO: Change to playerNameFromEspnProjections === playerNameFromFantasyFootballersProjections once replacements are added
           return playerNameFromEspnProjections.includes(
             playerNameFromFantasyFootballersProjections

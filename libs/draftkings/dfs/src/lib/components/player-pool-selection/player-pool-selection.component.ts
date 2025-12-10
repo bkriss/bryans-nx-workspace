@@ -7,6 +7,7 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -18,7 +19,7 @@ import {
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatListModule } from '@angular/material/list';
-import { MatStepperModule } from '@angular/material/stepper';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -57,6 +58,7 @@ import { QbPassCatcherOwnershipComponent } from '../qb-pass-catcher-ownership/qb
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
+  @ViewChild('stepper') stepper: MatStepper | undefined;
   private readonly router = inject(Router);
   private readonly _formBuilder = inject(FormBuilder);
   private readonly playerSelectionStore = inject(PlayerSelectionStore);
@@ -106,13 +108,13 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   rbSelectionFormGroup = this._formBuilder.group({
     rbPoolCtrl: [
       this.selectedRunningBacks() as RunningBack[],
-      [Validators.required, Validators.minLength(7), Validators.maxLength(15)],
+      [Validators.required, Validators.minLength(8), Validators.maxLength(16)],
     ],
   });
   wrSelectionFormGroup = this._formBuilder.group({
     wrPoolCtrl: [
       this.selectedWideReceivers() as PassCatcher[],
-      [Validators.required, Validators.minLength(18), Validators.maxLength(40)],
+      [Validators.required, Validators.minLength(35), Validators.maxLength(50)],
     ],
   });
   teSelectionFormGroup = this._formBuilder.group({
@@ -172,6 +174,12 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.updateSignalsWhenFormValuesChange();
     this.playerProjectionsStore.loadPlayerScoringProjections();
+
+    // TODO: Set query param when you change steps. E.g., ?step=2 for RB selection step
+    // TODO: Remove timeout and call goToStep based on query param
+    setTimeout(() => {
+      this.goToStep(6);
+    }, 100);
   }
 
   // TODO: Remove ngOnDestroy and refactor once Signal Forms is stable
@@ -181,6 +189,12 @@ export class PlayerPoolSelectionComponent implements OnInit, OnDestroy {
     this.wrChangesSubscription.unsubscribe();
     this.teChangesSubscription.unsubscribe();
     this.dstChangesSubscription.unsubscribe();
+  }
+
+  goToStep(step: number): void {
+    if (this.stepper) {
+      this.stepper.selectedIndex = step - 1;
+    }
   }
 
   selectPlayersBasedOnProjections(position: Position) {

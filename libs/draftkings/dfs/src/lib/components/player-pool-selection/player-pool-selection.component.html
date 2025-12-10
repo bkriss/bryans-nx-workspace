@@ -2,7 +2,7 @@
   <dfs-select-slate></dfs-select-slate>
 </div> -->
 
-<mat-stepper [linear]="true" #stepper>
+<mat-stepper #stepper>
   <mat-step [stepControl]="qbSelectionFormGroup">
     <form [formGroup]="qbSelectionFormGroup">
       <ng-template matStepLabel>Select 4-6 QBs</ng-template>
@@ -55,7 +55,7 @@
       }
     </form>
   </mat-step>
-  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 7-15 RBs">
+  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 8-16 RBs">
     <form [formGroup]="rbSelectionFormGroup">
       <mat-selection-list
         #rbs
@@ -100,7 +100,7 @@
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="wrSelectionFormGroup" label="Select 30-40 WRs">
+  <mat-step [stepControl]="wrSelectionFormGroup" label="Select 35-50 WRs">
     <form [formGroup]="wrSelectionFormGroup">
       <mat-selection-list
         #wrs
@@ -239,7 +239,7 @@
     </form>
   </mat-step>
   <mat-step>
-    <ng-template matStepLabel>Done</ng-template>
+    <ng-template matStepLabel>QB Stacks</ng-template>
 
     <div>
       <dfs-qb-pass-catcher-ownership></dfs-qb-pass-catcher-ownership>
