@@ -10,8 +10,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+
 import {
   DraftKingsEntry,
   Player,
@@ -26,6 +28,7 @@ import {
   downloadCsvFile,
   renderDraftKingsEntriesAsJson,
 } from '../../utils';
+import { DeleteConfirmationModalComponent } from '../delete-confirmation-modal/delete-confirmation-modal.component';
 
 @Component({
   imports: [CommonModule, MatButtonModule, MatIconModule, MatTableModule],
@@ -34,6 +37,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntriesComponent {
+  readonly dialog = inject(MatDialog);
   private readonly slatesStore = inject(SlatesStore);
   private readonly lineupsStore = inject(LineupsStore);
   readonly loadingLineups = this.lineupsStore.isLoading;
@@ -243,5 +247,31 @@ export class EntriesComponent {
       .replace('WR3', 'WR');
 
     downloadCsvFile(csv, csvFileName);
+  }
+
+  openLineupDeletionModal(): void {
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      data: {
+        bodyText: 'Are you sure you want to delete all lineups?',
+        headerText: 'Delete Lineups Confirmation',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result === true) {
+        this.deleteLineups();
+      }
+    });
+  }
+
+  deleteLineups(): void {
+    this.lineupsStore.saveLineupsToFirestore({
+      lineupsForQb1: [],
+      lineupsForQb2: [],
+      lineupsForQb3: [],
+      lineupsForQb4: [],
+      lineupsForQb5: [],
+      lineupsForQb6: [],
+    });
   }
 }

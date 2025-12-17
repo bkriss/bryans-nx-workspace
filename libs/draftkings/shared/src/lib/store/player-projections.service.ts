@@ -32,6 +32,7 @@ export interface PlayerProjections {
 export class PlayerProjectionsService {
   private firestore: Firestore = inject(Firestore);
   private functions = inject(Functions);
+
   nflWeeks = [
     {
       week: 1,

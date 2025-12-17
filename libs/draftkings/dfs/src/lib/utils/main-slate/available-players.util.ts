@@ -116,7 +116,6 @@ export const draftKingsPlayersWithScoringProjections = (
   rawDkPlayers: RawDkPlayer[],
   projections: PlayerProjections | null
 ) => {
-  console.log('draftKingsPlayersWithScoringProjections called 1');
   const availablePlayers = {
     quarterbacks: [] as Quarterback[],
     runningBacks: [] as RunningBack[],

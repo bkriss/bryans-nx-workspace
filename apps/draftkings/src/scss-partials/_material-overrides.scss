@@ -16,6 +16,15 @@
   );
 }
 
+.red-button {
+  @include mat.fab-overrides(
+    (
+      foreground-color: white,
+      container-color: #e7000b,
+    )
+  );
+}
+
 mat-expansion-panel {
   border: 1px solid var(--border-color);
 }
@@ -52,7 +61,7 @@ mat-stepper {
 .delete-icon-button {
   @include mat.icon-overrides(
     (
-      color: #e7000b // var(color-red-600),,
+      color: #e7000b,
     )
   );
 }
