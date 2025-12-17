@@ -11,6 +11,19 @@ import {
 
 import { Slate } from '../enums';
 import { SlateData, SlatesService } from './slates.service';
+import { csvToJson } from '../utils';
+
+export interface RawDkPlayer {
+  AvgPointsPerGame: string;
+  'Game Info': string;
+  ID: string;
+  Name: string;
+  'Name + ID': string;
+  Position: string;
+  'Roster Position': string;
+  Salary: string;
+  TeamAbbrev: string;
+}
 
 /**
  * State interface for contest slates
@@ -31,6 +44,7 @@ export interface SlatesState {
 const initialState: SlatesState = {
   currentSlate: Slate.MAIN,
   entries: {
+    [Slate.AFTERNOON_ONLY]: '',
     [Slate.EARLY_ONLY]: '',
     [Slate.MAIN]: '',
     [Slate.SUN_TO_MON]: '',
@@ -42,6 +56,7 @@ const initialState: SlatesState = {
   isLoading: false,
   isSaving: false,
   salaries: {
+    [Slate.AFTERNOON_ONLY]: '',
     [Slate.EARLY_ONLY]: '',
     [Slate.MAIN]: '',
     [Slate.SUN_TO_MON]: '',
@@ -55,14 +70,18 @@ export const SlatesStore = signalStore(
   withState(initialState),
   withComputed((store) => ({
     entriesForCurrentSlate: computed(
+      // TODO: Use csvToJson here?
       () => store.entries()[store.currentSlate()]
     ),
-    salariesForCurrentSlate: computed(
-      () => store.salaries()[store.currentSlate()]
+    rawDkPlayersForCurrentSlate: computed(
+      () => csvToJson(store.salaries()[store.currentSlate()]) as RawDkPlayer[]
     ),
     isSmallSlate: computed(() => {
       const currentSlate = store.currentSlate();
-      return currentSlate === Slate.THANKSGIVING;
+      return (
+        currentSlate === Slate.THANKSGIVING ||
+        currentSlate === Slate.AFTERNOON_ONLY
+      );
     }),
   })),
   withMethods(

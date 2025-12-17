@@ -60,29 +60,29 @@
 .sort-order {
   height: 45px;
   width: 45px;
-  color: white;
+  background-color: var(--border-color);
   border-radius: 50%;
   display: inline-block;
   line-height: 45px;
   text-align: center;
 
   &.qb-rank {
-    background-color: var(--qb-red) !important;
+    color: var(--qb-red);
   }
 
   &.rb-rank {
-    background-color: var(--rb-green) !important;
+    color: var(--rb-green);
   }
 
   &.wr-rank {
-    background-color: var(--wr-blue) !important;
+    color: var(--wr-blue);
   }
 
   &.te-rank {
-    background-color: var(--te-orange) !important;
+    color: var(--te-orange);
   }
 
   &.dst-rank {
-    background-color: var(--dst-brown) !important;
+    color: var(--dst-brown);
   }
 }

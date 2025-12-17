@@ -4,8 +4,20 @@
     Sort Players &amp; Set Preferences Below:
   </h2>
 
-  <div>
-    <button class="mr-2" matFab extended (click)="makeSuggestedSelections()">
+  <div class="grid grid-flow-col gap-2">
+    @if (position !== positionEnum.QB) {
+    <span class="px-2 self-end">
+      <span class="text-base text-slate-300">Total Max Usage: </span>
+      <span class="font-bold text-xl">
+        {{
+          position === positionEnum.RB
+            ? totalMaxOwnershipForRunningBacks()
+            : totalMaxOwnershipForDefenses()
+        }}%
+      </span>
+    </span>
+    }
+    <button matFab extended (click)="makeSuggestedSelections()">
       <mat-icon>check_box</mat-icon>
       Make Suggested Selections
     </button>
@@ -29,7 +41,7 @@
     class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
-    <span class="qb-rank sort-order text-xl">
+    <span class="qb-rank sort-order text-2xl">
       {{ i + 1 }}
     </span>
     <div class="ml-1">
@@ -138,10 +150,10 @@
 >
   @for (rb of runningBacks; let i = $index; track rb.id) {
   <div
-    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto_auto] gap-4 items-center sorted-player"
+    class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
-    <span class="rb-rank sort-order text-xl shadow-md shadow-gray-800">
+    <span class="rb-rank sort-order text-2xl shadow-md shadow-gray-800">
       {{ i + 1 }}
     </span>
     <div class="ml-1">
@@ -173,7 +185,46 @@
       />
     </mat-form-field>
 
-    <mat-slide-toggle
+    <div>
+      <mat-label class="block mb-1 text-center text-gray-300">
+        General Usage
+      </mat-label>
+
+      <div>
+        <mat-form-field class="w-[90px] mb-0">
+          <mat-label>Min</mat-label>
+          <input
+            min="0"
+            max="70"
+            matInput
+            [value]="runningBacks[i].minOwnershipPercentage"
+            (input)="
+              runningBacks[i].minOwnershipPercentage = $any($event.target).value
+            "
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+
+        <mat-form-field class="ml-2 w-[90px] mb-0">
+          <mat-label>Max</mat-label>
+          <input
+            (change)="updateOwnership()"
+            min="0"
+            max="90"
+            matInput
+            [value]="runningBacks[i].maxOwnershipPercentage"
+            (input)="
+              runningBacks[i].maxOwnershipPercentage = $any($event.target).value
+            "
+            type="number"
+          />
+          <span class="pl-1" matTextSuffix>&#37;</span>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- <mat-slide-toggle
       name="allowRBFromOpposingTeam"
       [checked]="runningBacks[i].allowRBFromOpposingTeam"
       (change)="
@@ -182,9 +233,9 @@
       "
     >
       Allow RB From Opponent
-    </mat-slide-toggle>
+    </mat-slide-toggle> -->
 
-    <mat-slide-toggle
+    <!-- <mat-slide-toggle
       name="useAsAlternate"
       [checked]="runningBacks[i].useAsAlternate"
       (change)="
@@ -192,17 +243,30 @@
       "
     >
       Use As Alternate
-    </mat-slide-toggle>
+    </mat-slide-toggle> -->
 
-    <mat-slide-toggle
-      name="allowOnlyAsFlex"
-      [checked]="runningBacks[i].allowOnlyAsFlex"
-      (change)="
-        runningBacks[i].allowOnlyAsFlex = !runningBacks[i].allowOnlyAsFlex
-      "
-    >
-      Flex Only
-    </mat-slide-toggle>
+    <div class="gap-2 grid self-end">
+      <mat-slide-toggle
+        name="onlyUseInLargerFieldContests"
+        [checked]="runningBacks[i].onlyUseInLargerFieldContests"
+        (change)="
+          runningBacks[i].onlyUseInLargerFieldContests =
+            !runningBacks[i].onlyUseInLargerFieldContests
+        "
+      >
+        Large Field Only
+      </mat-slide-toggle>
+
+      <mat-slide-toggle
+        name="allowOnlyAsFlex"
+        [checked]="runningBacks[i].allowOnlyAsFlex"
+        (change)="
+          runningBacks[i].allowOnlyAsFlex = !runningBacks[i].allowOnlyAsFlex
+        "
+      >
+        Flex Only
+      </mat-slide-toggle>
+    </div>
 
     <div class="grid h-[56px] self-end items-center delete-icon-button">
       <button
@@ -228,7 +292,7 @@
     class="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center sorted-player"
     cdkDrag
   >
-    <span class="dst-rank sort-order text-xl">
+    <span class="dst-rank sort-order text-2xl">
       {{ i + 1 }}
     </span>
     <div class="ml-1">
@@ -282,6 +346,7 @@
         <mat-form-field class="ml-2 w-[90px] mb-0">
           <mat-label>Max</mat-label>
           <input
+            (change)="updateOwnership()"
             min="0"
             max="90"
             matInput

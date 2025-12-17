@@ -1,7 +1,17 @@
 <div class="p-4">
   <div class="grid justify-between gap-1 grid-flow-col mb-4">
     <h1 class="text-2xl self-end">Slate Setup</h1>
-    <dfs-select-slate></dfs-select-slate>
+
+    <div class="grid gap-2 grid-flow-col">
+      <dk-shared-file-upload-button
+        [allowMultipleFiles]="true"
+        [buttonStyle]="'primary'"
+        [buttonText]="'Upload Projections'"
+        (handleFileSelection)="handleProjectionsCsvBatch($event)"
+        [isButtonDisabled]="isLoading() || isSaving()"
+      ></dk-shared-file-upload-button>
+      <dfs-select-slate></dfs-select-slate>
+    </div>
   </div>
 
   <p class="mb-4 note">
@@ -60,38 +70,24 @@
 
       <div class="grid gap-2 grid-flow-col justify-center">
         <!-- Salary CSV upload for Main Slate -->
-        <input
-          accept=".csv"
-          type="file"
-          class="hidden"
-          (change)="onFileSelected($event, slateEnum.MAIN, 'salaries')"
-          #mainSalariesInput
-        />
-        <button
-          (click)="mainSalariesInput.click()"
-          [disabled]="isLoading() || isSaving()"
-          matButton
-        >
-          <mat-icon>upload_file</mat-icon>
-          Upload DKSalaries
-        </button>
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKSalaries'"
+          [isButtonDisabled]="isLoading() || isSaving()"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.MAIN, 'salaries')
+          "
+        ></dk-shared-file-upload-button>
 
         <!-- Entries CSV upload for Main Slate -->
-        <input
-          accept=".csv"
-          type="file"
-          class="hidden"
-          (change)="onFileSelected($event, slateEnum.MAIN, 'entries')"
-          #mainEntriesInput
-        />
-        <button
-          matButton
-          (click)="mainEntriesInput.click()"
-          [disabled]="isLoading() || isSaving()"
-        >
-          <mat-icon>upload_file</mat-icon>
-          Upload DKEntries
-        </button>
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKEntries'"
+          [isButtonDisabled]="isLoading() || isSaving()"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.MAIN, 'entries')
+          "
+        ></dk-shared-file-upload-button>
       </div>
 
       <div class="grid gap-2 grid-flow-col justify-center"></div>
@@ -135,38 +131,87 @@
 
       <div class="grid gap-2 grid-flow-col justify-center">
         <!-- Salary CSV upload for Early Only Slate -->
-        <input
-          accept=".csv"
-          type="file"
-          class="hidden"
-          (change)="onFileSelected($event, slateEnum.EARLY_ONLY, 'salaries')"
-          #earlyOnlySalariesInput
-        />
-        <button
-          (click)="earlyOnlySalariesInput.click()"
-          [disabled]="isLoading() || isSaving()"
-          matButton
-        >
-          <mat-icon>upload_file</mat-icon>
-          Upload DKSalaries
-        </button>
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKSalaries'"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.EARLY_ONLY, 'salaries')
+          "
+          [isButtonDisabled]="isLoading() || isSaving()"
+        ></dk-shared-file-upload-button>
 
         <!-- Entries CSV upload for Early Only Slate -->
-        <input
-          accept=".csv"
-          type="file"
-          class="hidden"
-          (change)="onFileSelected($event, slateEnum.EARLY_ONLY, 'entries')"
-          #earlyOnlyEntriesInput
-        />
-        <button
-          matButton
-          (click)="earlyOnlyEntriesInput.click()"
-          [disabled]="isLoading() || isSaving()"
-        >
-          <mat-icon>upload_file</mat-icon>
-          Upload DKEntries
-        </button>
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKEntries'"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.EARLY_ONLY, 'entries')
+          "
+          [isButtonDisabled]="isLoading() || isSaving()"
+        ></dk-shared-file-upload-button>
+      </div>
+    </div>
+
+    <!-- AFTERNOON ONLY -->
+    <div class="slate-card">
+      <h3 class="text-lg mb-2 slate-title">Afternoon Only</h3>
+      <p class="mb-4">
+        If you entered contests in the
+        <span class="italic">afternoon only</span> slate, you can upload your
+        CSV files below.
+      </p>
+
+      @if (isLoading() ) {
+      <p>Loading upload statuses...</p>
+      } @else {
+
+      <ul class="list-disc mb-4 ml-4">
+        <li class="py-1">
+          DKSalaries:
+
+          <span
+            [class.text-green-500]="salaries()[slateEnum.AFTERNOON_ONLY]"
+            [class.text-red-500]="!salaries()[slateEnum.AFTERNOON_ONLY]"
+          >
+            {{
+              salaries()[slateEnum.AFTERNOON_ONLY] ? 'Uploaded' : 'Not Uploaded'
+            }}
+          </span>
+        </li>
+        <li class="py-1">
+          DKEntries:
+          <span
+            [class.text-green-500]="entries()[slateEnum.AFTERNOON_ONLY]"
+            [class.text-red-500]="!entries()[slateEnum.AFTERNOON_ONLY]"
+          >
+            {{
+              entries()[slateEnum.AFTERNOON_ONLY] ? 'Uploaded' : 'Not Uploaded'
+            }}
+          </span>
+        </li>
+      </ul>
+      }
+
+      <div class="grid gap-2 grid-flow-col justify-center">
+        <!-- Salary CSV upload for Afternoon Only Slate -->
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKSalaries'"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.AFTERNOON_ONLY, 'salaries')
+          "
+          [isButtonDisabled]="isLoading() || isSaving()"
+        ></dk-shared-file-upload-button>
+
+        <!-- Entries CSV upload for Afternoon Only Slate -->
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKEntries'"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.AFTERNOON_ONLY, 'entries')
+          "
+          [isButtonDisabled]="isLoading() || isSaving()"
+        ></dk-shared-file-upload-button>
       </div>
     </div>
 
@@ -208,38 +253,24 @@
 
       <div class="grid gap-2 grid-flow-col justify-center">
         <!-- Salary CSV upload for Sun-Mon Slate -->
-        <input
-          accept=".csv"
-          type="file"
-          class="hidden"
-          (change)="onFileSelected($event, slateEnum.SUN_TO_MON, 'salaries')"
-          #sunMonSalariesInput
-        />
-        <button
-          (click)="sunMonSalariesInput.click()"
-          [disabled]="isLoading() || isSaving()"
-          matButton
-        >
-          <mat-icon>upload_file</mat-icon>
-          Upload DKSalaries
-        </button>
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKSalaries'"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.SUN_TO_MON, 'salaries')
+          "
+          [isButtonDisabled]="isLoading() || isSaving()"
+        ></dk-shared-file-upload-button>
 
         <!-- Entries CSV upload for Sun-Mon Slate -->
-        <input
-          accept=".csv"
-          type="file"
-          class="hidden"
-          (change)="onFileSelected($event, slateEnum.SUN_TO_MON, 'entries')"
-          #sunMonEntriesInput
-        />
-        <button
-          matButton
-          (click)="sunMonEntriesInput.click()"
-          [disabled]="isLoading() || isSaving()"
-        >
-          <mat-icon>upload_file</mat-icon>
-          Upload DKEntries
-        </button>
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKEntries'"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.SUN_TO_MON, 'entries')
+          "
+          [isButtonDisabled]="isLoading() || isSaving()"
+        ></dk-shared-file-upload-button>
       </div>
     </div>
 
@@ -283,39 +314,23 @@
       }
 
       <div class="grid gap-2 grid-flow-col justify-center">
-        <!-- Salary CSV upload for Thanksgiving Slate -->
-        <input
-          accept=".csv"
-          type="file"
-          class="hidden"
-          (change)="onFileSelected($event, slateEnum.THANKSGIVING, 'salaries')"
-          #thanksgivingSalariesInput
-        />
-        <button
-          (click)="thanksgivingSalariesInput.click()"
-          [disabled]="isLoading() || isSaving()"
-          matButton
-        >
-          <mat-icon>upload_file</mat-icon>
-          Upload DKSalaries
-        </button>
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKSalaries'"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.THANKSGIVING, 'salaries')
+          "
+          [isButtonDisabled]="isLoading() || isSaving()"
+        ></dk-shared-file-upload-button>
 
-        <!-- Entries CSV upload for Thanksgiving Slate -->
-        <input
-          accept=".csv"
-          type="file"
-          class="hidden"
-          (change)="onFileSelected($event, slateEnum.THANKSGIVING, 'entries')"
-          #thanksgivingEntriesInput
-        />
-        <button
-          matButton
-          (click)="thanksgivingEntriesInput.click()"
-          [disabled]="isLoading() || isSaving()"
-        >
-          <mat-icon>upload_file</mat-icon>
-          Upload DKEntries
-        </button>
+        <dk-shared-file-upload-button
+          [buttonStyle]="'secondary'"
+          [buttonText]="'Upload DKEntries'"
+          (handleFileSelection)="
+            onFileSelected($event, slateEnum.THANKSGIVING, 'entries')
+          "
+          [isButtonDisabled]="isLoading() || isSaving()"
+        ></dk-shared-file-upload-button>
       </div>
     </div>
   </div>

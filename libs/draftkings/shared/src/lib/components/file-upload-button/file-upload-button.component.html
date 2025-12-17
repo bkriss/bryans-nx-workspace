@@ -1,0 +1,25 @@
+<input
+  accept=".csv"
+  type="file"
+  class="hidden"
+  (change)="handleFileSelection.emit($event)"
+  [attr.multiple]="allowMultipleFiles"
+  #hiddenInput
+/>
+
+@if (buttonStyle === 'primary') {
+<button
+  (click)="hiddenInput.click()"
+  [disabled]="isButtonDisabled"
+  matFab
+  extended
+>
+  <mat-icon>upload_file</mat-icon>
+  {{ buttonText }}
+</button>
+} @else {
+<button (click)="hiddenInput.click()" [disabled]="isButtonDisabled" matButton>
+  <mat-icon>upload_file</mat-icon>
+  {{ buttonText }}
+</button>
+}

@@ -1,4 +1,5 @@
 // TODO: Add validation that forces the max ownership percentages to total 100% for each QB
+// TODO: Consider refactoring this compomnent and/or child component once Signal Forms are available
 import {
   ChangeDetectionStrategy,
   Component,
@@ -15,7 +16,6 @@ import { MatInputModule } from '@angular/material/input';
 import {
   PassCatcher,
   PlayerSelectionStore,
-  Position,
 } from '@bryans-nx-workspace/draftkings-shared';
 import { PassCatcherOwnershipComponent } from '../pass-catcher-ownership/pass-catcher-ownership.component';
 
@@ -174,6 +174,20 @@ export class QbPassCatcherOwnershipComponent {
   }
 
   setOwnershipForPassCatchersWithOrAgainstQb(): void {
+    const havePassCatchersAlreadyBeenUpdated = this.selectedPassCatchers().some(
+      (pc) =>
+        (pc.maxOwnershipWhenPairedWithQb &&
+          pc.maxOwnershipWhenPairedWithQb > 0) ||
+        (pc.minOwnershipWhenPairedWithQb &&
+          pc.minOwnershipWhenPairedWithQb > 0) ||
+        (pc.maxOwnershipWhenPairedWithOpposingQb &&
+          pc.maxOwnershipWhenPairedWithOpposingQb > 0) ||
+        (pc.minOwnershipWhenPairedWithOpposingQb &&
+          pc.minOwnershipWhenPairedWithOpposingQb > 0)
+    );
+
+    if (havePassCatchersAlreadyBeenUpdated) return;
+
     const allPassCatchers = [
       ...this.selectedWideReceivers(),
       ...this.selectedTightEnds(),
@@ -233,7 +247,22 @@ export class QbPassCatcherOwnershipComponent {
   }
 
   savePassCatchers(): void {
-    console.log('selectedPassCatchers()', this.selectedPassCatchers());
-    // this.playerSelectionStore.saveSelectedPlayersToFirestore(Position.TE);
+    const updatedWideReceivers = this.selectedWideReceivers().map((wr) => {
+      const updatedWideReceiver = this.selectedPassCatchers().find(
+        (selectedPassCatcher) => selectedPassCatcher.id === wr.id
+      );
+      return updatedWideReceiver ? updatedWideReceiver : wr;
+    });
+
+    const updatedTightEnds = this.selectedTightEnds().map((te) => {
+      const updatedTightEnd = this.selectedPassCatchers().find(
+        (selectedPassCatcher) => selectedPassCatcher.id === te.id
+      );
+      return updatedTightEnd ? updatedTightEnd : te;
+    });
+
+    this.playerSelectionStore.setWideReceivers(updatedWideReceivers);
+    this.playerSelectionStore.setTightEnds(updatedTightEnds);
+    this.playerSelectionStore.saveSelectedPlayersToFirestore('PassCatchers');
   }
 }

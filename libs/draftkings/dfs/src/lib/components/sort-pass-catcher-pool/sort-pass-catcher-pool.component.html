@@ -4,8 +4,19 @@
     Sort Players &amp; Set Preferences Below:
   </h2>
 
-  <div>
-    <button class="mr-2" matFab extended (click)="makeSuggestedSelections()">
+  <div class="grid grid-flow-col gap-2">
+    <span class="px-2 self-end">
+      <span class="text-base text-slate-300">Total Max Usage: </span>
+      <span class="font-bold text-xl">
+        {{
+          position === positionEnum.WR
+            ? totalMaxOwnershipForWideReceivers()
+            : totalMaxOwnershipForTightEnds()
+        }}%
+      </span>
+    </span>
+
+    <button matFab extended (click)="makeSuggestedSelections()">
       <mat-icon>check_box</mat-icon>
       Make Suggested Selections
     </button>
@@ -29,7 +40,7 @@
     cdkDrag
   >
     <span
-      class="sort-order text-xl"
+      class="sort-order text-2xl"
       [class.wr-rank]="position === 'WR'"
       [class.te-rank]="position === 'TE'"
     >
@@ -88,6 +99,7 @@
         <mat-form-field class="ml-2 w-[90px] mb-0">
           <mat-label>Max</mat-label>
           <input
+            (change)="updateOwnership()"
             min="0"
             max="90"
             matInput

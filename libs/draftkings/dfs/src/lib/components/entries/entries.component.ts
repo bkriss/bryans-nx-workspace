@@ -39,7 +39,7 @@ export class EntriesComponent {
   readonly loadingLineups = this.lineupsStore.isLoading;
   readonly loadingSlates = this.slatesStore.isLoading;
 
-  currentSlate = this.slatesStore.currentSlate();
+  currentSlate = this.slatesStore.currentSlate;
   draftKingsEntries = this.slatesStore.entriesForCurrentSlate;
   isLoading = computed(() => this.loadingSlates() || this.loadingLineups());
   lineupsForQb1 = this.lineupsStore.lineupsForQb1;
@@ -227,9 +227,11 @@ export class EntriesComponent {
     });
 
     let csvFileName = 'draftkings-entries-main-slate.csv';
-    if (this.currentSlate === Slate.EARLY_ONLY) {
+    if (this.currentSlate() === Slate.EARLY_ONLY) {
       csvFileName = csvFileName.replace('main-slate', 'early-only');
-    } else if (this.currentSlate === Slate.SUN_TO_MON) {
+    } else if (this.currentSlate() === Slate.AFTERNOON_ONLY) {
+      csvFileName = csvFileName.replace('main-slate', 'afternoon-only');
+    } else if (this.currentSlate() === Slate.SUN_TO_MON) {
       csvFileName = csvFileName.replace('main-slate', 'sun-to-mon');
     }
 

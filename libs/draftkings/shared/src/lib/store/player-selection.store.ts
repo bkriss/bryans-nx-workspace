@@ -63,6 +63,39 @@ export const PlayerSelectionStore = signalStore(
         store.tightEnds().length > 0 &&
         store.defenses().length > 0
     ),
+
+    totalMaxOwnershipForRunningBacks: computed(() =>
+      store
+        .runningBacks()
+        .reduce(
+          (total, player) => total + Number(player.maxOwnershipPercentage),
+          0
+        )
+    ),
+    totalMaxOwnershipForWideReceivers: computed(() =>
+      store
+        .wideReceivers()
+        .reduce(
+          (total, player) => total + Number(player.maxOwnershipPercentage),
+          0
+        )
+    ),
+    totalMaxOwnershipForTightEnds: computed(() =>
+      store
+        .tightEnds()
+        .reduce(
+          (total, player) => total + Number(player.maxOwnershipPercentage),
+          0
+        )
+    ),
+    totalMaxOwnershipForDefenses: computed(() =>
+      store
+        .defenses()
+        .reduce(
+          (total, player) => total + Number(player.maxOwnershipPercentage),
+          0
+        )
+    ),
   })),
 
   withMethods(
@@ -135,7 +168,9 @@ export const PlayerSelectionStore = signalStore(
           )
           .subscribe();
       },
-      saveSelectedPlayersToFirestore(position: Position): void {
+      saveSelectedPlayersToFirestore(
+        position: Position | 'PassCatchers'
+      ): void {
         const currentSlate: Slate = slatesStore.currentSlate();
         let partial: Partial<PlayerPoolSelections> = {};
 
@@ -151,6 +186,12 @@ export const PlayerSelectionStore = signalStore(
             break;
           case Position.TE:
             partial = { tightEnds: store.tightEnds() };
+            break;
+          case 'PassCatchers':
+            partial = {
+              wideReceivers: store.wideReceivers(),
+              tightEnds: store.tightEnds(),
+            };
             break;
           case Position.DST:
             partial = { defenses: store.defenses() };

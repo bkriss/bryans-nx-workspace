@@ -33,6 +33,10 @@ export class SelectSlateComponent {
       id: Slate.EARLY_ONLY,
     },
     {
+      name: 'Afternoon Only',
+      id: Slate.AFTERNOON_ONLY,
+    },
+    {
       name: 'Sun-Mon',
       id: Slate.SUN_TO_MON,
     },

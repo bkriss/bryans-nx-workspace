@@ -1,24 +1,12 @@
 import {
-  csvToJson,
   PassCatcher,
   Player,
   Quarterback,
   RunningBack,
   PlayerProjections,
-  Position,
+  PlayerScoringProjection,
+  RawDkPlayer,
 } from '@bryans-nx-workspace/draftkings-shared';
-
-interface RawPlayer {
-  AvgPointsPerGame: string;
-  'Game Info': string;
-  ID: string;
-  Name: string;
-  'Name + ID': string;
-  Position: string;
-  'Roster Position': string;
-  Salary: string;
-  TeamAbbrev: string;
-}
 
 const renderLastName = (fullName: string): string => {
   const brokenUpName = fullName.split(' ');
@@ -31,8 +19,101 @@ const renderLastName = (fullName: string): string => {
   return lastName;
 };
 
+const simplifyText = (text: string): string =>
+  text
+    .toLowerCase()
+    .replace(/\./g, '')
+    .replace(/ /g, '')
+    .replace('d/st', '')
+    .replace('jr', '')
+    .replace('sr', '')
+    .replace('ii', '')
+    .replace('iii', '')
+    .replace('mitchell', 'mitch');
+
+const findDkPlayer = (
+  playerFromScoringProjections: PlayerScoringProjection,
+  rawDkPlayers: RawDkPlayer[],
+  teamsInThisSlate: Set<string>
+): Player | null => {
+  const dkPlayer = rawDkPlayers.find((rawPlayer: RawDkPlayer) => {
+    const teamAbbrev = rawPlayer.TeamAbbrev;
+
+    const playerNameFromScoringProjections = simplifyText(
+      playerFromScoringProjections.fullName
+    );
+    const playerNameFromDkSalaries = simplifyText(rawPlayer.Name);
+
+    return (
+      teamAbbrev === playerFromScoringProjections.teamAbbrev &&
+      playerNameFromScoringProjections === playerNameFromDkSalaries
+    );
+  });
+
+  let player: Player | null = null;
+
+  if (
+    !dkPlayer &&
+    teamsInThisSlate.has(playerFromScoringProjections.teamAbbrev)
+  ) {
+    console.warn(
+      `DK Player not found for ${playerFromScoringProjections.fullName} - ${playerFromScoringProjections.teamAbbrev}`
+    );
+    return null;
+  }
+
+  if (dkPlayer) {
+    const firstName = dkPlayer.Name.split(' ')[0];
+    const lastName = renderLastName(dkPlayer.Name);
+    const nameAbbrev =
+      dkPlayer.Position !== 'DST'
+        ? `${firstName?.[0]}. ${lastName}`
+        : dkPlayer.Name;
+    const gameInfo = dkPlayer['Game Info'].split(' ')[0];
+    const opposingTeamAbbrev =
+      gameInfo.split('@')[0] !== dkPlayer.TeamAbbrev
+        ? gameInfo.split('@')[0]
+        : gameInfo.split('@')[1];
+
+    const name = dkPlayer.Name;
+    const salary = parseInt(dkPlayer.Salary, 10);
+    const teamAbbrev = dkPlayer.TeamAbbrev;
+
+    const projectedPointsAvg =
+      playerFromScoringProjections?.projectedPointsAvg ?? 0;
+    const projectedPointsEspn =
+      playerFromScoringProjections?.projectedPointsEspn ?? 0;
+    const projectedPointsFantasyFootballers =
+      playerFromScoringProjections?.projectedPointsFantasyFootballers ?? 0;
+    const projectedPointsPerDollar = Number(
+      ((projectedPointsAvg / salary) * 100).toFixed(4)
+    );
+
+    player = {
+      gameInfo,
+      gradeOutOfTen: 0,
+      id: dkPlayer.ID,
+      isSelectedForPlayerPool: false,
+      maxOwnershipPercentage: 0,
+      minOwnershipPercentage: 0,
+      name,
+      nameAbbrev,
+      opposingTeamAbbrev,
+      position: dkPlayer.Position,
+      projectedPointsAvg,
+      projectedPointsEspn,
+      projectedPointsFantasyFootballers,
+      projectedPointsPerDollar,
+      salary,
+      teamAbbrev,
+    };
+  }
+
+  return player;
+};
+
 export const draftKingsPlayersWithScoringProjections = (
-  playerSalaries: string,
+  rawDkPlayers: RawDkPlayer[],
   projections: PlayerProjections | null
 ) => {
   console.log('draftKingsPlayersWithScoringProjections called 1');
@@ -44,168 +125,91 @@ export const draftKingsPlayersWithScoringProjections = (
     defenses: [] as Player[],
   };
 
-  if (!playerSalaries?.length || !projections) return availablePlayers;
+  if (!rawDkPlayers?.length || !projections) return availablePlayers;
 
-  console.log('draftKingsPlayersWithScoringProjections called 2');
-
-  const teamsPlayingInThisSlate: Set<string> = new Set<string>();
-  const playerSalariesJson = csvToJson(playerSalaries);
-  playerSalariesJson.forEach((line: RawPlayer) => {
-    teamsPlayingInThisSlate.add(line.TeamAbbrev);
+  const teamsInThisSlate = new Set<string>();
+  rawDkPlayers.forEach((player) => {
+    teamsInThisSlate.add(player.TeamAbbrev);
   });
 
-  console.log('playerSalariesJson length: ', playerSalariesJson.length);
+  projections.quarterbacks.forEach((qb) => {
+    const player = findDkPlayer(qb, rawDkPlayers, teamsInThisSlate);
 
-  // TODO: Separate this by position and then slice it so that we limit the number of players we're looping through (currently going though 566)
-
-  playerSalariesJson.forEach((rawPlayer: RawPlayer) => {
-    const firstName = rawPlayer.Name.split(' ')[0];
-    const lastName = renderLastName(rawPlayer.Name);
-    const nameAbbrev =
-      rawPlayer.Position !== 'DST'
-        ? `${firstName?.[0]}. ${lastName}`
-        : rawPlayer.Name;
-    const gameInfo = rawPlayer['Game Info'].split(' ')[0];
-    const opposingTeamAbbrev =
-      gameInfo.split('@')[0] !== rawPlayer.TeamAbbrev
-        ? gameInfo.split('@')[0]
-        : gameInfo.split('@')[1];
-
-    const playerProjections = [
-      ...projections.quarterbacks,
-      ...projections.runningBacks,
-      ...projections.wideReceivers,
-      ...projections.tightEnds,
-      ...projections.dsts,
-    ];
-
-    const name = rawPlayer.Name;
-    const salary = parseInt(rawPlayer.Salary, 10);
-    const teamAbbrev = rawPlayer.TeamAbbrev;
-
-    const matchedPlayerFromDkAndProjections = playerProjections.find(
-      (playerFromProjections) => {
-        // TODO: Add replace method for Jr., Sr., III, etc.
-        // TODO: Add replace method for D/ST so that we can stop using includes
-        const playerNameFromEspnProjections = playerFromProjections.fullName
-          .toLowerCase()
-          .replace(/\./g, '')
-          .replace(/ /g, '')
-          .replace('d/st', '')
-          .replace('jr', '')
-          .replace('sr', '')
-          .replace('iii', '');
-        const playerNameFromDkSalaries = name
-          .toLowerCase()
-          .replace(/\./g, '')
-          .replace(/ /g, '')
-          .replace('d/st', '')
-          .replace('jr', '')
-          .replace('sr', '')
-          .replace('iii', '');
-
-        return (
-          teamAbbrev === playerFromProjections.teamAbbrev &&
-          playerNameFromEspnProjections.includes(playerNameFromDkSalaries)
-        );
-      }
-    );
-
-    // if (
-    //   !matchedPlayerFromDkAndProjections &&
-    //   teamsPlayingInThisSlate.has(teamAbbrev)
-    // ) {
-    //   console.warn(
-    //     `Couldn't find scoring projection for: ${name} (${teamAbbrev})`
-    //   );
-    // }
-
-    const projectedPointsAvg =
-      matchedPlayerFromDkAndProjections?.projectedPointsAvg ?? 0;
-    const projectedPointsEspn =
-      matchedPlayerFromDkAndProjections?.projectedPointsEspn ?? 0;
-    const projectedPointsFantasyFootballers =
-      matchedPlayerFromDkAndProjections?.projectedPointsFantasyFootballers ?? 0;
-
-    const projectedPointsPerDollar = Number(
-      ((projectedPointsAvg / salary) * 100).toFixed(4)
-    );
-
-    const player: Player = {
-      gameInfo,
-      gradeOutOfTen: 0,
-      id: rawPlayer.ID,
-      isSelectedForPlayerPool: false,
-      maxOwnershipPercentage: 30,
-      minOwnershipPercentage: 10,
-      name,
-      nameAbbrev,
-      opposingTeamAbbrev,
-      position: rawPlayer.Position,
-      projectedPointsAvg,
-      projectedPointsEspn,
-      projectedPointsFantasyFootballers,
-      projectedPointsPerDollar,
-      salary,
-      teamAbbrev,
-    };
-
-    const runningBack: RunningBack = {
-      ...player,
-      allowOnlyAsFlex: false,
-      allowRBFromOpposingTeam: false,
-      maxOwnershipPercentage: 35,
-      minOwnershipPercentage: 10,
-      useAsAlternate: false,
-    };
-
-    const quarterback: Quarterback = {
-      ...player,
-      maxNumberOfTeammatePasscatchers: 1,
-      minNumberOfTeammatePasscatchers: 1,
-      maxOwnershipPercentage: 100,
-      minOwnershipPercentage: 100,
-      numberOfLineupsWithThisPlayer: 10,
-      passCatcherStacks: [],
-      requirePlayerFromOpposingTeam: true,
-      sortOrder: 0,
-    };
-
-    const passCatcher: PassCatcher = {
-      ...player,
-      maxOwnershipPercentage: 25,
-      minOwnershipPercentage: 5,
-      maxOwnershipWhenPairedWithQb: 70,
-      minOwnershipWhenPairedWithQb: 50,
-      maxOwnershipWhenPairedWithOpposingQb: 60,
-      minOwnershipWhenPairedWithOpposingQb: 50,
-      onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
-      onlyUseInLargerFieldContests: false,
-    };
-
-    if (player.position === Position.QB) {
-      // return quarterback;
+    if (player) {
+      const quarterback: Quarterback = {
+        ...player,
+        maxNumberOfTeammatePasscatchers: 1,
+        minNumberOfTeammatePasscatchers: 1,
+        maxOwnershipPercentage: 100,
+        minOwnershipPercentage: 100,
+        numberOfLineupsWithThisPlayer: 10,
+        passCatcherStacks: [],
+        requirePlayerFromOpposingTeam: true,
+        sortOrder: 0,
+      };
       availablePlayers.quarterbacks.push(quarterback);
     }
+  });
 
-    if (player.position === Position.RB) {
+  projections.runningBacks.forEach((rb) => {
+    const player = findDkPlayer(rb, rawDkPlayers, teamsInThisSlate);
+    if (player) {
+      const runningBack: RunningBack = {
+        ...player,
+        allowOnlyAsFlex: false,
+        allowRBFromOpposingTeam: false,
+        maxOwnershipPercentage: 35,
+        minOwnershipPercentage: 10,
+        useAsAlternate: false,
+      };
+
       availablePlayers.runningBacks.push(runningBack);
-      // return runningBack;
     }
+  });
 
-    if (player.position === Position.WR) {
+  projections.wideReceivers.forEach((wr) => {
+    const player = findDkPlayer(wr, rawDkPlayers, teamsInThisSlate);
+    if (player) {
+      const passCatcher: PassCatcher = {
+        ...player,
+        maxOwnershipPercentage: 0,
+        minOwnershipPercentage: 0,
+        maxOwnershipWhenPairedWithQb: 0,
+        minOwnershipWhenPairedWithQb: 0,
+        maxOwnershipWhenPairedWithOpposingQb: 0,
+        minOwnershipWhenPairedWithOpposingQb: 0,
+        onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
+        onlyUseInLargerFieldContests: false,
+      };
+
       availablePlayers.wideReceivers.push(passCatcher);
     }
+  });
 
-    if (player.position === Position.TE) {
+  projections.tightEnds.forEach((te) => {
+    const player = findDkPlayer(te, rawDkPlayers, teamsInThisSlate);
+    if (player) {
+      const passCatcher: PassCatcher = {
+        ...player,
+        maxOwnershipPercentage: 0,
+        minOwnershipPercentage: 0,
+        maxOwnershipWhenPairedWithQb: 0,
+        minOwnershipWhenPairedWithQb: 0,
+        maxOwnershipWhenPairedWithOpposingQb: 0,
+        minOwnershipWhenPairedWithOpposingQb: 0,
+        onlyUseIfPartOfStackOrPlayingWithOrAgainstQb: false,
+        onlyUseInLargerFieldContests: false,
+      };
+
       availablePlayers.tightEnds.push(passCatcher);
     }
+  });
 
-    if (player.position === Position.DST) {
+  projections.dsts.forEach((dst) => {
+    const player = findDkPlayer(dst, rawDkPlayers, teamsInThisSlate);
+    if (player) {
       availablePlayers.defenses.push(player);
     }
-
-    // return player;
   });
 
   return availablePlayers;

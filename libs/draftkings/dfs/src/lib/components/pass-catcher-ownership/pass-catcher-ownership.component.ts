@@ -11,6 +11,24 @@ import { PassCatcher, Position } from '@bryans-nx-workspace/draftkings-shared';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PassCatcherOwnershipComponent {
-  @Input() player: PassCatcher | undefined;
+  @Input() minPropertyName:
+    | 'minOwnershipWhenPairedWithQb'
+    | 'minOwnershipWhenPairedWithOpposingQb' = 'minOwnershipWhenPairedWithQb';
+  @Input() maxPropertyName:
+    | 'maxOwnershipWhenPairedWithQb'
+    | 'maxOwnershipWhenPairedWithOpposingQb' = 'maxOwnershipWhenPairedWithQb';
+  @Input({ required: true }) player!: PassCatcher;
   position = Position;
+
+  updateValue(event: Event, minOrMax: 'min' | 'max') {
+    if (minOrMax === 'max') {
+      this.player[this.maxPropertyName] = Number(
+        (event.target as HTMLInputElement).value
+      );
+    } else {
+      this.player[this.minPropertyName] = Number(
+        (event.target as HTMLInputElement).value
+      );
+    }
+  }
 }

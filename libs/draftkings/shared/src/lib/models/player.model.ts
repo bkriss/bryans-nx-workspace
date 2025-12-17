@@ -31,6 +31,7 @@ export interface RunningBack extends Player {
   // TODO: Confirm logic is setup for allowOnlyAsFlex and useAsAlternate
   allowOnlyAsFlex: boolean;
   allowRBFromOpposingTeam: boolean;
+  onlyUseInLargerFieldContests?: boolean;
   useAsAlternate: boolean;
 }
 
