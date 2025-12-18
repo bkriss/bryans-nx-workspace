@@ -49,6 +49,19 @@ export class SortPassCatcherPoolComponentComponent {
   @Input() position: Position = Position.WR;
   @Output() selectPlayersBasedOnProjections = new EventEmitter<Position>();
   private readonly playerSelectionStore = inject(PlayerSelectionStore);
+  positionEnum = Position;
+  totalMaxOwnershipForWideReceivers =
+    this.playerSelectionStore.totalMaxOwnershipForWideReceivers;
+  totalMaxOwnershipForTightEnds =
+    this.playerSelectionStore.totalMaxOwnershipForTightEnds;
+
+  updateOwnership() {
+    if (this.position === Position.WR) {
+      this.playerSelectionStore.setWideReceivers(this.passCatchers);
+    } else {
+      this.playerSelectionStore.setTightEnds(this.passCatchers);
+    }
+  }
 
   dropPassCatcher(event: CdkDragDrop<PassCatcher[]>) {
     moveItemInArray(this.passCatchers, event.previousIndex, event.currentIndex);

@@ -46,12 +46,17 @@ import { calculateGrade } from '../../utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SortPlayerPoolComponent {
-  @Input() position: Position = Position.WR;
+  @Input() position: Position = Position.QB;
   @Input() quarterbacks: Quarterback[] = [];
   @Input() runningBacks: RunningBack[] = [];
   @Input() dsts: Player[] = [];
   @Output() selectPlayersBasedOnProjections = new EventEmitter<Position>();
   private readonly playerSelectionStore = inject(PlayerSelectionStore);
+  positionEnum = Position;
+  totalMaxOwnershipForRunningBacks =
+    this.playerSelectionStore.totalMaxOwnershipForRunningBacks;
+  totalMaxOwnershipForDefenses =
+    this.playerSelectionStore.totalMaxOwnershipForDefenses;
 
   dropQuarterback(event: CdkDragDrop<Quarterback[]>) {
     moveItemInArray(this.quarterbacks, event.previousIndex, event.currentIndex);
@@ -76,19 +81,19 @@ export class SortPlayerPoolComponent {
       let maxOwnershipPercentage = 0;
       let minOwnershipPercentage = 0;
 
-      if (i >= 0 && i <= 2) {
-        maxOwnershipPercentage = 33;
-        minOwnershipPercentage = 25;
+      if (i >= 0 && i <= 3) {
+        maxOwnershipPercentage = 35;
+        minOwnershipPercentage = 27;
       }
 
-      if (i >= 3) {
-        maxOwnershipPercentage = 33 - i;
-        minOwnershipPercentage = 25 - i;
+      if (i === 4 || i === 5) {
+        maxOwnershipPercentage = 30;
+        minOwnershipPercentage = 22;
       }
 
-      if (i >= 7) {
-        maxOwnershipPercentage = 50 - Math.ceil(i * 4);
-        minOwnershipPercentage = 42 - Math.ceil(i * 4);
+      if (i >= 6) {
+        maxOwnershipPercentage = 24 - Math.ceil(i * 2);
+        minOwnershipPercentage = 18 - Math.ceil(i * 2);
       }
 
       maxOwnershipPercentage =
@@ -98,11 +103,11 @@ export class SortPlayerPoolComponent {
 
       return {
         ...rb,
-        allowOnlyAsFlex: i >= 8,
+        allowOnlyAsFlex: i >= 7,
         gradeOutOfTen: calculateGrade(i),
         maxOwnershipPercentage,
         minOwnershipPercentage,
-        useAsAlternate: i === 7,
+        useAsAlternate: i === 6,
       };
     });
 
@@ -164,6 +169,14 @@ export class SortPlayerPoolComponent {
       default:
         console.warn('Unknown position: ', position);
         break;
+    }
+  }
+
+  updateOwnership() {
+    if (this.position === Position.RB) {
+      this.playerSelectionStore.setRunningBacks(this.runningBacks);
+    } else if (this.position === Position.DST) {
+      this.playerSelectionStore.setDefenses(this.dsts);
     }
   }
 }

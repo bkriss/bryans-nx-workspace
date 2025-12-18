@@ -2,7 +2,7 @@
   <dfs-select-slate></dfs-select-slate>
 </div> -->
 
-<mat-stepper [linear]="true" #stepper>
+<mat-stepper #stepper (selectionChange)="stepChanged($event)">
   <mat-step [stepControl]="qbSelectionFormGroup">
     <form [formGroup]="qbSelectionFormGroup">
       <ng-template matStepLabel>Select 4-6 QBs</ng-template>
@@ -55,8 +55,11 @@
       }
     </form>
   </mat-step>
-  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 7-15 RBs">
+  <mat-step [stepControl]="rbSelectionFormGroup" label="Select 8-16 RBs">
     <form [formGroup]="rbSelectionFormGroup">
+      @if (isLoading()) {
+      <div>Loading available players...</div>
+      } @else {
       <mat-selection-list
         #rbs
         class="max-h-[385px] overflow-scroll rounded"
@@ -98,10 +101,14 @@
           Next
         </button>
       </div>
+      }
     </form>
   </mat-step>
-  <mat-step [stepControl]="wrSelectionFormGroup" label="Select 30-40 WRs">
+  <mat-step [stepControl]="wrSelectionFormGroup" label="Select 35-50 WRs">
     <form [formGroup]="wrSelectionFormGroup">
+      @if (isLoading()) {
+      <div>Loading available players...</div>
+      } @else {
       <mat-selection-list
         #wrs
         class="max-h-[385px] overflow-scroll rounded"
@@ -144,10 +151,14 @@
           Next
         </button>
       </div>
+      }
     </form>
   </mat-step>
   <mat-step [stepControl]="teSelectionFormGroup" label="Select 7-15 TEs">
     <form [formGroup]="teSelectionFormGroup">
+      @if (isLoading()) {
+      <div>Loading available players...</div>
+      } @else {
       <mat-selection-list
         #tes
         class="max-h-[385px] overflow-scroll rounded"
@@ -190,10 +201,14 @@
           Next
         </button>
       </div>
+      }
     </form>
   </mat-step>
-  <mat-step [stepControl]="dstSelectionFormGroup" label="Select 8-12 DSTs">
+  <mat-step [stepControl]="dstSelectionFormGroup" label="Select 8-15 DSTs">
     <form [formGroup]="dstSelectionFormGroup">
+      @if (isLoading()) {
+      <div>Loading available players...</div>
+      } @else {
       <mat-selection-list
         #dsts
         class="max-h-[385px] overflow-scroll rounded"
@@ -236,11 +251,14 @@
           Next
         </button>
       </div>
+      }
     </form>
   </mat-step>
   <mat-step>
-    <ng-template matStepLabel>Done</ng-template>
-
+    <ng-template matStepLabel>QB Stacks</ng-template>
+    @if (isLoading()) {
+    <div>Loading available players...</div>
+    } @else {
     <div>
       <dfs-qb-pass-catcher-ownership></dfs-qb-pass-catcher-ownership>
 
@@ -249,5 +267,6 @@
         Generate Lineup Builders
       </button>
     </div>
+    }
   </mat-step>
 </mat-stepper>

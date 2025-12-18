@@ -5,6 +5,17 @@
     </h1>
     <div>
       <button
+        class="mr-2 bg-red-600 red-button"
+        (click)="openLineupDeletionModal()"
+        [disabled]="!entries().length"
+        extended
+        matFab
+      >
+        <mat-icon>delete</mat-icon>
+        Delete Lineups
+      </button>
+
+      <button
         (click)="downloadCsv()"
         [disabled]="!entries().length"
         extended

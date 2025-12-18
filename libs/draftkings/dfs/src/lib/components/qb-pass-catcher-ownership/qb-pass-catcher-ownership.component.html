@@ -1,38 +1,40 @@
-<div>
-  @for (qb of selectedQuarterbacks(); track qb.id) {
+<div class="grid justify-between gap-1 grid-flow-col mb-4">
+  <h1 class="text-2xl self-end">QB Stack Lineup Percentages</h1>
+  <button matFab extended (click)="savePassCatchers()">
+    <mat-icon>save</mat-icon>
+    Save Selections
+  </button>
+</div>
 
-  <div class="mb-2">
-    <h2 class="text-xl mt-4">{{ qb.name }}</h2>
-    <h3 class="text-base my-2">Wide Receivers:</h3>
-    <ul>
-      @for (wr of selectedWideReceivers(); track wr.id) {
+<div class="qb-pass-catcher-ownership-container">
+  @for (stack of quarterbackStacks(); track stack.qb.id) {
 
-      <ng-container>
-        @if (wr.teamAbbrev === qb.teamAbbrev) {
-        <li>
-          {{ wr.name }} | {{ wr.minOwnershipWhenPairedWithQb }} -
-          {{ wr.maxOwnershipWhenPairedWithQb }}
-        </li>
-        }
-      </ng-container>
-
+  <div class="border-b border-[#ccc] p-4">
+    <h2 class="mb-2">
+      <span class="font-bold text-xl">{{ stack.qb.name }}</span> &bull;
+      <span class="text-sm text-slate-300">{{ stack.qb.gameInfo }}</span>
+    </h2>
+    <div class="grid grid-flow-col gap-4 justify-start">
+      @for (player of stack.teammatePassCatchers; let i = $index; track
+      player.id) {
+      <dfs-pass-catcher-ownership
+        [player]="player"
+        minPropertyName="minOwnershipWhenPairedWithQb"
+        maxPropertyName="maxOwnershipWhenPairedWithQb"
+      ></dfs-pass-catcher-ownership>
       }
-    </ul>
+    </div>
 
-    <h3 class="text-base my-2">Tight Ends:</h3>
-    <ul>
-      @for (te of selectedTightEnds(); track te.id) {
-      <ng-container>
-        @if (te.teamAbbrev === qb.teamAbbrev) {
-        <li>
-          {{ te.name }} | {{ te.minOwnershipWhenPairedWithQb }} -
-          {{ te.maxOwnershipWhenPairedWithQb }}
-        </li>
-        }
-      </ng-container>
+    <div class="grid grid-flow-col gap-4 justify-start mt-4">
+      @for (player of stack.opposingPassCatchers; let i = $index; track
+      player.id) {
+      <dfs-pass-catcher-ownership
+        [player]="player"
+        minPropertyName="minOwnershipWhenPairedWithOpposingQb"
+        maxPropertyName="maxOwnershipWhenPairedWithOpposingQb"
+      ></dfs-pass-catcher-ownership>
       }
-    </ul>
+    </div>
   </div>
-
   }
 </div>

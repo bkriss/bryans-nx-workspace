@@ -109,27 +109,30 @@ export const LineupsStore = signalStore(
       },
 
       saveLineupsToFirestore(lineupsPartial: Partial<Lineups>): void {
-        // console.log('lineupsId to save:', lineupsId);
         const currentSlate: Slate = slatesStore.currentSlate();
-        // const lineups: Lineups = {
-        //   lineupsForQb1: store.lineupsForQb1(),
-        //   lineupsForQb2: store.lineupsForQb2(),
-        //   lineupsForQb3: store.lineupsForQb3(),
-        //   lineupsForQb4: store.lineupsForQb4(),
-        //   lineupsForQb5: store.lineupsForQb5(),
-        // };
+
+        let successMessage = `Saved lineups for ${currentSlate
+          .replace('_', ' ')
+          .toLowerCase()} slate`;
+        if (
+          lineupsPartial.lineupsForQb1?.length === 0 &&
+          lineupsPartial.lineupsForQb2?.length === 0 &&
+          lineupsPartial.lineupsForQb3?.length === 0 &&
+          lineupsPartial.lineupsForQb4?.length === 0 &&
+          lineupsPartial.lineupsForQb5?.length === 0 &&
+          lineupsPartial.lineupsForQb6?.length === 0
+        ) {
+          successMessage = `Deleted all lineups for ${currentSlate
+            .replace('_', ' ')
+            .toLowerCase()} slate`;
+        }
 
         patchState(store, { isSaving: true, error: null });
         lineupsService
           .saveLineups(currentSlate, lineupsPartial)
           .pipe(
             tap(() => {
-              _matSnackBar.open(
-                `Saved lineups for ${currentSlate
-                  .replace('_', ' ')
-                  .toLowerCase()} slate`,
-                'Close'
-              );
+              _matSnackBar.open(successMessage, 'Close');
             }),
             catchError((error) => {
               console.error(

@@ -1,6 +1,10 @@
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
+// import type {
+//   FantasyFootballersProjections,
+//   MappedFantasyFootballersPlayer,
+// } from '@bryans-nx-workspace/draftkings-shared';
 
 const admin = require('firebase-admin');
 admin.initializeApp();
@@ -43,18 +47,9 @@ type FantasyFilter = {
     filterStatus?: { value: string[] };
     filterSlotIds?: { value: number[] };
     filterRanksForScoringPeriodIds: { value: number[] };
-    sortAppliedStatTotalForScoringPeriodId?: {
-      sortPriority: number;
-      sortAsc: boolean;
-      value: number;
-    };
+    sortPercOwned?: { sortAsc: boolean; sortPriority: number };
     limit?: number;
     offset?: number;
-    sortAppliedStatTotal: {
-      sortAsc: boolean;
-      sortPriority: number;
-      value: string;
-    };
     sortDraftRanks: {
       sortPriority: number;
       sortAsc: boolean;
@@ -69,65 +64,25 @@ type FantasyFilter = {
   };
 };
 
-interface RawFantasyFootballersProjections {
-  defenses: string;
-  quarterbacks: string;
-  runningBacks: string;
-  tightEnds: string;
-  wideReceivers: string;
-}
-
-interface RawFantasyFootballersPlayer {
-  '"Name"': string;
-  '"PTS"': string;
-  '"Team"': string;
+interface FantasyFootballersProjections {
+  quarterbacks: MappedFantasyFootballersPlayer[];
+  runningBacks: MappedFantasyFootballersPlayer[];
+  wideReceivers: MappedFantasyFootballersPlayer[];
+  tightEnds: MappedFantasyFootballersPlayer[];
+  defenses: MappedFantasyFootballersPlayer[];
 }
 
 interface MappedFantasyFootballersPlayer {
+  id: string;
   name: string;
   projectedPoints: number;
   teamAbbrev: string;
 }
 
-// TODO: Import csvToJson from shared library
-export const csvToJson = (csvString: string): any[] => {
-  const rows = csvString.split('\n');
-  const headers = rows[0].split(',');
-  const jsonData = [];
-
-  for (let i = 1; i < rows.length; i++) {
-    const values = rows[i].split(',');
-    const obj: any = {};
-
-    for (let j = 0; j < headers.length; j++) {
-      const key = headers[j].trim();
-      const value = values[j] ? values[j].trim() : ''; // Handle potential missing values
-      obj[key] = value;
-    }
-
-    jsonData.push(obj);
-  }
-
-  return jsonData;
-};
-
-export const renderFantasyFootballersScoringProjectionsAsJson = (
-  csvData: string
-) =>
-  csvToJson(csvData).map(
-    (player: RawFantasyFootballersPlayer): MappedFantasyFootballersPlayer => {
-      return {
-        name: player['"Name"'].replace(/"/g, ''),
-        projectedPoints: Number(player['"PTS"'].replace(/"/g, '')),
-        teamAbbrev: player['"Team"'].replace(/"/g, ''),
-      };
-    }
-  );
-
 function buildFantasyFilter(
   season: number,
   week: number,
-  limit = 500
+  limit = 750
 ): FantasyFilter {
   return {
     players: {
@@ -136,11 +91,7 @@ function buildFantasyFilter(
       filterRanksForScoringPeriodIds: { value: [week] },
       limit,
       offset: 0,
-      sortAppliedStatTotal: {
-        sortAsc: false,
-        sortPriority: 1,
-        value: `11${season}${week}`, // TODO: Set the first 2 digits dynamically once we know how. Is it the month?
-      },
+      sortPercOwned: { sortAsc: false, sortPriority: 1 },
       sortDraftRanks: { sortPriority: 100, sortAsc: true, value: 'STANDARD' },
       filterRanksForRankTypes: { value: ['PPR'] },
       filterRanksForSlotIds: {
@@ -148,7 +99,13 @@ function buildFantasyFilter(
       },
       filterStatsForTopScoringPeriodIds: {
         value: 2,
-        additionalValue: ['002025', '102025', '002024', '11202511', '022025'],
+        additionalValue: [
+          '002025',
+          '102025',
+          '002024',
+          `11${season}${week}`,
+          '022025',
+        ],
       },
     },
   };
@@ -194,44 +151,47 @@ const findTeamAbbrev = (proTeamId: number): string => {
   return teamAbbrevs[proTeamId] || 'Unknown';
 };
 
+const simplifyText = (text: string): string =>
+  text
+    .toLowerCase()
+    .replace(/\./g, '')
+    .replace(/ /g, '')
+    .replace('d/st', '')
+    .replace('jr', '')
+    .replace('sr', '')
+    .replace('ii', '')
+    .replace('iii', '')
+    .replace('mitchell', 'mitch');
+
 export const simplifyEspnReturnData = (
   espnPlayerData: EspnPlayerData[],
   week: number,
-  fantasyFootballersProjections?: RawFantasyFootballersProjections
+  fantasyFootballersProjections?: FantasyFootballersProjections
 ) => {
   const { quarterbacks, runningBacks, wideReceivers, tightEnds, defenses } =
     fantasyFootballersProjections || {};
 
+  // TODO: Refactor simplifyEspnReturnData to be more efficient. Reference available-players.util.ts for ideas.
   const fantasyFootballersPlayerProjections =
     [] as MappedFantasyFootballersPlayer[];
   if (quarterbacks?.length) {
-    fantasyFootballersPlayerProjections.push(
-      ...renderFantasyFootballersScoringProjectionsAsJson(quarterbacks)
-    );
+    fantasyFootballersPlayerProjections.push(...quarterbacks);
   }
   if (runningBacks?.length) {
-    fantasyFootballersPlayerProjections.push(
-      ...renderFantasyFootballersScoringProjectionsAsJson(runningBacks)
-    );
+    fantasyFootballersPlayerProjections.push(...runningBacks);
   }
   if (wideReceivers?.length) {
-    fantasyFootballersPlayerProjections.push(
-      ...renderFantasyFootballersScoringProjectionsAsJson(wideReceivers)
-    );
+    fantasyFootballersPlayerProjections.push(...wideReceivers);
   }
   if (tightEnds?.length) {
-    fantasyFootballersPlayerProjections.push(
-      ...renderFantasyFootballersScoringProjectionsAsJson(tightEnds)
-    );
+    fantasyFootballersPlayerProjections.push(...tightEnds);
   }
   if (defenses?.length) {
     fantasyFootballersPlayerProjections.push(
-      ...renderFantasyFootballersScoringProjectionsAsJson(defenses).map(
-        (defense) => ({
-          ...defense,
-          name: defense.name.split(' ')[1], // Use "Vikings" instead of "Minnesota Vikings"
-        })
-      )
+      ...defenses.map((defense) => ({
+        ...defense,
+        name: defense.name.split(' ')[1], // Use "Vikings" instead of "Minnesota Vikings"
+      }))
     );
   }
 
@@ -245,17 +205,12 @@ export const simplifyEspnReturnData = (
 
       const fantasyFootballersPlayer = fantasyFootballersPlayerProjections.find(
         (p) => {
-          // TODO: Add replace method for Jr., Sr., III, etc.
-          // TODO: Add replace method for D/ST so that we can stop using includes
-          const playerNameFromEspnProjections = player.fullName
-            .replace(/\./g, '')
-            .toLowerCase();
-          const playerNameFromFantasyFootballersProjections = p.name
-            .replace(/\./g, '')
-            .toLowerCase();
-
-          // TODO: Change to playerNameFromEspnProjections === playerNameFromFantasyFootballersProjections once replacements are added
-          return playerNameFromEspnProjections.includes(
+          const playerNameFromEspnProjections = simplifyText(player.fullName);
+          const playerNameFromFantasyFootballersProjections = simplifyText(
+            p.name
+          );
+          return (
+            playerNameFromEspnProjections ===
             playerNameFromFantasyFootballersProjections
           );
         }
@@ -333,7 +288,7 @@ export const playerScoringProjections = onCall(async (request) => {
 
   try {
     const host = 'https://lm-api-reads.fantasy.espn.com';
-    const path = `/apis/v3/games/ffl/seasons/${season}/segments/0/leagues/${leagueId}/players?scoringPeriodId=${week}&view=kona_player_info`;
+    const path = `/apis/v3/games/ffl/seasons/${season}/segments/0/leagues/${leagueId}/players?scoringPeriodId=${week}&view=kona_player_info&platformVersion=d79639d0989d93b7a7ecbd5f90925b437f3767e0`;
     const apiUrl = `${host}${path}`;
     const filter = buildFantasyFilter(season, week, limit);
     const cookieHeader = `espn_s2=${s2}; SWID=${swid};`;
@@ -372,12 +327,11 @@ export const playerScoringProjections = onCall(async (request) => {
       };
     }
 
-    const configDocRef = admin
+    const projectionsDocRef = admin
       .firestore()
       .collection('projections')
       .doc('draftKings');
-    const fantasyFootballersProjections = await configDocRef.get();
-
+    const fantasyFootballersProjections = await projectionsDocRef.get();
     const data = (await resp.json()) as EspnPlayerData[];
     const simplifiedData = simplifyEspnReturnData(
       data,

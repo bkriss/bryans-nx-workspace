@@ -16,6 +16,44 @@ interface RawEntry {
   WR: string;
 }
 
+export const afternoonOnlyContestSizes = [
+  {
+    name: 'NFL $10K Huddle [Single Entry] (Afternoon Only)',
+    entries: 2378,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $25K Fair Catch [Single Entry] (Afternoon Only)',
+    entries: 2450,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $10K Fair Catch [Single Entry] (Afternoon Only)',
+    entries: 980,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $30K Flea Flicker [$5K to 1st] (Afternoon Only)',
+    entries: 7134,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $5K Screen Pass [3 Entry Max] (Afternoon Only)',
+    entries: 392,
+    topPrize: 1000,
+  },
+  {
+    name: 'NFL $5K Cover Four [5 Entry Max] (Afternoon Only)',
+    entries: 1486,
+    topPrize: 500,
+  },
+  // {
+  //   name: '',
+  //   entries: 0,
+  //   topPrize: 0,
+  // },
+];
+
 export const earlyOnlyContestSizes = [
   {
     name: 'NFL $25K Fair Catch [Single Entry] (Early Only)',
@@ -90,6 +128,21 @@ export const earlyOnlyContestSizes = [
 ];
 
 export const mainSlateContestSizes = [
+  {
+    name: 'NFL $25K Screen Pass [3 Entry Max $5K to 1st]',
+    entries: 1960,
+    topPrize: 5000,
+  },
+  {
+    name: 'NFL $150K Fair Catch [Single Entry]',
+    entries: 1666,
+    topPrize: 2500,
+  },
+  {
+    name: 'NFL $30K Front Four [20 Entry Max]',
+    entries: 8917,
+    topPrize: 3000,
+  },
   {
     name: 'NFL $15K Spy [Single Entry]',
     entries: 166,
@@ -529,6 +582,7 @@ export const thanksgivingContestSizes = [
 ];
 
 export const contestSizes = [
+  ...afternoonOnlyContestSizes,
   ...earlyOnlyContestSizes,
   ...mainSlateContestSizes,
   ...sunToMonContestSizes,

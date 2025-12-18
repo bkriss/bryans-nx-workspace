@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>{{ data.headerText }}</h2>
+<mat-dialog-content class="mat-typography">
+  {{ data.bodyText }}
+  <!-- @if(data.errorMessages.length === 0) {
+  <p>Your lineups are valid!</p>
+  } @else {
+  <h3 class="text-lg mb-4">
+    The following issues were found with your lineup(s):
+  </h3>
+  <ul class="list-disc ml-4">
+    @for (error of data.errorMessages; track error) {
+    <li class="py-1">{{ error }}</li>
+    }
+  </ul>
+  } -->
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button matButton mat-dialog-close (click)="close(false)">Close</button>
+  <button
+    class="red-button bg-red-600"
+    matButton="filled"
+    mat-dialog-close
+    (click)="close(true)"
+  >
+    Yes, Delete all Lineups
+  </button>
+</mat-dialog-actions>
